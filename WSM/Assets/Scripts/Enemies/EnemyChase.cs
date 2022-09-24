@@ -35,6 +35,7 @@ public class EnemyChase : MonoBehaviour
             enemyHealth -= collision.collider.GetComponent<Bullet>().damage;
             if (enemyHealth <= 0)
             {
+                transform.parent.GetComponent<RoomController>().checkEnemyKilled();
                 Destroy(gameObject);
             }
         }

@@ -150,5 +150,5 @@ MonoBehaviour:
   moveSpeed: 10
   invincibilityAfterDamage: 1
   weaponsList: {fileID: 11400000, guid: 75bd8bb901e71904ba857aa489ced5be, type: 2}
-  loseScreen: {fileID: 8171546135851622958, guid: e8807fbf217d41d4a90f7477820c4267, type: 3}
-  HUD: {fileID: 2311604818996662126, guid: 6abbd2e38158ca4428034656e8212c7a, type: 3}
+  loseScreen: {fileID: 0}
+  HUD: {fileID: 0}

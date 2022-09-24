@@ -10,6 +10,8 @@ TagManager:
   - Enemy
   - Bullet
   - EnemyBullet
+  - SmallRoom
+  - Door
   layers:
   - Default
   - TransparentFX
