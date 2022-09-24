@@ -23,7 +23,7 @@ public class PlayerController : MonoBehaviour
         hpMain = HUD.transform.Find("HPMain").GetComponent<HUDHP>();
     }
 
-    void Update()
+    private void Update()
     {
         movement.x = Input.GetAxisRaw("Horizontal");
         movement.y = Input.GetAxisRaw("Vertical");
@@ -38,7 +38,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    void FixedUpdate()
+    private void FixedUpdate()
     {
         rb.MovePosition(rb.position + movement * moveSpeed * Time.fixedDeltaTime);
     }
@@ -47,15 +47,14 @@ public class PlayerController : MonoBehaviour
     {
         if (other.CompareTag("Weapon_dropped"))
         {
-            GameObject weapon = Instantiate(weaponsList.weapons[other.name[0] - '0'], transform, false);
-            weapon.transform.position = transform.position;
+            Instantiate(weaponsList.weapons[other.name[0] - '0'], transform.position, Quaternion.identity, transform);
             Destroy(other.gameObject);
         }
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.collider.CompareTag("Enemy"))
+        if (collision.collider.CompareTag("Enemy") || collision.collider.CompareTag("EnemyBullet"))
         {
             takeDamage();
         }
@@ -63,7 +62,7 @@ public class PlayerController : MonoBehaviour
 
     private void OnCollisionStay2D(Collision2D collision)
     {
-        if (collision.collider.CompareTag("Enemy"))
+        if (collision.collider.CompareTag("Enemy") || collision.collider.CompareTag("EnemyBullet"))
         {
             takeDamage();
         }

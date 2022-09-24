@@ -8,21 +8,21 @@ public class EnemyChase : MonoBehaviour
     public float refreshFrequency;
 
     private Rigidbody2D rb;
-    private GameObject player;
+    private Transform player;
     private Vector3 destination;
 
     private void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        player = GameObject.FindGameObjectWithTag("Player");
+        player = GameObject.FindGameObjectWithTag("Player").transform;
         StartCoroutine("refreshPlayerPos");
     }
 
-    IEnumerator refreshPlayerPos()
+    private IEnumerator refreshPlayerPos()
     {
         for (; ; )
         {
-            destination = player.transform.position - transform.position;
+            destination = player.position - transform.position;
             rb.velocity = destination.normalized * enemySpeed;
             yield return new WaitForSeconds(refreshFrequency);
         }

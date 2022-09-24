@@ -19,6 +19,7 @@ public class WeaponController : MonoBehaviour
     private float timer;
     private Vector2 tmp;
     private Vector3 direction;
+    private float rotation;
 
     private void Start()
     {
@@ -28,7 +29,7 @@ public class WeaponController : MonoBehaviour
     private void Update()
     {
         direction = Camera.main.ScreenToWorldPoint(Input.mousePosition) - transform.position;
-        float rotation = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        rotation = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
         transform.rotation = Quaternion.Euler(0f, 0f, rotation + angleOffset);
 
         if (Input.GetMouseButton(0) && timer <= 0)
