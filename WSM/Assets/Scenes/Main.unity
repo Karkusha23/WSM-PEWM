@@ -220,8 +220,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2c6a9ec4c94d4c147a89b232d20a6b38, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  camDumping: 10
-  switchDistance: 0.1
+  camDumping: 50
+  switchDistance: 0.2
 --- !u!1 &992770834 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8171546135851622958, guid: e8807fbf217d41d4a90f7477820c4267, type: 3}
@@ -469,6 +469,10 @@ PrefabInstance:
       propertyPath: HUD
       value: 
       objectReference: {fileID: 1817426854}
+    - target: {fileID: 1307716973, guid: 356225765ba6af74eb99f07c94984356, type: 3}
+      propertyPath: moveSpeed
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 1307716973, guid: 356225765ba6af74eb99f07c94984356, type: 3}
       propertyPath: loseScreen
       value: 
