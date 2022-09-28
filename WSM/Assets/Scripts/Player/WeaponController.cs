@@ -32,7 +32,7 @@ public class WeaponController : MonoBehaviour
         rotation = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
         transform.rotation = Quaternion.Euler(0f, 0f, rotation + angleOffset);
 
-        if (Input.GetMouseButton(0) && timer <= 0)
+        if (Input.GetMouseButton(0) && timer <= 0f)
         {
             bul = Instantiate(bullet, sp.transform.position, Quaternion.identity);
             tmp.x = direction.x;
@@ -42,6 +42,10 @@ public class WeaponController : MonoBehaviour
             timer = reloadTime;
         }
 
-        timer -= Time.deltaTime;
+        if (timer > 0f)
+        {
+            timer -= Time.deltaTime;
+        }
+
     }
 }

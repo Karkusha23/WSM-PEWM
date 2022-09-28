@@ -7,6 +7,8 @@ public class PlayerController : MonoBehaviour
     public int health;
     public float moveSpeed;
     public float invincibilityAfterDamage;
+    public float dodgerollActivePhaseTime;
+    public float dodgerollPassivePhaseTime;
     public WeaponsList weaponsList;
     public GameObject HUD;
     public GameObject loseScreen;
@@ -24,24 +26,36 @@ public class PlayerController : MonoBehaviour
     private float dropWeaponTimer;
     private GameObject weapon;
     private CameraController camcon;
+    private int invincible_dodgeroll;
+    private float dodgeroolTimer;
 
     private void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         invincible = false;
+        invincibleTimer = 0f;
         loseScreen.SetActive(false);
         hpMain = HUD.transform.Find("HPMain").GetComponent<HUDHP>();
         anim = GetComponent<Animator>();
         anim.SetFloat("InvincibilityTime", invincibilityAfterDamage);
+        anim.SetBool("Invincible", false);
+        anim.SetBool("IsRolling", false);
         dropKeyTime = 1f;
         camcon = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraController>();
         hasWeapon = false;
+        invincible_dodgeroll = 0;
+        dodgeroolTimer = 0f;
     }
 
     private void Update()
     {
-        movement.x = Input.GetAxisRaw("Horizontal");
-        movement.y = Input.GetAxisRaw("Vertical");
+        if (invincible_dodgeroll == 0)
+        {
+            movement.x = Input.GetAxisRaw("Horizontal");
+            movement.y = Input.GetAxisRaw("Vertical");
+        }
+
+        dodgeRollCheck();
 
         if (invincible)
         {
@@ -102,7 +116,7 @@ public class PlayerController : MonoBehaviour
 
     private void takeDamage()
     {
-        if (!invincible)
+        if (!(invincible || invincible_dodgeroll == 1))
         {
             health -= 1;
             hpMain.removeHP();
@@ -148,6 +162,36 @@ public class PlayerController : MonoBehaviour
             if (camcon.camMode > 0)
             {
                 camcon.follow(gameObject);
+            }
+        }
+    }
+
+    private void dodgeRollCheck()
+    {
+        if (Input.GetMouseButton(1) && invincible_dodgeroll == 0)
+        {
+            dodgeroolTimer = dodgerollActivePhaseTime;
+            invincible_dodgeroll = 1;
+            anim.SetBool("IsRolling", true);
+        }
+
+        if (invincible_dodgeroll == 1)
+        {
+            dodgeroolTimer -= Time.deltaTime;
+            if (dodgeroolTimer <= 0f)
+            {
+                invincible_dodgeroll = 2;
+                dodgeroolTimer = dodgerollPassivePhaseTime;
+                anim.SetBool("IsRolling", false);
+            }
+        }
+
+        if (invincible_dodgeroll == 2)
+        {
+            dodgeroolTimer -= Time.deltaTime;
+            if (dodgeroolTimer <= 0f)
+            {
+                invincible_dodgeroll = 0;
             }
         }
     }

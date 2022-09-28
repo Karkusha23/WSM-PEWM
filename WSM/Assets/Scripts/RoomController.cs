@@ -14,6 +14,7 @@ public class RoomController : MonoBehaviour
     {
         isCleaned = false;
         camcon = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraController>();
+        openDoors();
     }
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -24,7 +25,7 @@ public class RoomController : MonoBehaviour
             {
                 camcon.goToPos(transform.position);
             }
-            if (!isCleaned)
+            if (loadout != null && !isCleaned)
             {
                 lockDoors();
                 enemyCount = loadout.enemyPoss.Length;
@@ -36,7 +37,7 @@ public class RoomController : MonoBehaviour
         }
     }
 
-    private void OnTriggerExit2D(Collider2D other)
+    /*private void OnTriggerExit2D(Collider2D other)
     {
         if (other.CompareTag("Player"))
         {
@@ -49,7 +50,7 @@ public class RoomController : MonoBehaviour
                 camcon.follow(other.gameObject);
             }
         }
-    }
+    }*/
 
     public void checkEnemyKilled()
     {
