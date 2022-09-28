@@ -224,31 +224,7 @@ MonoBehaviour:
   switchDistance: 0.2
   camMouseMultiplicator: 0.6
   maxCamMouseDistance: 6
---- !u!1 &833424495 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 8055075734462150384, guid: 356225765ba6af74eb99f07c94984356, type: 3}
-  m_PrefabInstance: {fileID: 8055075733171477399}
-  m_PrefabAsset: {fileID: 0}
---- !u!95 &833424501
-Animator:
-  serializedVersion: 4
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 833424495}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: a1e95373647512748a7f7438086b5d29, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorControllerStateOnDisable: 0
+  camMode: 0
 --- !u!1 &992770834 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8171546135851622958, guid: e8807fbf217d41d4a90f7477820c4267, type: 3}
@@ -444,6 +420,14 @@ PrefabInstance:
       value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 1605603152557468207, guid: 29cb0d6a947cc4f458f5d0ee789a57db, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1605603152557468207, guid: 29cb0d6a947cc4f458f5d0ee789a57db, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1605603152557468207, guid: 29cb0d6a947cc4f458f5d0ee789a57db, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
@@ -496,10 +480,6 @@ PrefabInstance:
       propertyPath: HUD
       value: 
       objectReference: {fileID: 1817426854}
-    - target: {fileID: 1307716973, guid: 356225765ba6af74eb99f07c94984356, type: 3}
-      propertyPath: moveSpeed
-      value: 10
-      objectReference: {fileID: 0}
     - target: {fileID: 1307716973, guid: 356225765ba6af74eb99f07c94984356, type: 3}
       propertyPath: loseScreen
       value: 

@@ -8,8 +8,10 @@ public class PlayerController : MonoBehaviour
     public float moveSpeed;
     public float invincibilityAfterDamage;
     public WeaponsList weaponsList;
-    public GameObject loseScreen;
     public GameObject HUD;
+    public GameObject loseScreen;
+
+    [HideInInspector]
     public bool hasWeapon;
 
     private Rigidbody2D rb;
@@ -21,6 +23,7 @@ public class PlayerController : MonoBehaviour
     private float dropKeyTime;
     private float dropWeaponTimer;
     private GameObject weapon;
+    private CameraController camcon;
 
     private void Start()
     {
@@ -31,6 +34,8 @@ public class PlayerController : MonoBehaviour
         anim = GetComponent<Animator>();
         anim.SetFloat("InvincibilityTime", invincibilityAfterDamage);
         dropKeyTime = 1f;
+        camcon = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraController>();
+        hasWeapon = false;
     }
 
     private void Update()
@@ -69,35 +74,25 @@ public class PlayerController : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("Weapon_dropped") && Input.GetKey("e") && Vector3.Distance(transform.position, other.transform.position) <= 2f)
-        {
-
-            Instantiate(weaponsList.weapons[other.name[0] - '0'], transform.position, Quaternion.identity, transform);
-            hasWeapon = true;
-            Destroy(other.gameObject);
-        }
+        checkTakeWeapon(other);
     }
 
     private void OnTriggerStay2D(Collider2D other)
     {
-        if (other.CompareTag("Weapon_dropped") && Input.GetKey("e") && Vector3.Distance(transform.position, other.transform.position) <= 2f)
-        {
-            dropWeapon();
-            weapon = Instantiate(weaponsList.weapons[other.name[0] - '0'], transform.position, Quaternion.identity, transform);
-            hasWeapon = true;
-            Destroy(other.gameObject);
-        }
+        checkTakeWeapon(other);
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.collider.CompareTag("Enemy") || collision.collider.CompareTag("EnemyBullet"))
-        {
-            takeDamage();
-        }
+        checkTakeDamage(collision);
     }
 
     private void OnCollisionStay2D(Collision2D collision)
+    {
+        checkTakeDamage(collision);
+    }
+
+    private void checkTakeDamage(Collision2D collision)
     {
         if (collision.collider.CompareTag("Enemy") || collision.collider.CompareTag("EnemyBullet"))
         {
@@ -128,12 +123,32 @@ public class PlayerController : MonoBehaviour
         gameObject.SetActive(false);
     }
 
+    private void checkTakeWeapon(Collider2D other)
+    {
+        if (other.CompareTag("Weapon_dropped") && Input.GetKey("e") && Vector3.Distance(transform.position, other.transform.position) <= 2f)
+        {
+            dropWeapon();
+            weapon = Instantiate(weaponsList.weapons[other.name[0] - '0'], transform.position, Quaternion.identity, transform);
+            hasWeapon = true;
+            Destroy(other.gameObject);
+            if (camcon.camMode > 0)
+            {
+                camcon.followMousePos();
+            }
+        }
+    }
+
     private void dropWeapon()
     {
-        if (weapon != null)
+        if (hasWeapon)
         {
             Instantiate(weaponsList.weapons_dropped[weapon.name[0] - '0'], transform.position, Quaternion.Euler(0f, 0f, Random.Range(0f, 360f)));
             Destroy(weapon);
+            hasWeapon = false;
+            if (camcon.camMode > 0)
+            {
+                camcon.follow(gameObject);
+            }
         }
     }
 }

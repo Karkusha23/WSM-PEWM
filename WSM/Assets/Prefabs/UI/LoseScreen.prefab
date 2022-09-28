@@ -245,7 +245,7 @@ GameObject:
   - component: {fileID: 8171546135851622959}
   m_Layer: 5
   m_Name: LoseScreen
-  m_TagString: Untagged
+  m_TagString: LoseScreen
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

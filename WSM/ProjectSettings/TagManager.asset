@@ -12,6 +12,8 @@ TagManager:
   - EnemyBullet
   - SmallRoom
   - Door
+  - HUD
+  - LoseScreen
   layers:
   - Default
   - TransparentFX

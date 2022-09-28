@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.IO;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class CameraController : MonoBehaviour
 {
@@ -9,6 +10,9 @@ public class CameraController : MonoBehaviour
     public float switchDistance;
     public float camMouseMultiplicator;
     public float maxCamMouseDistance;
+
+    [HideInInspector]
+    public int camMode;
 
     private Vector3 cameraOffset;
     private Vector3 target;
@@ -38,17 +42,20 @@ public class CameraController : MonoBehaviour
     {
         doEveryFrame = goingToStaticPos;
         target = pos + cameraOffset;
+        camMode = 0;
     }
 
     public void follow(GameObject what)
     {
         doEveryFrame = goingToDynamicPos;
         followingTarget = what.transform;
+        camMode = 1;
     }
 
     public void followMousePos()
     {
         doEveryFrame = goingToMousePos;
+        camMode = 1;
     }
 
     private void goingToStaticPos()

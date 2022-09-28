@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 8055075734462150399}
   - component: {fileID: 1307716972}
   - component: {fileID: 1307716973}
+  - component: {fileID: 833424501}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -150,5 +151,26 @@ MonoBehaviour:
   moveSpeed: 10
   invincibilityAfterDamage: 1
   weaponsList: {fileID: 11400000, guid: 75bd8bb901e71904ba857aa489ced5be, type: 2}
-  loseScreen: {fileID: 0}
   HUD: {fileID: 0}
+  loseScreen: {fileID: 0}
+  hasWeapon: 0
+--- !u!95 &833424501
+Animator:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8055075734462150384}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: a1e95373647512748a7f7438086b5d29, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
