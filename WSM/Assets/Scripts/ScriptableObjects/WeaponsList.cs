@@ -6,4 +6,5 @@ using UnityEngine;
 public class WeaponsList : ScriptableObject
 {
     public GameObject[] weapons;
+    public GameObject[] weapons_dropped;
 }

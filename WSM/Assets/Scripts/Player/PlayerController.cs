@@ -1,3 +1,5 @@
+using System.Data;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -8,12 +10,17 @@ public class PlayerController : MonoBehaviour
     public WeaponsList weaponsList;
     public GameObject loseScreen;
     public GameObject HUD;
+    public bool hasWeapon;
 
     private Rigidbody2D rb;
     private Vector2 movement;
     private bool invincible;
     private float invincibleTimer;
     private HUDHP hpMain;
+    private Animator anim;
+    private float dropKeyTime;
+    private float dropWeaponTimer;
+    private GameObject weapon;
 
     private void Start()
     {
@@ -21,6 +28,9 @@ public class PlayerController : MonoBehaviour
         invincible = false;
         loseScreen.SetActive(false);
         hpMain = HUD.transform.Find("HPMain").GetComponent<HUDHP>();
+        anim = GetComponent<Animator>();
+        anim.SetFloat("InvincibilityTime", invincibilityAfterDamage);
+        dropKeyTime = 1f;
     }
 
     private void Update()
@@ -34,7 +44,21 @@ public class PlayerController : MonoBehaviour
             if (invincibleTimer <= 0f)
             {
                 invincible = false;
+                anim.SetBool("Invincible", false);
             }
+        }
+
+        if (Input.GetKey("f"))
+        {
+            dropWeaponTimer += Time.deltaTime;
+            if (dropWeaponTimer >= dropKeyTime)
+            {
+                dropWeapon();
+            }
+        }
+        else
+        {
+            dropWeaponTimer = 0f;
         }
     }
 
@@ -45,9 +69,22 @@ public class PlayerController : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("Weapon_dropped"))
+        if (other.CompareTag("Weapon_dropped") && Input.GetKey("e") && Vector3.Distance(transform.position, other.transform.position) <= 2f)
         {
+
             Instantiate(weaponsList.weapons[other.name[0] - '0'], transform.position, Quaternion.identity, transform);
+            hasWeapon = true;
+            Destroy(other.gameObject);
+        }
+    }
+
+    private void OnTriggerStay2D(Collider2D other)
+    {
+        if (other.CompareTag("Weapon_dropped") && Input.GetKey("e") && Vector3.Distance(transform.position, other.transform.position) <= 2f)
+        {
+            dropWeapon();
+            weapon = Instantiate(weaponsList.weapons[other.name[0] - '0'], transform.position, Quaternion.identity, transform);
+            hasWeapon = true;
             Destroy(other.gameObject);
         }
     }
@@ -80,6 +117,7 @@ public class PlayerController : MonoBehaviour
                 return;
             }
             invincible = true;
+            anim.SetBool("Invincible", true);
             invincibleTimer = invincibilityAfterDamage;
         }
     }
@@ -88,5 +126,14 @@ public class PlayerController : MonoBehaviour
     {
         loseScreen.SetActive(true);
         gameObject.SetActive(false);
+    }
+
+    private void dropWeapon()
+    {
+        if (weapon != null)
+        {
+            Instantiate(weaponsList.weapons_dropped[weapon.name[0] - '0'], transform.position, Quaternion.Euler(0f, 0f, Random.Range(0f, 360f)));
+            Destroy(weapon);
+        }
     }
 }

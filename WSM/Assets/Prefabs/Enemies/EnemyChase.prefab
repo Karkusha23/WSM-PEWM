@@ -121,7 +121,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enemyHealth: 3
-  enemySpeed: 5
+  enemySpeed: 7
   refreshFrequency: 0.1
 --- !u!61 &1371662492
 BoxCollider2D:

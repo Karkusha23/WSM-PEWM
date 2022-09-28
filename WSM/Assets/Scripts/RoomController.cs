@@ -40,7 +40,14 @@ public class RoomController : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            camcon.follow(other.gameObject);
+            if (other.GetComponent<PlayerController>().hasWeapon)
+            {
+                camcon.followMousePos();
+            }
+            else
+            {
+                camcon.follow(other.gameObject);
+            }
         }
     }
 
