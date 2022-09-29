@@ -69,6 +69,10 @@ public class RoomController : MonoBehaviour
         {
             door.SetActive(true);
         }
+        foreach (var doorTrigger in GameObject.FindGameObjectsWithTag("DoorTrigger"))
+        {
+            doorTrigger.SetActive(false);
+        }
     }
 
     private void openDoors()
@@ -76,6 +80,10 @@ public class RoomController : MonoBehaviour
         foreach (var door in doors)
         {
             door.SetActive(false);
+        }
+        foreach (var doorTrigger in GameObject.FindGameObjectsWithTag("DoorTrigger"))
+        {
+            doorTrigger.SetActive(true);
         }
     }
 }
