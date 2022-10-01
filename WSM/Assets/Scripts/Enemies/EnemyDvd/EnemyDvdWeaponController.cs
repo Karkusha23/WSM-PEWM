@@ -15,6 +15,9 @@ public class EnemyDvdWeaponController : MonoBehaviour
     private Rigidbody2D enemyRB;
     private EnemyDvd enemy;
     private GameObject bul;
+    //private Quaternion currentRotation;
+    //private Quaternion targetRotation;
+    //private bool isRotating;
 
     private void Start()
     {
@@ -30,14 +33,24 @@ public class EnemyDvdWeaponController : MonoBehaviour
         sps[3] = Instantiate(shootingPoint, transform.position + tmp, Quaternion.identity, transform);
         enemyRB = transform.parent.GetComponent<Rigidbody2D>();
         enemy = transform.parent.GetComponent<EnemyDvd>();
+        //targetRotation = Quaternion.identity;
         StartCoroutine("shoot");
     }
+
+    /*private void Update()
+    {
+        if (isRotating)
+        {
+            transform.rotation = Quaternion.Lerp(currentRotation, targetRotation, Time.deltaTime / fireRate);
+        }
+    }*/
 
     private IEnumerator shoot()
     {
         yield return new WaitForSeconds(fireRate);
         for (; ; )
         {
+            //isRotating = false;
             enemy.allowedToMove = false;
             enemyRB.velocity = Vector2.zero;
             for (int i = 0; i < bulletAmount; ++i)
@@ -51,6 +64,9 @@ public class EnemyDvdWeaponController : MonoBehaviour
             }
             enemy.allowedToMove = true;
             enemyRB.velocity = enemy.direction * enemy.enemySpeed;
+            //isRotating = true;
+            //currentRotation = targetRotation;
+            //targetRotation.z += 45f;
             yield return new WaitForSeconds(fireRate);
         }
     }
