@@ -448,7 +448,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: WSM
+  m_Text: Av&Al
 --- !u!222 &1679424756
 CanvasRenderer:
   m_ObjectHideFlags: 0

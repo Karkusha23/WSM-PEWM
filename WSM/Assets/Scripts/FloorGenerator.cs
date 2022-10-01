@@ -28,6 +28,10 @@ public class FloorGenerator : MonoBehaviour
 
     public GameObject s_NWES;
 
+    public EnemyLoadout[] loadouts;
+    public WeaponsList weapons;
+    public GameObject[] pickups;
+
     private int[,] floorMatrix;
     private int[] freeRoomHeights;
     private int[] freeRoomWidths;
@@ -124,7 +128,16 @@ public class FloorGenerator : MonoBehaviour
     private void createRoom(int row, int col)
     {
         Vector3 pos = new Vector3((col - floorWidth / 2) * 17.6f, (floorHeight / 2 - row) * 11f, 0f);
-        Instantiate(getRoomType(row, col), pos, Quaternion.identity);
+        GameObject room = Instantiate(getRoomType(row, col), pos, Quaternion.identity);
+        if (row == floorHeight / 2 && col == floorWidth / 2)
+        {
+            Instantiate(weapons.weapons_dropped[0], room.transform.position + new Vector3(4f, 0f, 0f), Quaternion.Euler(0f, 0f, Random.Range(0f, 360f)));
+        }
+        else
+        {
+            room.GetComponent<RoomController>().loadout = loadouts[Random.Range(0, loadouts.Length)];
+            room.GetComponent<RoomController>().roomDrops = pickups;
+        }
     }
 
     private GameObject getRoomType(int row, int col)

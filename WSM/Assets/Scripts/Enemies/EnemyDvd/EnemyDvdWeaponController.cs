@@ -15,9 +15,9 @@ public class EnemyDvdWeaponController : MonoBehaviour
     private Rigidbody2D enemyRB;
     private EnemyDvd enemy;
     private GameObject bul;
-    //private Quaternion currentRotation;
-    //private Quaternion targetRotation;
-    //private bool isRotating;
+    private Vector3 targetAngle;
+    private Quaternion targetRotation;
+    private bool isRotating;
 
     private void Start()
     {
@@ -33,24 +33,26 @@ public class EnemyDvdWeaponController : MonoBehaviour
         sps[3] = Instantiate(shootingPoint, transform.position + tmp, Quaternion.identity, transform);
         enemyRB = transform.parent.GetComponent<Rigidbody2D>();
         enemy = transform.parent.GetComponent<EnemyDvd>();
-        //targetRotation = Quaternion.identity;
+        targetAngle = Vector3.zero;
+        targetRotation = Quaternion.identity;
+        isRotating = false;
         StartCoroutine("shoot");
     }
 
-    /*private void Update()
+    private void Update()
     {
         if (isRotating)
         {
-            transform.rotation = Quaternion.Lerp(currentRotation, targetRotation, Time.deltaTime / fireRate);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 5f / fireRate);
         }
-    }*/
+    }
 
     private IEnumerator shoot()
     {
         yield return new WaitForSeconds(fireRate);
         for (; ; )
         {
-            //isRotating = false;
+            isRotating = false;
             enemy.allowedToMove = false;
             enemyRB.velocity = Vector2.zero;
             for (int i = 0; i < bulletAmount; ++i)
@@ -64,9 +66,9 @@ public class EnemyDvdWeaponController : MonoBehaviour
             }
             enemy.allowedToMove = true;
             enemyRB.velocity = enemy.direction * enemy.enemySpeed;
-            //isRotating = true;
-            //currentRotation = targetRotation;
-            //targetRotation.z += 45f;
+            isRotating = true;
+            targetAngle.z = ((int)targetAngle.z + 45) % 360;
+            targetRotation.eulerAngles = targetAngle;
             yield return new WaitForSeconds(fireRate);
         }
     }
