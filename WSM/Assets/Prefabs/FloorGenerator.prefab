@@ -1,0 +1,66 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &7309073861808278979
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7309073861808278981}
+  - component: {fileID: 7309073861808278978}
+  m_Layer: 0
+  m_Name: FloorGenerator
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7309073861808278981
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7309073861808278979}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7309073861808278978
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7309073861808278979}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1fe871c789d3cc747a049ac90a89373a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  minRoomCount: 10
+  maxRoomCount: 15
+  floorHeight: 5
+  floorWidth: 5
+  s_D: {fileID: 2510042977769514951, guid: a63cac1490099a14eb28bc93238bee4d, type: 3}
+  s_N: {fileID: 1605603152557468206, guid: 29cb0d6a947cc4f458f5d0ee789a57db, type: 3}
+  s_W: {fileID: 9177096356495845237, guid: b6b404726994dd44bae47bb08c694ea1, type: 3}
+  s_E: {fileID: 2931454406878253318, guid: 9d7f7d525fbb71748a6f3b1444706b78, type: 3}
+  s_S: {fileID: 1411333606327410471, guid: 5ac70edec1c2d1a43a4e65a93f9f6a48, type: 3}
+  s_NS: {fileID: 3796559451766887272, guid: 417a5afc46175154e945749461ad4700, type: 3}
+  s_WE: {fileID: 5453770428878263254, guid: 93503a9881703ce488faefee0fa83b68, type: 3}
+  s_NW: {fileID: 3703303570161965730, guid: 6aa5c98721d84af4fa38dbdd7ccec776, type: 3}
+  s_NE: {fileID: 7682532540598947324, guid: 2dd4325409a87c6468e4b2d8745c10af, type: 3}
+  s_WS: {fileID: 7335904991739871672, guid: 9fb7c06b52a94ba43812a6f25d73794c, type: 3}
+  s_ES: {fileID: 6988831154226991774, guid: affe62ea020a79a4cada78151f32d320, type: 3}
+  s_NWE: {fileID: 997927948027857242, guid: 2d758ebb4db3a8746b916c751f8fab8b, type: 3}
+  s_NWS: {fileID: 6838803538518607785, guid: 38179d4fab3b8f0418ba1ca113405d7b, type: 3}
+  s_NES: {fileID: 17237886398159188, guid: 7cfee38af3bab0a4db2613b052c2e4a2, type: 3}
+  s_WES: {fileID: 3604880023691436980, guid: 9fd7b6bb79e8e664fbc23b421c80d773, type: 3}
+  s_NWES: {fileID: 9126028428803511073, guid: 7f0e3bd8272f82d4e95fbf915d80d229, type: 3}
