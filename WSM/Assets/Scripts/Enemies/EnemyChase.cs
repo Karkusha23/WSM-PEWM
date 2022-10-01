@@ -18,16 +18,6 @@ public class EnemyChase : MonoBehaviour
         StartCoroutine("refreshPlayerPos");
     }
 
-    private IEnumerator refreshPlayerPos()
-    {
-        for (; ; )
-        {
-            destination = player.position - transform.position;
-            rb.velocity = destination.normalized * enemySpeed;
-            yield return new WaitForSeconds(refreshFrequency);
-        }
-    }
-
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.collider.CompareTag("Bullet"))
@@ -38,6 +28,16 @@ public class EnemyChase : MonoBehaviour
                 transform.parent.GetComponent<RoomController>().checkEnemyKilled();
                 Destroy(gameObject);
             }
+        }
+    }
+
+    private IEnumerator refreshPlayerPos()
+    {
+        for (; ; )
+        {
+            destination = player.position - transform.position;
+            rb.velocity = destination.normalized * enemySpeed;
+            yield return new WaitForSeconds(refreshFrequency);
         }
     }
 }

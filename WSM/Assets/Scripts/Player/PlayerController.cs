@@ -9,6 +9,7 @@ public class PlayerController : MonoBehaviour
     public float invincibilityAfterDamage;
     public float dodgerollActivePhaseTime;
     public float dodgerollPassivePhaseTime;
+    public float dodgerollSpeedBoost;
     public WeaponsList weaponsList;
     public GameObject HUD;
     public GameObject loseScreen;
@@ -83,7 +84,7 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        rb.MovePosition(rb.position + movement * moveSpeed * Time.fixedDeltaTime);
+        rb.MovePosition(rb.position + movement.normalized * moveSpeed * Time.fixedDeltaTime);
     }
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -168,11 +169,12 @@ public class PlayerController : MonoBehaviour
 
     private void dodgeRollCheck()
     {
-        if (Input.GetMouseButton(1) && invincible_dodgeroll == 0)
+        if (Input.GetMouseButtonDown(1) && invincible_dodgeroll == 0)
         {
             dodgeroolTimer = dodgerollActivePhaseTime;
             invincible_dodgeroll = 1;
             anim.SetBool("IsRolling", true);
+            moveSpeed *= dodgerollSpeedBoost;
         }
 
         if (invincible_dodgeroll == 1)
@@ -183,6 +185,7 @@ public class PlayerController : MonoBehaviour
                 invincible_dodgeroll = 2;
                 dodgeroolTimer = dodgerollPassivePhaseTime;
                 anim.SetBool("IsRolling", false);
+                moveSpeed /= dodgerollSpeedBoost;
             }
         }
 

@@ -225,6 +225,11 @@ MonoBehaviour:
   camMouseMultiplicator: 0.6
   maxCamMouseDistance: 6
   camMode: 0
+--- !u!1 &828439052 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1411333605842974737, guid: 5ac70edec1c2d1a43a4e65a93f9f6a48, type: 3}
+  m_PrefabInstance: {fileID: 7221231763470343550}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &992770834 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8171546135851622958, guid: e8807fbf217d41d4a90f7477820c4267, type: 3}
@@ -519,7 +524,11 @@ PrefabInstance:
     - target: {fileID: 8394126735571396700, guid: 5ac70edec1c2d1a43a4e65a93f9f6a48, type: 3}
       propertyPath: loadout
       value: 
-      objectReference: {fileID: 11400000, guid: a00ce937e80906844887e3bdf8d4b7ca, type: 2}
+      objectReference: {fileID: 11400000, guid: 9d73bbaee9e00c4409561bb05e8664e0, type: 2}
+    - target: {fileID: 8394126735571396700, guid: 5ac70edec1c2d1a43a4e65a93f9f6a48, type: 3}
+      propertyPath: doors.Array.data[0]
+      value: 
+      objectReference: {fileID: 828439052}
     - target: {fileID: 8394126735571396700, guid: 5ac70edec1c2d1a43a4e65a93f9f6a48, type: 3}
       propertyPath: roomDrops.Array.data[0]
       value: 
@@ -541,14 +550,6 @@ PrefabInstance:
       propertyPath: loseScreen
       value: 
       objectReference: {fileID: 992770834}
-    - target: {fileID: 1307716973, guid: 356225765ba6af74eb99f07c94984356, type: 3}
-      propertyPath: dodgerollActivePhaseTime
-      value: 0.3
-      objectReference: {fileID: 0}
-    - target: {fileID: 1307716973, guid: 356225765ba6af74eb99f07c94984356, type: 3}
-      propertyPath: dodgerollPassivePhaseTime
-      value: 0.1
-      objectReference: {fileID: 0}
     - target: {fileID: 8055075734462150384, guid: 356225765ba6af74eb99f07c94984356, type: 3}
       propertyPath: m_Name
       value: Player

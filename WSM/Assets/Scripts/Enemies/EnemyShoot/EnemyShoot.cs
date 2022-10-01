@@ -21,6 +21,19 @@ public class EnemyShoot : MonoBehaviour
         StartCoroutine("refreshPlayerPos");
     }
 
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.collider.CompareTag("Bullet"))
+        {
+            enemyHealth -= collision.collider.GetComponent<Bullet>().damage;
+            if (enemyHealth <= 0)
+            {
+                transform.parent.GetComponent<RoomController>().checkEnemyKilled();
+                Destroy(gameObject);
+            }
+        }
+    }
+
     private IEnumerator refreshPlayerPos()
     {
         for (; ; )
@@ -35,19 +48,6 @@ public class EnemyShoot : MonoBehaviour
                 rb.velocity = Vector2.zero;
             }
             yield return new WaitForSeconds(refreshFrequency);
-        }
-    }
-
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        if (collision.collider.CompareTag("Bullet"))
-        {
-            enemyHealth -= collision.collider.GetComponent<Bullet>().damage;
-            if (enemyHealth <= 0)
-            {
-                transform.parent.GetComponent<RoomController>().checkEnemyKilled();
-                Destroy(gameObject);
-            }
         }
     }
 }
