@@ -2,13 +2,14 @@ using UnityEngine;
 
 public class RoomController : MonoBehaviour
 {
-    public GameObject[] doors;
     public EnemyLoadout loadout;
     public GameObject[] roomDrops;
+    public GameObject[] doors;
 
     private int enemyCount;
     private bool isCleaned;
     private CameraController camcon;
+    private bool isBig;
 
     private void Start()
     {
@@ -25,6 +26,17 @@ public class RoomController : MonoBehaviour
             {
                 camcon.goToPos(transform.position);
             }
+            else if (CompareTag("BigRoom"))
+            {
+                if (other.GetComponent<PlayerController>().hasWeapon)
+                {
+                    camcon.followMousePos();
+                }
+                else
+                {
+                    camcon.follow(other.gameObject);
+                }
+            }
             if (loadout != null && !isCleaned)
             {
                 lockDoors();
@@ -36,21 +48,6 @@ public class RoomController : MonoBehaviour
             }
         }
     }
-
-    /*private void OnTriggerExit2D(Collider2D other)
-    {
-        if (other.CompareTag("Player"))
-        {
-            if (other.GetComponent<PlayerController>().hasWeapon)
-            {
-                camcon.followMousePos();
-            }
-            else
-            {
-                camcon.follow(other.gameObject);
-            }
-        }
-    }*/
 
     public void checkEnemyKilled()
     {
@@ -67,11 +64,10 @@ public class RoomController : MonoBehaviour
     {
         foreach (var door in doors)
         {
-            door.SetActive(true);
-        }
-        foreach (var doorTrigger in GameObject.FindGameObjectsWithTag("DoorTrigger"))
-        {
-            doorTrigger.SetActive(false);
+            if (door != null)
+            {
+                door.SetActive(true);
+            }
         }
     }
 
@@ -79,11 +75,10 @@ public class RoomController : MonoBehaviour
     {
         foreach (var door in doors)
         {
-            door.SetActive(false);
-        }
-        foreach (var doorTrigger in GameObject.FindGameObjectsWithTag("DoorTrigger"))
-        {
-            doorTrigger.SetActive(true);
+            if (door != null)
+            {
+                door.SetActive(false);
+            }
         }
     }
 }

@@ -15,6 +15,7 @@ TagManager:
   - HUD
   - LoseScreen
   - DoorTrigger
+  - BigRoom
   layers:
   - Default
   - TransparentFX

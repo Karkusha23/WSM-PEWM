@@ -7,26 +7,10 @@ public class FloorGenerator : MonoBehaviour
     public int floorHeight;
     public int floorWidth;
 
-    public GameObject s_D;
-
-    public GameObject s_N;
-    public GameObject s_W;
-    public GameObject s_E;
-    public GameObject s_S;
-
-    public GameObject s_NS;
-    public GameObject s_WE;
-    public GameObject s_NW;
-    public GameObject s_NE;
-    public GameObject s_WS;
-    public GameObject s_ES;
-
-    public GameObject s_NWE;
-    public GameObject s_NWS;
-    public GameObject s_NES;
-    public GameObject s_WES;
-
-    public GameObject s_NWES;
+    public GameObject smallRoom;
+    public GameObject bigRoom;
+    public GameObject door;
+    public GameObject wallPlug;
 
     public EnemyLoadout[] loadouts;
     public WeaponsList weapons;
@@ -36,9 +20,29 @@ public class FloorGenerator : MonoBehaviour
     private int[] freeRoomHeights;
     private int[] freeRoomWidths;
     private int freeRoomCount;
+    private GameObject room;
+    private bool[] smallDoors;
+    private Vector3[] doorPoss;
+    private Vector3[] bigRoomDoorOffsets;
 
     private void Awake()
     {
+        smallDoors = new bool[4];
+        doorPoss = new Vector3[4];
+        doorPoss[0] = new Vector3(0f, 5f, 0f);
+        doorPoss[1] = new Vector3(-8f, 0f, 0f);
+        doorPoss[2] = new Vector3(8f, 0f, 0f);
+        doorPoss[3] = new Vector3(0f, -5f, 0f);
+        for (int i = 0; i < 4; ++i)
+        {
+            doorPoss[i] *= 1.1f;
+        }
+
+        bigRoomDoorOffsets = new Vector3[3];
+        bigRoomDoorOffsets[0] = new Vector3(17.6f, 0f, 0f);
+        bigRoomDoorOffsets[1] = new Vector3(0, -11f, 0f);
+        bigRoomDoorOffsets[2] = new Vector3(17.6f, -11f, 0f);
+
         buildMatrix();
         for (int i = 0; i < floorHeight; ++i)
         {
@@ -128,7 +132,9 @@ public class FloorGenerator : MonoBehaviour
     private void createRoom(int row, int col)
     {
         Vector3 pos = new Vector3((col - floorWidth / 2) * 17.6f, (floorHeight / 2 - row) * 11f, 0f);
-        GameObject room = Instantiate(getRoomType(row, col), pos, Quaternion.identity);
+        room = Instantiate(smallRoom, pos, Quaternion.identity);
+        getRoomType(row, col);
+        createDoors();
         if (row == floorHeight / 2 && col == floorWidth / 2)
         {
             Instantiate(weapons.weapons_dropped[0], room.transform.position + new Vector3(4f, 0f, 0f), Quaternion.Euler(0f, 0f, Random.Range(0f, 360f)));
@@ -140,60 +146,56 @@ public class FloorGenerator : MonoBehaviour
         }
     }
 
-    private GameObject getRoomType(int row, int col)
+    private void getRoomType(int row, int col)
     {
-        int exits = 0;
         if (row > 0)
         {
-            exits |= (floorMatrix[row - 1, col] == 2) ? 1 : 0;
+            smallDoors[0] = floorMatrix[row - 1, col] == 2;
+        }
+        else
+        {
+            smallDoors[0] = false;
         }
         if (col > 0)
         {
-            exits |= (floorMatrix[row, col - 1] == 2) ? 2 : 0;
+            smallDoors[1] = floorMatrix[row, col - 1] == 2;
+        }
+        else
+        {
+            smallDoors[1] = false;
         }
         if (row < floorHeight - 1)
         {
-            exits |= (floorMatrix[row + 1, col] == 2) ? 8 : 0;
+            smallDoors[3] = floorMatrix[row + 1, col] == 2;
+        }
+        else
+        {
+            smallDoors[3] = false;
         }
         if (col < floorWidth - 1)
         {
-            exits |= (floorMatrix[row, col + 1] == 2) ? 4 : 0;
+            smallDoors[2] = floorMatrix[row, col + 1] == 2;
         }
-        switch (exits)
+        else
         {
-            case 0:
-                return s_D;
-            case 1:
-                return s_N;
-            case 2:
-                return s_W;
-            case 3:
-                return s_NW;
-            case 4:
-                return s_E;
-            case 5:
-                return s_NE;
-            case 6:
-                return s_WE;
-            case 7:
-                return s_NWE;
-            case 8:
-                return s_S;
-            case 9:
-                return s_NS;
-            case 10:
-                return s_WS;
-            case 11:
-                return s_NWS;
-            case 12:
-                return s_ES;
-            case 13:
-                return s_NES;
-            case 14:
-                return s_WES;
-            case 15:
-                return s_NWES;
+            smallDoors[0] = false;
         }
-        return s_D;
+    }
+
+    private void createDoors()
+    {
+        GameObject tmp;
+        RoomController roomcon = room.GetComponent<RoomController>();
+        roomcon.doors = new GameObject[4];
+        int counter = 0;
+        for (int i = 0; i < 4; ++i)
+        {
+            tmp = Instantiate(smallDoors[i] ? door : wallPlug, room.transform.position + doorPoss[i], i == 0 || i == 3 ? Quaternion.identity : Quaternion.Euler(0f, 0f, 90f), room.transform);
+            if (smallDoors[i])
+            {
+                roomcon.doors[counter] = tmp;
+                ++counter;
+            }
+        }
     }
 }
