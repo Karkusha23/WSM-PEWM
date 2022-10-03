@@ -510,45 +510,13 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 7309073861808278978, guid: eb8370d209416074aa3de4f765e5eefa, type: 3}
-      propertyPath: door
-      value: 
-      objectReference: {fileID: 2980541394161524617, guid: 9f5b4032567f5f84687c48d05a1d50c4, type: 3}
-    - target: {fileID: 7309073861808278978, guid: eb8370d209416074aa3de4f765e5eefa, type: 3}
-      propertyPath: bigRoom
-      value: 
-      objectReference: {fileID: 2322337418231900787, guid: e7b006119d6f79a44a0a0b59b7946fbd, type: 3}
-    - target: {fileID: 7309073861808278978, guid: eb8370d209416074aa3de4f765e5eefa, type: 3}
-      propertyPath: weapons
-      value: 
-      objectReference: {fileID: 11400000, guid: 75bd8bb901e71904ba857aa489ced5be, type: 2}
-    - target: {fileID: 7309073861808278978, guid: eb8370d209416074aa3de4f765e5eefa, type: 3}
-      propertyPath: wallPlug
-      value: 
-      objectReference: {fileID: 6542898871119334974, guid: d5e7e321bf02efa418c3c731acf458b3, type: 3}
-    - target: {fileID: 7309073861808278978, guid: eb8370d209416074aa3de4f765e5eefa, type: 3}
-      propertyPath: smallRoom
-      value: 
-      objectReference: {fileID: 7288156958747843772, guid: 2b0ab6a6d4715f6488511e3614d3b4f5, type: 3}
-    - target: {fileID: 7309073861808278978, guid: eb8370d209416074aa3de4f765e5eefa, type: 3}
-      propertyPath: pickups.Array.size
-      value: 1
+      propertyPath: floorWidth
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 7309073861808278978, guid: eb8370d209416074aa3de4f765e5eefa, type: 3}
-      propertyPath: loadouts.Array.size
-      value: 2
+      propertyPath: floorHeight
+      value: 10
       objectReference: {fileID: 0}
-    - target: {fileID: 7309073861808278978, guid: eb8370d209416074aa3de4f765e5eefa, type: 3}
-      propertyPath: pickups.Array.data[0]
-      value: 
-      objectReference: {fileID: 4370064962261114294, guid: 212499558dea19446856b3d5396767d1, type: 3}
-    - target: {fileID: 7309073861808278978, guid: eb8370d209416074aa3de4f765e5eefa, type: 3}
-      propertyPath: loadouts.Array.data[0]
-      value: 
-      objectReference: {fileID: 11400000, guid: a00ce937e80906844887e3bdf8d4b7ca, type: 2}
-    - target: {fileID: 7309073861808278978, guid: eb8370d209416074aa3de4f765e5eefa, type: 3}
-      propertyPath: loadouts.Array.data[1]
-      value: 
-      objectReference: {fileID: 11400000, guid: 9d73bbaee9e00c4409561bb05e8664e0, type: 2}
     - target: {fileID: 7309073861808278979, guid: eb8370d209416074aa3de4f765e5eefa, type: 3}
       propertyPath: m_Name
       value: FloorGenerator

@@ -48,19 +48,16 @@ MonoBehaviour:
   maxRoomCount: 15
   floorHeight: 5
   floorWidth: 5
-  s_D: {fileID: 2510042977769514951, guid: a63cac1490099a14eb28bc93238bee4d, type: 3}
-  s_N: {fileID: 1605603152557468206, guid: 29cb0d6a947cc4f458f5d0ee789a57db, type: 3}
-  s_W: {fileID: 9177096356495845237, guid: b6b404726994dd44bae47bb08c694ea1, type: 3}
-  s_E: {fileID: 2931454406878253318, guid: 9d7f7d525fbb71748a6f3b1444706b78, type: 3}
-  s_S: {fileID: 1411333606327410471, guid: 5ac70edec1c2d1a43a4e65a93f9f6a48, type: 3}
-  s_NS: {fileID: 3796559451766887272, guid: 417a5afc46175154e945749461ad4700, type: 3}
-  s_WE: {fileID: 5453770428878263254, guid: 93503a9881703ce488faefee0fa83b68, type: 3}
-  s_NW: {fileID: 3703303570161965730, guid: 6aa5c98721d84af4fa38dbdd7ccec776, type: 3}
-  s_NE: {fileID: 7682532540598947324, guid: 2dd4325409a87c6468e4b2d8745c10af, type: 3}
-  s_WS: {fileID: 7335904991739871672, guid: 9fb7c06b52a94ba43812a6f25d73794c, type: 3}
-  s_ES: {fileID: 6988831154226991774, guid: affe62ea020a79a4cada78151f32d320, type: 3}
-  s_NWE: {fileID: 997927948027857242, guid: 2d758ebb4db3a8746b916c751f8fab8b, type: 3}
-  s_NWS: {fileID: 6838803538518607785, guid: 38179d4fab3b8f0418ba1ca113405d7b, type: 3}
-  s_NES: {fileID: 17237886398159188, guid: 7cfee38af3bab0a4db2613b052c2e4a2, type: 3}
-  s_WES: {fileID: 3604880023691436980, guid: 9fd7b6bb79e8e664fbc23b421c80d773, type: 3}
-  s_NWES: {fileID: 9126028428803511073, guid: 7f0e3bd8272f82d4e95fbf915d80d229, type: 3}
+  smallRoom: {fileID: 7288156958747843772, guid: 2b0ab6a6d4715f6488511e3614d3b4f5, type: 3}
+  bigRoom: {fileID: 2322337418231900787, guid: e7b006119d6f79a44a0a0b59b7946fbd, type: 3}
+  door: {fileID: 2980541394161524617, guid: 9f5b4032567f5f84687c48d05a1d50c4, type: 3}
+  wallPlug: {fileID: 6542898871119334974, guid: d5e7e321bf02efa418c3c731acf458b3, type: 3}
+  smallLoadouts:
+  - {fileID: 11400000, guid: a00ce937e80906844887e3bdf8d4b7ca, type: 2}
+  - {fileID: 11400000, guid: 9d73bbaee9e00c4409561bb05e8664e0, type: 2}
+  bigLoadouts:
+  - {fileID: 11400000, guid: a00ce937e80906844887e3bdf8d4b7ca, type: 2}
+  - {fileID: 11400000, guid: 9d73bbaee9e00c4409561bb05e8664e0, type: 2}
+  weapons: {fileID: 11400000, guid: 75bd8bb901e71904ba857aa489ced5be, type: 2}
+  pickups:
+  - {fileID: 4370064962261114294, guid: 212499558dea19446856b3d5396767d1, type: 3}
