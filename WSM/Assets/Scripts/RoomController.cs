@@ -9,10 +9,24 @@ public class RoomController : MonoBehaviour
     private int enemyCount;
     private bool isCleaned;
     private CameraController camcon;
-    private bool isBig;
+    private Vector3 bigRoomOffset;
+    private int roomType;
 
     private void Start()
     {
+        bigRoomOffset = new Vector3(8.8f, -5.5f, 0f);
+        if (CompareTag("SmallRoom"))
+        {
+            roomType = 0;
+        }
+        else if (CompareTag("BigRoom"))
+        {
+            roomType = 1;
+        }
+        else
+        {
+            roomType = 2;
+        }
         isCleaned = false;
         camcon = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraController>();
         openDoors();
@@ -22,11 +36,11 @@ public class RoomController : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            if (CompareTag("SmallRoom"))
+            if (roomType == 0)
             {
                 camcon.goToPos(transform.position);
             }
-            else if (CompareTag("BigRoom"))
+            else if (roomType == 1)
             {
                 if (other.GetComponent<PlayerController>().hasWeapon)
                 {
@@ -41,9 +55,19 @@ public class RoomController : MonoBehaviour
             {
                 lockDoors();
                 enemyCount = loadout.enemyPoss.Length;
-                for (int i = enemyCount - 1; i >= 0; --i)
+                if (roomType == 0)
                 {
-                    Instantiate(loadout.enemyTypes[i], loadout.enemyPoss[i] + transform.position, Quaternion.identity, transform);
+                    for (int i = enemyCount - 1; i >= 0; --i)
+                    {
+                        Instantiate(loadout.enemyTypes[i], loadout.enemyPoss[i] + transform.position, Quaternion.identity, transform);
+                    }
+                }
+                else if (roomType == 1)
+                {
+                    for (int i = enemyCount - 1; i >= 0; --i)
+                    {
+                        Instantiate(loadout.enemyTypes[i], loadout.enemyPoss[i] + transform.position + bigRoomOffset, Quaternion.identity, transform);
+                    }
                 }
             }
         }
@@ -55,7 +79,7 @@ public class RoomController : MonoBehaviour
         if (enemyCount <= 0)
         {
             openDoors();
-            Instantiate(roomDrops[Random.Range(0, roomDrops.Length)], transform.position, Quaternion.identity);
+            Instantiate(roomDrops[Random.Range(0, roomDrops.Length)], roomType == 1 ? transform.position + bigRoomOffset : transform.position, Quaternion.identity);
             isCleaned = true;
         }
     }

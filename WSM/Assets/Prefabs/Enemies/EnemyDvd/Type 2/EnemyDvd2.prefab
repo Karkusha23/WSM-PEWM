@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 1017972510189653163}
   - component: {fileID: 1017972510706031599}
   m_Layer: 6
-  m_Name: EnemyDvd
+  m_Name: EnemyDvd2
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -77,7 +77,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
-  m_Color: {r: 0.25690627, g: 0.9150943, b: 0.11654504, a: 1}
+  m_Color: {r: 0.11472735, g: 0.3490566, b: 0.06421325, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -146,8 +146,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 28a5c05a3e83f9245bb8c15126667016, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enemyWeapon: {fileID: 3384298221420424276, guid: 9c4d3d7262965294280de5fc2f85dd4d, type: 3}
+  enemyWeapon: {fileID: 3384298221420424276, guid: 81ff993c67a49fd409d2df778ca83607, type: 3}
   enemyHealth: 6
-  enemySpeed: 5
+  enemySpeed: 8
+  minSpeedScale: 0.8
+  maxSpeedScale: 1.2
   allowedToMove: 0
   direction: {x: 0, y: 0}

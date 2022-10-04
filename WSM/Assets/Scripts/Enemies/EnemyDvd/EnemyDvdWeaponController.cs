@@ -10,6 +10,7 @@ public class EnemyDvdWeaponController : MonoBehaviour
     public float timeBetweenBullets;
     public int bulletAmount;
     public float bulletSpeed;
+    public bool type;
 
     private GameObject[] sps;
     private Rigidbody2D enemyRB;
@@ -33,8 +34,17 @@ public class EnemyDvdWeaponController : MonoBehaviour
         sps[3] = Instantiate(shootingPoint, transform.position + tmp, Quaternion.identity, transform);
         enemyRB = transform.parent.GetComponent<Rigidbody2D>();
         enemy = transform.parent.GetComponent<EnemyDvd>();
-        targetAngle = Vector3.zero;
-        targetRotation = Quaternion.identity;
+        if (type)
+        {
+            transform.rotation = Quaternion.Euler(0f, 0f, 45f);
+            targetAngle = new Vector3(0f, 0f, 45f);
+            targetRotation = Quaternion.Euler(0f, 0f, 45f);
+        }
+        else
+        {
+            targetAngle = Vector3.zero;
+            targetRotation = Quaternion.identity;
+        }
         isRotating = false;
         StartCoroutine("shoot");
     }

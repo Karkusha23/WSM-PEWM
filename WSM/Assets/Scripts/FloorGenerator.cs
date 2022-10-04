@@ -7,6 +7,7 @@ public class FloorGenerator : MonoBehaviour
     public int maxRoomCount;
     public int floorHeight;
     public int floorWidth;
+    public float bigRoomProbability;
 
     public GameObject smallRoom;
     public GameObject bigRoom;
@@ -115,17 +116,17 @@ public class FloorGenerator : MonoBehaviour
 
     private bool buildRandomRoom()
     {
-        if (Random.value <= 0.15f && freeBigRoomCount > 0)
+        if (Random.value <= bigRoomProbability && freeBigRoomCount > 0)
         {
             int index = Random.Range(0, freeBigRoomCount);
             checkBigFreeRoom(freeBigRoomHeights[index], freeBigRoomWidths[index]);
             removeFreeBigAround(freeBigRoomHeights[index], freeBigRoomWidths[index]);
             floorMatrix[freeBigRoomHeights[index], freeBigRoomWidths[index]] = 5;
-            removeFreeBigRoom(index);
             for (int i = 1; i < 4; ++i)
             {
                 floorMatrix[freeBigRoomHeights[index] + i / 2, freeBigRoomWidths[index] + i % 2] = 6;
             }
+            removeFreeBigRoom(index);
         }
         else
         {

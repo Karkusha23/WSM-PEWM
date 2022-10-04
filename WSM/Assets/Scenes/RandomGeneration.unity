@@ -510,13 +510,13 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 7309073861808278978, guid: eb8370d209416074aa3de4f765e5eefa, type: 3}
-      propertyPath: floorWidth
-      value: 10
+      propertyPath: bigLoadouts.Array.size
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7309073861808278978, guid: eb8370d209416074aa3de4f765e5eefa, type: 3}
-      propertyPath: floorHeight
-      value: 10
-      objectReference: {fileID: 0}
+      propertyPath: bigLoadouts.Array.data[0]
+      value: 
+      objectReference: {fileID: 11400000, guid: b717a4f6dd0e1364fb0c4df37ca82c96, type: 2}
     - target: {fileID: 7309073861808278979, guid: eb8370d209416074aa3de4f765e5eefa, type: 3}
       propertyPath: m_Name
       value: FloorGenerator

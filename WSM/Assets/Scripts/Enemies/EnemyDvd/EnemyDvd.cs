@@ -6,6 +6,8 @@ public class EnemyDvd : MonoBehaviour
     public GameObject enemyWeapon;
     public float enemyHealth;
     public float enemySpeed;
+    public float minSpeedScale;
+    public float maxSpeedScale;
 
     [HideInInspector]
     public bool allowedToMove;
@@ -17,7 +19,7 @@ public class EnemyDvd : MonoBehaviour
 
     private void Start()
     {
-        direction = new Vector2(1f, 1f);
+        direction = new Vector2(Random.Range(0, 2) == 0 ? -1f : 1f, Random.Range(0, 2) == 0 ? -1f : 1f);
         rb = GetComponent<Rigidbody2D>();
         rb.velocity = direction * enemySpeed;
         Instantiate(enemyWeapon, transform.position, Quaternion.identity, transform);
@@ -61,7 +63,7 @@ public class EnemyDvd : MonoBehaviour
             }
             if (allowedToMove)
             {
-                rb.velocity = direction * enemySpeed;
+                rb.velocity = direction * enemySpeed * Random.Range(minSpeedScale, maxSpeedScale);
             }
         }
         else if (collision.collider.CompareTag("Bullet"))

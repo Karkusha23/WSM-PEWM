@@ -46,8 +46,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   minRoomCount: 10
   maxRoomCount: 15
-  floorHeight: 5
-  floorWidth: 5
+  floorHeight: 10
+  floorWidth: 10
+  bigRoomProbability: 0.5
   smallRoom: {fileID: 7288156958747843772, guid: 2b0ab6a6d4715f6488511e3614d3b4f5, type: 3}
   bigRoom: {fileID: 2322337418231900787, guid: e7b006119d6f79a44a0a0b59b7946fbd, type: 3}
   door: {fileID: 2980541394161524617, guid: 9f5b4032567f5f84687c48d05a1d50c4, type: 3}
