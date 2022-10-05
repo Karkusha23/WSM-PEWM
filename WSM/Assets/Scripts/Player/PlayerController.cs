@@ -171,10 +171,15 @@ public class PlayerController : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(1) && invincible_dodgeroll == 0)
         {
+            if (hasWeapon)
+            {
+                weapon.SetActive(false);
+            }
             dodgeroolTimer = dodgerollActivePhaseTime;
             invincible_dodgeroll = 1;
             anim.SetBool("IsRolling", true);
             moveSpeed *= dodgerollSpeedBoost;
+            movement = Camera.main.ScreenToWorldPoint(Input.mousePosition) - transform.position;
         }
 
         if (invincible_dodgeroll == 1)
@@ -194,6 +199,10 @@ public class PlayerController : MonoBehaviour
             dodgeroolTimer -= Time.deltaTime;
             if (dodgeroolTimer <= 0f)
             {
+                if (hasWeapon)
+                {
+                    weapon.SetActive(true);
+                }
                 invincible_dodgeroll = 0;
             }
         }

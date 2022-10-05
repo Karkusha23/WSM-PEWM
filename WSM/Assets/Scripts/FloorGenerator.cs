@@ -57,6 +57,7 @@ public class FloorGenerator : MonoBehaviour
                 }
             }
         }
+        createBossRoom(); // TODO
     }
 
     private void initVectors()
@@ -630,5 +631,10 @@ public class FloorGenerator : MonoBehaviour
                 roomcon.doors[counter++] = tmp;
             }
         }
+    }
+
+    private void createBossRoom()
+    {
+        //TODO
     }
 }
