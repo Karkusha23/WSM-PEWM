@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1820597460}
   - component: {fileID: 1820597461}
+  - component: {fileID: 579386896}
   m_Layer: 0
   m_Name: Boss1Weapon
   m_TagString: Untagged
@@ -24,7 +25,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1820597459}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -49,7 +50,30 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spearsOffset: 90
+  rotationSpeed: 500
+  spearsDumping: 10
+  changeDistance: 0.2
   EnemyBullet: {fileID: 0}
+--- !u!95 &579386896
+Animator:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1820597459}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 3274ca78bedbb0f45adc2014f57a677b, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!1 &908353080552381990
 GameObject:
   m_ObjectHideFlags: 0
@@ -421,15 +445,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 211350373683881711, guid: feb7a32c35080fe479aceee777c98f03, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 211350373683881711, guid: feb7a32c35080fe479aceee777c98f03, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 211350373683881711, guid: feb7a32c35080fe479aceee777c98f03, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 211350373683881711, guid: feb7a32c35080fe479aceee777c98f03, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x

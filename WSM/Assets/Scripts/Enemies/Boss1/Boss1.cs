@@ -18,6 +18,7 @@ public class Boss1 : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         player = GameObject.FindGameObjectWithTag("Player").transform;
         approach = StartCoroutine("approachPlayer");
+        StartCoroutine("attacks");
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -42,7 +43,10 @@ public class Boss1 : MonoBehaviour
         for (; ; )
         {
             StopCoroutine(approach);
+            rb.velocity = Vector2.zero;
+            enemyWeapon.GetComponent<Boss1WeaponController>().spiralAttack();
             yield return new WaitForSeconds(betweenAttacksTime);
+            approach = StartCoroutine("approachPlayer");
         }
     }
 
