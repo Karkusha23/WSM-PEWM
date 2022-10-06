@@ -25,6 +25,8 @@ public class Boss1WeaponController : MonoBehaviour
     private Vector3[] spearsStartPositions;
     private Vector3[] spearsRotatePositions;
     private float timeBetweenAttacks;
+    private Boss1 bosscon;
+    private int[] spSpiralAttack = { 0, 3, 5, 6 };
 
     private void Start()
     {
@@ -46,7 +48,8 @@ public class Boss1WeaponController : MonoBehaviour
             shootingPoints[i * 2] = spears[i].transform.GetChild(0).gameObject;
             shootingPoints[i * 2 + 1] = spears[i].transform.GetChild(1).gameObject;
         }
-        timeBetweenAttacks = transform.parent.GetComponent<Boss1>().betweenAttacksTime;
+        bosscon = transform.parent.GetComponent<Boss1>();
+        timeBetweenAttacks = bosscon.betweenAttacksTime;
     }
 
     private void Update()
@@ -97,7 +100,7 @@ public class Boss1WeaponController : MonoBehaviour
                 rotationTmp = Mathf.Atan2(magnitudeTmp, spears[i].transform.localPosition.x * spearsScale) * Mathf.Rad2Deg;
                 spears[i].transform.localRotation = Quaternion.Lerp(spears[i].transform.localRotation, Quaternion.Euler(0f, 0f, rotationTmp + spearsOffset), spearsDumping * Time.deltaTime);
             }
-            if ((spears[3].transform.localPosition - spearsStartPositions[3]).magnitude <= changeDistance)
+            if ((spears[0].transform.localPosition - spearsStartPositions[0]).magnitude <= changeDistance)
             {
                 for (int i = 0; i < 4; ++i)
                 {
@@ -115,13 +118,14 @@ public class Boss1WeaponController : MonoBehaviour
 
     private IEnumerator spiralAttacking()
     {
+        bosscon.stopMoving();
         int count = Mathf.FloorToInt(spiralAttackDuration / spiralAttackTimeBetweenShots) + 1;
         spearsState = 1;
         yield return new WaitForSeconds(timeBetweenAttacks);
         GameObject bul;
         for (int i = 0; i < count; ++i)
         {
-            for (int j = 0; j < 8; ++j)
+            foreach (int j in spSpiralAttack)
             {
                 bul = Instantiate(EnemyBullet, shootingPoints[j].transform.position, Quaternion.identity);
                 bul.GetComponent<Rigidbody2D>().velocity = (shootingPoints[j].transform.position - transform.position).normalized * spiralAttackBulletSpeed;
@@ -129,5 +133,7 @@ public class Boss1WeaponController : MonoBehaviour
             yield return new WaitForSeconds(spiralAttackTimeBetweenShots);
         }
         spearsState = 3;
+        yield return new WaitForSeconds(timeBetweenAttacks);
+        bosscon.refresh();
     }
 }

@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using System;
 
 public class Boss1 : MonoBehaviour
 {
@@ -11,14 +12,19 @@ public class Boss1 : MonoBehaviour
 
     private Rigidbody2D rb;
     private Transform player;
-    private Coroutine approach;
+    private int attackCount;
+    private Boss1WeaponController wepcon;
+    private bool isAllowedToMove;
 
     private void Start()
     {
+        isAllowedToMove = true;
         rb = GetComponent<Rigidbody2D>();
         player = GameObject.FindGameObjectWithTag("Player").transform;
-        approach = StartCoroutine("approachPlayer");
-        StartCoroutine("attacks");
+        attackCount = 1;
+        wepcon = enemyWeapon.GetComponent<Boss1WeaponController>();
+        StartCoroutine("approachPlayer");
+        refresh();
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -37,16 +43,25 @@ public class Boss1 : MonoBehaviour
         }
     }
 
+    public void stopMoving()
+    {
+        isAllowedToMove = false;
+        rb.velocity = Vector2.zero;
+    }
+
+    public void refresh()
+    {
+        isAllowedToMove = true;
+        StartCoroutine("attacks");
+    }
+
     private IEnumerator attacks()
     {
         yield return new WaitForSeconds(betweenAttacksTime);
-        for (; ; )
+        int tmp = UnityEngine.Random.Range(0, attackCount);
+        if (tmp == 0)
         {
-            StopCoroutine(approach);
-            rb.velocity = Vector2.zero;
-            enemyWeapon.GetComponent<Boss1WeaponController>().spiralAttack();
-            yield return new WaitForSeconds(betweenAttacksTime);
-            approach = StartCoroutine("approachPlayer");
+            wepcon.spiralAttack();
         }
     }
 
@@ -54,7 +69,10 @@ public class Boss1 : MonoBehaviour
     {
         for (; ; )
         {
-            rb.velocity = (player.position - transform.position).normalized * enemySpeed;
+            if (isAllowedToMove)
+            {
+                rb.velocity = (player.position - transform.position).normalized * enemySpeed;
+            }
             yield return new WaitForSeconds(refreshPlayerPosTime);
         }
     }

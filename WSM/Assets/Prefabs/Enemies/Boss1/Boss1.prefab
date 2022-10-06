@@ -50,11 +50,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spearsOffset: 90
-  rotationSpeed: 500
+  rotationSpeed: 400
   spearsDumping: 5
-  changeDistance: 0.1
+  changeDistance: 0.005
   spearsRotationDumping: 10
-  EnemyBullet: {fileID: 0}
+  spiralAttackDuration: 3
+  spiralAttackTimeBetweenShots: 0.05
+  spiralAttackBulletSpeed: 5
+  EnemyBullet: {fileID: 3239862130681951045, guid: 968b415287c1da04e99413c21c2792c3, type: 3}
 --- !u!95 &579386896
 Animator:
   serializedVersion: 4
