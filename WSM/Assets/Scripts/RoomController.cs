@@ -1,3 +1,4 @@
+using System.Net.Http.Headers;
 using UnityEngine;
 
 public class RoomController : MonoBehaviour
@@ -5,6 +6,7 @@ public class RoomController : MonoBehaviour
     public EnemyLoadout loadout;
     public GameObject[] roomDrops;
     public GameObject[] doors;
+    public float invincibleTime;
 
     private int enemyCount;
     private bool isCleaned;
@@ -53,6 +55,7 @@ public class RoomController : MonoBehaviour
             }
             if (loadout != null && !isCleaned)
             {
+                other.GetComponent<PlayerController>().setInvincible(invincibleTime);
                 lockDoors();
                 enemyCount = loadout.enemyPoss.Length;
                 if (roomType == 0)

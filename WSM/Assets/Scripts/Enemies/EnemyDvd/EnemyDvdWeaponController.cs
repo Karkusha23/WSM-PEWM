@@ -19,6 +19,7 @@ public class EnemyDvdWeaponController : MonoBehaviour
     private Vector3 targetAngle;
     private Quaternion targetRotation;
     private bool isRotating;
+    private float activationTime;
 
     private void Start()
     {
@@ -46,7 +47,8 @@ public class EnemyDvdWeaponController : MonoBehaviour
             targetRotation = Quaternion.identity;
         }
         isRotating = false;
-        StartCoroutine("shoot");
+        activationTime = transform.parent.GetComponent<EnemyDvd>().activationTime;
+        StartCoroutine("activateEnemyWeapon");
     }
 
     private void Update()
@@ -55,6 +57,12 @@ public class EnemyDvdWeaponController : MonoBehaviour
         {
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 5f / fireRate);
         }
+    }
+
+    private IEnumerator activateEnemyWeapon()
+    {
+        yield return new WaitForSeconds(activationTime);
+        StartCoroutine("shoot");
     }
 
     private IEnumerator shoot()

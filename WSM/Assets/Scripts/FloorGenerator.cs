@@ -1,4 +1,3 @@
-using UnityEditor;
 using UnityEngine;
 
 public class FloorGenerator : MonoBehaviour
@@ -16,8 +15,10 @@ public class FloorGenerator : MonoBehaviour
 
     public EnemyLoadout[] smallLoadouts;
     public EnemyLoadout[] bigLoadouts;
+    public EnemyLoadout[] bossLoadouts;
     public WeaponsList weapons;
     public GameObject[] pickups;
+    public GameObject[] bossDrops;
 
     private int[,] floorMatrix;
     // 0 - no room, can not build there
@@ -27,6 +28,8 @@ public class FloorGenerator : MonoBehaviour
     // 4 - small room
     // 5 - big room core
     // 6 - big room subunits
+    // 7 - boss room core
+    // 8 - pre-boss room
     private int[] freeSmallRoomHeights;
     private int[] freeSmallRoomWidths;
     private int freeSmallRoomCount;
@@ -49,15 +52,22 @@ public class FloorGenerator : MonoBehaviour
             {
                 if (floorMatrix[i, j] == 4)
                 {
-                    createSmallRoom(i, j);
+                    createSmallRoom(i, j, true);
                 }
-                if (floorMatrix[i, j] == 5)
+                else if (floorMatrix[i, j] == 5)
                 {
-                    createBigRoom(i, j);
+                    createBigRoom(i, j, false);
+                }
+                else if (floorMatrix[i, j] == 7)
+                {
+                    createBigRoom(i, j, true);
+                }
+                else if (floorMatrix[i, j] == 8)
+                {
+                    createSmallRoom(i, j, false);
                 }
             }
         }
-        createBossRoom(); // TODO
     }
 
     private void initVectors()
@@ -93,6 +103,7 @@ public class FloorGenerator : MonoBehaviour
                 break;
             }
         }
+        buildBossRoom();
     }
 
     private void initMatrix()
@@ -464,7 +475,7 @@ public class FloorGenerator : MonoBehaviour
         --freeBigRoomCount;
     }
 
-    private void createSmallRoom(int row, int col)
+    private void createSmallRoom(int row, int col, bool withEnemies)
     {
         Vector3 pos = new Vector3((col - floorWidth / 2) * 17.6f, (floorHeight / 2 - row) * 11f, 0f);
         room = Instantiate(smallRoom, pos, Quaternion.identity);
@@ -474,21 +485,29 @@ public class FloorGenerator : MonoBehaviour
         {
             Instantiate(weapons.weapons_dropped[0], room.transform.position + new Vector3(4f, 0f, 0f), Quaternion.Euler(0f, 0f, Random.Range(0f, 360f)));
         }
-        else
+        else if (withEnemies)
         {
             room.GetComponent<RoomController>().loadout = smallLoadouts[Random.Range(0, smallLoadouts.Length)];
             room.GetComponent<RoomController>().roomDrops = pickups;
         }
     }
 
-    private void createBigRoom(int row, int col)
+    private void createBigRoom(int row, int col, bool isBoss)
     {
         Vector3 pos = new Vector3((col - floorWidth / 2) * 17.6f, (floorHeight / 2 - row) * 11f, 0f);
         room = Instantiate(bigRoom, pos, Quaternion.identity);
         getBigRoomType(row, col);
         createBigDoors();
-        room.GetComponent<RoomController>().loadout = bigLoadouts[Random.Range(0, bigLoadouts.Length)];
-        room.GetComponent<RoomController>().roomDrops = pickups;
+        if (isBoss)
+        {
+            room.GetComponent<RoomController>().loadout = bossLoadouts[Random.Range(0, bigLoadouts.Length)];
+            room.GetComponent<RoomController>().roomDrops = bossDrops;
+        }
+        else
+        {
+            room.GetComponent<RoomController>().loadout = bigLoadouts[Random.Range(0, bigLoadouts.Length)];
+            room.GetComponent<RoomController>().roomDrops = pickups;
+        }
     }
 
     private void getSmallRoomType(int row, int col)
@@ -633,8 +652,149 @@ public class FloorGenerator : MonoBehaviour
         }
     }
 
-    private void createBossRoom()
+    private void buildBossRoom()
     {
-        //TODO
+        int[,] tmpMatrix = new int[floorHeight + 6, floorWidth + 6];
+        for (int i = 0; i < floorHeight; ++i)
+        {
+            for (int j = 0; j < floorWidth; ++j)
+            {
+                tmpMatrix[i + 3, j + 3] = floorMatrix[i, j];
+            }
+        }
+        floorMatrix = tmpMatrix;
+        floorHeight += 6;
+        floorWidth += 6;
+        int tmpType = Random.Range(0, 4);
+        int[] freeRoom = new int[Mathf.Max(floorHeight, floorWidth)];
+        int freeRoomCount = 0;
+        if (tmpType == 0)
+        {
+            int row = 0, col = 0;
+            bool indicator = false;
+            for (; row < floorHeight; ++row)
+            {
+                for (; col < floorWidth; ++col)
+                {
+                    if (floorMatrix[row, col] >= 4)
+                    {
+                        indicator = true;
+                        break;
+                    }
+                }
+                if (indicator)
+                {
+                    break;
+                }
+                col = 0;
+            }
+            for (; col < floorWidth; ++col)
+            {
+                if (floorMatrix[row, col] >= 4)
+                {
+                    freeRoom[freeRoomCount++] = col;
+                }
+            }
+            int tmpPos = freeRoom[Random.Range(0, freeRoomCount)];
+            floorMatrix[row - 1, tmpPos] = 4;
+            floorMatrix[row - 3, tmpPos] = 7;
+            floorMatrix[row - 3, tmpPos + 1] = floorMatrix[row - 2, tmpPos] = floorMatrix[row - 2, tmpPos + 1] = 6;
+        }
+        else if (tmpType == 1)
+        {
+            int row = 0, col = 0;
+            bool indicator = false;
+            for (; col < floorWidth; ++col)
+            {
+                for (; row < floorHeight; ++row)
+                {
+                    if (floorMatrix[row, col] >= 4)
+                    {
+                        indicator = true;
+                        break;
+                    }
+                }
+                if (indicator)
+                {
+                    break;
+                }
+                row = 0;
+            }
+            for (; row < floorHeight; ++row)
+            {
+                if (floorMatrix[row, col] >= 4)
+                {
+                    freeRoom[freeRoomCount++] = row;
+                }
+            }
+            int tmpPos = freeRoom[Random.Range(0, freeRoomCount)];
+            floorMatrix[tmpPos, col - 1] = 8;
+            floorMatrix[tmpPos, col - 3] = 7;
+            floorMatrix[tmpPos, col - 2] = floorMatrix[tmpPos + 1, col - 3] = floorMatrix[tmpPos + 1, col - 2] = 6;
+        }
+        else if (tmpType == 2)
+        {
+            int row = 0, col = floorWidth - 1;
+            bool indicator = false;
+            for (; col >= 0; --col)
+            {
+                for (; row < floorHeight; ++row)
+                {
+                    if (floorMatrix[row, col] >= 4)
+                    {
+                        indicator = true;
+                        break;
+                    }
+                }
+                if (indicator)
+                {
+                    break;
+                }
+                row = 0;
+            }
+            for (; row < floorHeight; ++row)
+            {
+                if (floorMatrix[row, col] >= 4)
+                {
+                    freeRoom[freeRoomCount++] = row;
+                }
+            }
+            int tmpPos = freeRoom[Random.Range(0, freeRoomCount)];
+            floorMatrix[tmpPos, col + 1] = 8;
+            floorMatrix[tmpPos, col + 2] = 7;
+            floorMatrix[tmpPos, col + 3] = floorMatrix[tmpPos + 1, col + 2] = floorMatrix[tmpPos + 1, col + 3] = 6;
+        }
+        else
+        {
+            int row = floorHeight - 1, col = 0;
+            bool indicator = false;
+            for (; row >= 0; --row)
+            {
+                for (; col < floorWidth; ++col)
+                {
+                    if (floorMatrix[row, col] >= 4)
+                    {
+                        indicator = true;
+                        break;
+                    }
+                }
+                if (indicator)
+                {
+                    break;
+                }
+                col = 0;
+            }
+            for (; col < floorWidth; ++col)
+            {
+                if (floorMatrix[row, col] >= 4)
+                {
+                    freeRoom[freeRoomCount++] = col;
+                }
+            }
+            int tmpPos = freeRoom[Random.Range(0, freeRoomCount)];
+            floorMatrix[row + 1, tmpPos] = 8;
+            floorMatrix[row + 2, tmpPos] = 7;
+            floorMatrix[row + 2, tmpPos + 1] = floorMatrix[row + 3, tmpPos] = floorMatrix[row + 3, tmpPos + 1] = 6;
+        }
     }
 }

@@ -6,6 +6,7 @@ public class EnemyChase : MonoBehaviour
     public float enemyHealth;
     public float enemySpeed;
     public float refreshFrequency;
+    public float activationTime;
 
     private Rigidbody2D rb;
     private Transform player;
@@ -15,7 +16,7 @@ public class EnemyChase : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         player = GameObject.FindGameObjectWithTag("Player").transform;
-        StartCoroutine("refreshPlayerPos");
+        StartCoroutine("activateEnemy");
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -29,6 +30,12 @@ public class EnemyChase : MonoBehaviour
                 Destroy(gameObject);
             }
         }
+    }
+
+    private IEnumerator activateEnemy()
+    {
+        yield return new WaitForSeconds(activationTime);
+        StartCoroutine("refreshPlayerPos");
     }
 
     private IEnumerator refreshPlayerPos()

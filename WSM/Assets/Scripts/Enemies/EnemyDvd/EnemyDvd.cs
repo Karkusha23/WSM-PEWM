@@ -1,5 +1,5 @@
-using System.Threading;
 using UnityEngine;
+using System.Collections;
 
 public class EnemyDvd : MonoBehaviour
 {
@@ -8,6 +8,7 @@ public class EnemyDvd : MonoBehaviour
     public float enemySpeed;
     public float minSpeedScale;
     public float maxSpeedScale;
+    public float activationTime;
 
     [HideInInspector]
     public bool allowedToMove;
@@ -21,9 +22,8 @@ public class EnemyDvd : MonoBehaviour
     {
         direction = new Vector2(Random.Range(0, 2) == 0 ? -1f : 1f, Random.Range(0, 2) == 0 ? -1f : 1f);
         rb = GetComponent<Rigidbody2D>();
-        rb.velocity = direction * enemySpeed;
         Instantiate(enemyWeapon, transform.position, Quaternion.identity, transform);
-        allowedToMove = true;
+        StartCoroutine("activateEnemy");
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -75,5 +75,12 @@ public class EnemyDvd : MonoBehaviour
                 Destroy(gameObject);
             }
         }
+    }
+
+    private IEnumerator activateEnemy()
+    {
+        yield return new WaitForSeconds(activationTime);
+        rb.velocity = direction * enemySpeed;
+        allowedToMove = true;
     }
 }

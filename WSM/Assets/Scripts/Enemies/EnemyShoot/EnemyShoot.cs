@@ -8,6 +8,7 @@ public class EnemyShoot : MonoBehaviour
     public float refreshFrequency;
     public GameObject enemyWeapon;
     public float stayDistanceSqr;
+    public float activationTime;
 
     private Rigidbody2D rb;
     private Transform player;
@@ -18,7 +19,7 @@ public class EnemyShoot : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         player = GameObject.FindGameObjectWithTag("Player").transform;
         Instantiate(enemyWeapon, transform.position, Quaternion.identity, transform);
-        StartCoroutine("refreshPlayerPos");
+        StartCoroutine("activateEnemy");
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -33,6 +34,13 @@ public class EnemyShoot : MonoBehaviour
             }
         }
     }
+
+    private IEnumerator activateEnemy()
+    {
+        yield return new WaitForSeconds(activationTime);
+        StartCoroutine("refreshPlayerPos");
+    }
+
 
     private IEnumerator refreshPlayerPos()
     {

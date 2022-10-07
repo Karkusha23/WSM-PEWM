@@ -107,6 +107,12 @@ public class PlayerController : MonoBehaviour
         checkTakeDamage(collision);
     }
 
+    public void setInvincible(float time)
+    {
+        invincible = true;
+        invincibleTimer = time;
+    }
+
     private void checkTakeDamage(Collision2D collision)
     {
         if (collision.collider.CompareTag("Enemy") || collision.collider.CompareTag("EnemyBullet"))

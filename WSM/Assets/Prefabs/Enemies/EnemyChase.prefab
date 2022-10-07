@@ -123,6 +123,7 @@ MonoBehaviour:
   enemyHealth: 3
   enemySpeed: 7
   refreshFrequency: 0.1
+  activationTime: 0.5
 --- !u!61 &1371662492
 BoxCollider2D:
   m_ObjectHideFlags: 0

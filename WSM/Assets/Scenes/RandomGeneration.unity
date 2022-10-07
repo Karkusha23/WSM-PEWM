@@ -510,13 +510,33 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 7309073861808278978, guid: eb8370d209416074aa3de4f765e5eefa, type: 3}
+      propertyPath: bigRoomProbability
+      value: 0.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 7309073861808278978, guid: eb8370d209416074aa3de4f765e5eefa, type: 3}
+      propertyPath: bossDrops.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7309073861808278978, guid: eb8370d209416074aa3de4f765e5eefa, type: 3}
       propertyPath: bigLoadouts.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7309073861808278978, guid: eb8370d209416074aa3de4f765e5eefa, type: 3}
+      propertyPath: bossDrops.Array.data[0]
+      value: 
+      objectReference: {fileID: 4370064962261114294, guid: 212499558dea19446856b3d5396767d1, type: 3}
+    - target: {fileID: 7309073861808278978, guid: eb8370d209416074aa3de4f765e5eefa, type: 3}
+      propertyPath: bossLoadouts.Array.size
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7309073861808278978, guid: eb8370d209416074aa3de4f765e5eefa, type: 3}
       propertyPath: bigLoadouts.Array.data[0]
       value: 
       objectReference: {fileID: 11400000, guid: b717a4f6dd0e1364fb0c4df37ca82c96, type: 2}
+    - target: {fileID: 7309073861808278978, guid: eb8370d209416074aa3de4f765e5eefa, type: 3}
+      propertyPath: bossLoadouts.Array.data[0]
+      value: 
+      objectReference: {fileID: 11400000, guid: 896bc78445cf9d64aa8ff697c7af9aee, type: 2}
     - target: {fileID: 7309073861808278979, guid: eb8370d209416074aa3de4f765e5eefa, type: 3}
       propertyPath: m_Name
       value: FloorGenerator

@@ -151,3 +151,4 @@ MonoBehaviour:
   refreshFrequency: 0.1
   enemyWeapon: {fileID: 211350373683881708, guid: feb7a32c35080fe479aceee777c98f03, type: 3}
   stayDistanceSqr: 20
+  activationTime: 0.5
