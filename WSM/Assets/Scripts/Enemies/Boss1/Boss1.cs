@@ -1,6 +1,5 @@
 using UnityEngine;
 using System.Collections;
-using System;
 
 public class Boss1 : MonoBehaviour
 {
@@ -9,20 +8,24 @@ public class Boss1 : MonoBehaviour
     public float enemySpeed;
     public float refreshPlayerPosTime;
     public float betweenAttacksTime;
+    public GameObject bossHealthBar;
 
     private Rigidbody2D rb;
     private Transform player;
     private int attackCount;
     private Boss1WeaponController wepcon;
     private bool isAllowedToMove;
+    private BossHealthBar healthBar;
 
     private void Start()
     {
         isAllowedToMove = true;
         rb = GetComponent<Rigidbody2D>();
         player = GameObject.FindGameObjectWithTag("Player").transform;
-        attackCount = 1;
+        attackCount = 2;
         wepcon = enemyWeapon.GetComponent<Boss1WeaponController>();
+        healthBar = Instantiate(bossHealthBar, GameObject.FindGameObjectWithTag("HUD").transform).GetComponent<BossHealthBar>();
+        healthBar.maxHealth = healthBar.health = enemyHealth;
         StartCoroutine("approachPlayer");
         refresh();
     }
@@ -32,12 +35,14 @@ public class Boss1 : MonoBehaviour
         if (collision.collider.CompareTag("Bullet"))
         {
             enemyHealth -= collision.collider.GetComponent<Bullet>().damage;
+            healthBar.health = enemyHealth;
             if (enemyHealth <= 0)
             {
                 if (transform.parent != null)
                 {
                     transform.parent.GetComponent<RoomController>().checkEnemyKilled();
                 }
+                Destroy(healthBar.gameObject);
                 Destroy(gameObject);
             }
         }
@@ -58,10 +63,14 @@ public class Boss1 : MonoBehaviour
     private IEnumerator attacks()
     {
         yield return new WaitForSeconds(betweenAttacksTime);
-        int tmp = UnityEngine.Random.Range(0, attackCount);
+        int tmp = Random.Range(0, attackCount);
         if (tmp == 0)
         {
             wepcon.spiralAttack();
+        }
+        else if (tmp == 1)
+        {
+            wepcon.machineGunAttack();
         }
     }
 

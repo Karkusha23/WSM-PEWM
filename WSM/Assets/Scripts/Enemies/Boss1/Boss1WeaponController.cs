@@ -11,6 +11,12 @@ public class Boss1WeaponController : MonoBehaviour
     public float spiralAttackDuration;
     public float spiralAttackTimeBetweenShots;
     public float spiralAttackBulletSpeed;
+    public float machineGunAttackDuration;
+    public float machineGunAttackTimeBetweenShots;
+    public float machineGunAttackBulletSpeed;
+    public float minBulSpeedScale;
+    public float maxBulSpeedScale;
+    public float maxBulDirectionDeviation;
     public GameObject EnemyBullet;
 
     private GameObject[] spears;
@@ -116,6 +122,11 @@ public class Boss1WeaponController : MonoBehaviour
         StartCoroutine("spiralAttacking");
     }
 
+    public void machineGunAttack()
+    {
+        StartCoroutine("machineGunAttacking");
+    }
+
     private IEnumerator spiralAttacking()
     {
         bosscon.stopMoving();
@@ -134,6 +145,28 @@ public class Boss1WeaponController : MonoBehaviour
         }
         spearsState = 3;
         yield return new WaitForSeconds(timeBetweenAttacks);
+        bosscon.refresh();
+    }
+
+    private IEnumerator machineGunAttacking()
+    {
+        int count = Mathf.FloorToInt(machineGunAttackDuration / machineGunAttackTimeBetweenShots) / 4 + 1;
+        spearsState = 3;
+        yield return new WaitForSeconds(timeBetweenAttacks);
+        GameObject bul;
+        Vector3 destination, tmp;
+        for (int i = 0; i < count; ++i)
+        {
+            for (int j = 0; j < 8; j += 2)
+            {
+                destination = (player.position - shootingPoints[j].transform.position).normalized;
+                tmp = new Vector3(destination.y, -destination.x, 0f);
+                destination += tmp * Random.Range(-maxBulDirectionDeviation, maxBulDirectionDeviation);
+                bul = Instantiate(EnemyBullet, shootingPoints[j].transform.position, Quaternion.identity);
+                bul.GetComponent<Rigidbody2D>().velocity = destination.normalized * machineGunAttackBulletSpeed * Random.Range(minBulSpeedScale, maxBulSpeedScale);
+                yield return new WaitForSeconds(machineGunAttackTimeBetweenShots);
+            }
+        }
         bosscon.refresh();
     }
 }

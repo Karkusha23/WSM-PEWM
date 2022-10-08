@@ -696,7 +696,7 @@ public class FloorGenerator : MonoBehaviour
                 }
             }
             int tmpPos = freeRoom[Random.Range(0, freeRoomCount)];
-            floorMatrix[row - 1, tmpPos] = 4;
+            floorMatrix[row - 1, tmpPos] = 8;
             floorMatrix[row - 3, tmpPos] = 7;
             floorMatrix[row - 3, tmpPos + 1] = floorMatrix[row - 2, tmpPos] = floorMatrix[row - 2, tmpPos + 1] = 6;
         }
