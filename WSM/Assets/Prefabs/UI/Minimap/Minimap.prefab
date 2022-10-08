@@ -45,9 +45,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5395861895567193116}
+  - component: {fileID: 1633807974}
   m_Layer: 5
   m_Name: Minimap
-  m_TagString: Untagged
+  m_TagString: Minimap
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -74,6 +75,28 @@ RectTransform:
   m_AnchoredPosition: {x: -100.00003, y: -100}
   m_SizeDelta: {x: 200, y: 200}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1633807974
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5395861895567193107}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 28d862f30466f4b42a049dda93b18c2b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pixHalfARoom: 10
+  minimapHeight: 10
+  minimapWidth: 10
+  smallRoomNotExplored: {fileID: 6983687976442030218, guid: 778f65d0a22590d4eb980d8805177cbd, type: 3}
+  smallRoomExplored: {fileID: 5255416606429172782, guid: 9be8e059dfd2b3649a24cf7397d0b06c, type: 3}
+  bigRoomNotExplored: {fileID: 60979803528149536, guid: 9c849dcd1a5971b4ba4f561d4e3e10d5, type: 3}
+  bigRoomExplored: {fileID: 6495265555360798463, guid: 87cd6a5feb1fb5f4daeea1dff13e4468, type: 3}
+  bossIcon: {fileID: 9177709812278769706, guid: e9d2774799a3b294eb78ee20c36c43e1, type: 3}
+  floorHeight: 0
+  floorWidth: 0
 --- !u!1 &5395861896048033398
 GameObject:
   m_ObjectHideFlags: 0

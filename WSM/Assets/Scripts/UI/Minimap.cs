@@ -1,7 +1,12 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Minimap : MonoBehaviour
 {
+    public int pixHalfARoom;
+    public int minimapHeight;
+    public int minimapWidth;
+    public Vector3 pixelOffset;
     public GameObject smallRoomNotExplored;
     public GameObject smallRoomExplored;
     public GameObject bigRoomNotExplored;
@@ -20,20 +25,20 @@ public class Minimap : MonoBehaviour
     // 1 - explored small room, not visited
     // 2 - explored big room core, not visited
     // 3 - explored big room units, not visited
-    // 4 - explored boss room core, not visited
-    // 5 - small room visited
-    // 6 - big room core visited
-    // 7 - big room subuints visited
-    // 8 - boss room visited
+    // 4 - small room visited
+    // 5 - big room core visited
+    // 6 - big room subuints visited
     private int curRow;
     private int curCol;
     private Transform player;
     private Transform minimapBase;
     private GameObject[,] notExploredRooms;
     private GameObject[,] exploredRooms;
+    private int pixARoom;
 
-    private void Start()
+    public void init()
     {
+        pixARoom = pixHalfARoom * 2;
         floorExplored = new int[floorHeight, floorWidth];
         player = GameObject.FindGameObjectWithTag("Player").transform;
         minimapBase = transform.Find("MinimapBase");
@@ -45,15 +50,15 @@ public class Minimap : MonoBehaviour
             {
                 if (floorMatrix[i, j] == 4 || floorMatrix[i, j] == 8)
                 {
-                    notExploredRooms[i, j] = Instantiate(smallRoomNotExplored, new Vector3(floorWidth / 2 + j * 20f, floorHeight / 2 - i * 20f, 0f), Quaternion.identity, minimapBase);
+                    notExploredRooms[i, j] = Instantiate(smallRoomNotExplored, Camera.main.ScreenToWorldPoint(pixelOffset + new Vector3(floorWidth / 2 + j * pixARoom, floorHeight / 2 - i * pixARoom, 0f)), Quaternion.identity, minimapBase);
                     notExploredRooms[i, j].SetActive(false);
-                    exploredRooms[i, j] = Instantiate(smallRoomExplored, new Vector3(floorWidth / 2 + j * 20f, floorHeight / 2 - i * 20f, 0f), Quaternion.identity, minimapBase);
+                    exploredRooms[i, j] = Instantiate(smallRoomExplored, Camera.main.ScreenToWorldPoint(pixelOffset + new Vector3(floorWidth / 2 + j * pixARoom, floorHeight / 2 - i * pixARoom, 0f)), Quaternion.identity, minimapBase);
                     exploredRooms[i, j].SetActive(false);
                 }
                 else if (floorMatrix[i, j] == 5 || floorMatrix[i, j] == 7)
                 {
-                    notExploredRooms[i, j] = Instantiate(bigRoomNotExplored, new Vector3(floorWidth / 2 + j * 20f + 10f, floorHeight / 2 - i * 20f - 10f, 0f), Quaternion.identity, minimapBase);
-                    exploredRooms[i, j] = Instantiate(bigRoomExplored, new Vector3(floorWidth / 2 + j * 20f + 10f, floorHeight / 2 - i * 20f - 10f, 0f), Quaternion.identity, minimapBase);
+                    notExploredRooms[i, j] = notExploredRooms[i, j + 1] = notExploredRooms[i + 1, j] = notExploredRooms[i + 1, j + 1] = Instantiate(bigRoomNotExplored, Camera.main.ScreenToWorldPoint(pixelOffset + new Vector3(floorWidth / 2 + j * pixARoom + pixHalfARoom, floorHeight / 2 - i * pixARoom - pixHalfARoom, 0f)), Quaternion.identity, minimapBase);
+                    exploredRooms[i, j] = exploredRooms[i, j + 1] = exploredRooms[i + 1, j] = exploredRooms[i + 1, j + 1] = Instantiate(bigRoomExplored, Camera.main.ScreenToWorldPoint(pixelOffset + new Vector3(floorWidth / 2 + j * pixARoom + pixHalfARoom, floorHeight / 2 - i * pixARoom - pixHalfARoom, 0f)), Quaternion.identity, minimapBase);
                     if (floorMatrix[i, j] == 7)
                     {
                         Instantiate(bossIcon, notExploredRooms[i, j].transform.position, Quaternion.identity, notExploredRooms[i, j].transform);
@@ -71,23 +76,114 @@ public class Minimap : MonoBehaviour
     {
         int row = floorHeight / 2 - Mathf.RoundToInt(roomPos.y / 11f);
         int col = floorWidth / 2 + Mathf.RoundToInt(roomPos.x / 17.6f);
-        if (floorExplored[row, col] < 5)
+        if (floorExplored[row, col] < 4)
         {
             if (floorMatrix[row, col] == 4 || floorMatrix[row, col] == 8)
             {
-                floorExplored[row, col] = 5;
+                floorExplored[row, col] = 4;
             }
             else if (floorMatrix[row, col] == 5 || floorMatrix[row, col] == 7)
             {
-                if (floorMatrix[row, col] == 5)
+                floorExplored[row, col] = 5;
+                floorExplored[row, col + 1] = floorExplored[row + 1, col] = floorExplored[row + 1, col + 1] = 6;
+            }
+            exploredRooms[row, col].SetActive(true);
+            notExploredRooms[row, col].SetActive(false);
+            if (floorMatrix[row, col] == 4 || floorMatrix[row, col] == 8)
+            {
+                checkSmallAround(row, col);
+            }
+            else if (floorMatrix[row, col] == 5)
+            {
+                checkBigAround(row, col);
+            }
+        }
+        minimapBase.position += new Vector3((curRow - row) * pixARoom, (col - curCol) * pixARoom, 0f);
+        curRow = row;
+        curCol = col;
+        checkToActivate();
+    }
+
+    private void checkSmallAround(int row, int col)
+    {
+        checkCell(row - 1, col);
+        checkCell(row, col - 1);
+        checkCell(row, col + 1);
+        checkCell(row + 1, col);
+    }
+
+    private void checkBigAround(int row, int col)
+    {
+        checkCell(row - 1, col);
+        checkCell(row - 1, col + 1);
+        checkCell(row, col - 1);
+        checkCell(row, col + 2);
+        checkCell(row + 1, col - 1);
+        checkCell(row + 1, col + 2);
+        checkCell(row + 2, col);
+        checkCell(row + 2, col + 1);
+    }
+
+    private void checkCell(int row, int col)
+    {
+        if (floorExplored[row, col] == 0 && floorMatrix[row, col] >= 4)
+        {
+            notExploredRooms[row, col].SetActive(true);
+            if (floorMatrix[row, col] == 4 || floorMatrix[row, col] == 8)
+            {
+                floorExplored[row, col] = 1;
+            }
+            else if (floorMatrix[row, col] == 5 || floorMatrix[row, col] == 7)
+            {
+                floorExplored[row, col] = 2;
+                floorExplored[row, col + 1] = floorExplored[row + 1, col] = floorExplored[row + 1, col + 1] = 3;
+            }
+            else if (floorMatrix[row, col] == 6)
+            {
+                if (floorMatrix[row, col - 1] == 5 || floorMatrix[row, col - 1] == 7)
                 {
-                    floorExplored[row, col] = 6;
+                    floorExplored[row, col - 1] = 2;
+                    floorExplored[row, col] = floorExplored[row + 1, col - 1] = floorExplored[row + 1, col] = 3;
+                }
+                else if (floorMatrix[row - 1, col] == 5 || floorMatrix[row - 1, col] == 7)
+                {
+                    floorExplored[row - 1, col] = 2;
+                    floorExplored[row - 1, col + 1] = floorExplored[row, col] = floorExplored[row, col + 1] = 3;
                 }
                 else
                 {
-                    floorExplored[row, col] = 8;
+                    floorExplored[row - 1, col - 1] = 2;
+                    floorExplored[row - 1, col] = floorExplored[row, col - 1] = floorExplored[row, col] = 3;
                 }
-                floorExplored[row, col + 1] = floorExplored[row + 1, col] = floorExplored[row + 1, col + 1] = 7;
+            }
+        }
+    }
+
+    private void checkToActivate()
+    {
+        for (int i = 0; i < floorHeight; ++i)
+        {
+            for (int j = 0; j < floorWidth; ++j)
+            {
+                if (floorExplored[i, j] > 0)
+                {
+                    if (Mathf.Abs(i - curRow) <= minimapHeight / 2 && Mathf.Abs(i - curCol) <= minimapWidth / 2)
+                    {
+                        if (floorExplored[i, j] >= 1 && floorExplored[i, j] <= 3)
+                        {
+                            notExploredRooms[i, j].SetActive(true);
+                        }
+                        else if (floorExplored[i, j] >= 4 && floorExplored[i, j] <= 6)
+                        {
+                            exploredRooms[i, j].SetActive(true);
+                        }
+                    }
+                    else
+                    {
+                        notExploredRooms[i, j].SetActive(false);
+                        exploredRooms[i, j].SetActive(true);
+                    }
+                }
             }
         }
     }

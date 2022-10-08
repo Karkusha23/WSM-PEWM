@@ -1,3 +1,4 @@
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 public class FloorGenerator : MonoBehaviour
@@ -41,6 +42,7 @@ public class FloorGenerator : MonoBehaviour
     private bool[] bigDoors;
     private Vector3[] doorPoss;
     private Vector3[] bigRoomDoorOffsets;
+    private Minimap minimap;
 
     private void Awake()
     {
@@ -68,6 +70,11 @@ public class FloorGenerator : MonoBehaviour
                 }
             }
         }
+        minimap = GameObject.FindGameObjectWithTag("Minimap").GetComponent<Minimap>();
+        minimap.floorMatrix = floorMatrix;
+        minimap.floorHeight = floorHeight;
+        minimap.floorWidth = floorWidth;
+        minimap.init();
     }
 
     private void initVectors()

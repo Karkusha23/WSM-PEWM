@@ -16,6 +16,7 @@ TagManager:
   - LoseScreen
   - DoorTrigger
   - BigRoom
+  - Minimap
   layers:
   - Default
   - TransparentFX
