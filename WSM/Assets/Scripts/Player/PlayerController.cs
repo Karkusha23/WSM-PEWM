@@ -1,4 +1,5 @@
 using System.Data;
+using System.Xml;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -22,6 +23,7 @@ public class PlayerController : MonoBehaviour
     private bool invincible;
     private float invincibleTimer;
     private HUDHP hpMain;
+    private Minimap minimap;
     private Animator anim;
     private float dropKeyTime;
     private float dropWeaponTimer;
@@ -37,6 +39,7 @@ public class PlayerController : MonoBehaviour
         invincibleTimer = 0f;
         loseScreen.SetActive(false);
         hpMain = HUD.transform.Find("HPMain").GetComponent<HUDHP>();
+        minimap = HUD.transform.Find("Minimap").GetComponent<Minimap>();
         anim = GetComponent<Animator>();
         anim.SetFloat("InvincibilityTime", invincibilityAfterDamage);
         anim.SetBool("Invincible", false);
@@ -90,6 +93,10 @@ public class PlayerController : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D other)
     {
         checkTakeWeapon(other);
+        if (other.CompareTag("SmallRoom") || other.CompareTag("BigRoom"))
+        {
+            minimap.checkRoom(other.transform.position);
+        }
     }
 
     private void OnTriggerStay2D(Collider2D other)
