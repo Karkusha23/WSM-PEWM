@@ -333,14 +333,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 2121556451}
     m_Modifications:
-    - target: {fileID: 1097839462, guid: 26273eeb44fa4664fad4d1c6d66f3484, type: 3}
-      propertyPath: m_SizeDelta.x
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 1097839462, guid: 26273eeb44fa4664fad4d1c6d66f3484, type: 3}
-      propertyPath: m_SizeDelta.y
-      value: 10
-      objectReference: {fileID: 0}
     - target: {fileID: 5395861895567193107, guid: 26273eeb44fa4664fad4d1c6d66f3484, type: 3}
       propertyPath: m_Name
       value: Minimap
@@ -621,7 +613,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 7309073861808278978, guid: eb8370d209416074aa3de4f765e5eefa, type: 3}
       propertyPath: bigRoomProbability
-      value: 0.15
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7309073861808278978, guid: eb8370d209416074aa3de4f765e5eefa, type: 3}
       propertyPath: bossDrops.Array.size

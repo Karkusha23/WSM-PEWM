@@ -29,12 +29,12 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 5395861895567193116}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: 10, y: 10}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &5395861895567193107
 GameObject:
@@ -65,8 +65,8 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 5395861896048033399}
   - {fileID: 1097839462}
+  - {fileID: 5395861896048033399}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -95,6 +95,7 @@ MonoBehaviour:
   bigRoomNotExplored: {fileID: 60979803528149536, guid: 9c849dcd1a5971b4ba4f561d4e3e10d5, type: 3}
   bigRoomExplored: {fileID: 6495265555360798463, guid: 87cd6a5feb1fb5f4daeea1dff13e4468, type: 3}
   bossIcon: {fileID: 9177709812278769706, guid: e9d2774799a3b294eb78ee20c36c43e1, type: 3}
+  pixelOffset: {x: 17.79, y: 15.38, z: 10}
   floorHeight: 0
   floorWidth: 0
 --- !u!1 &5395861896048033398
@@ -128,7 +129,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 5395861895567193116}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
