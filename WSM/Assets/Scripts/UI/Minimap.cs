@@ -10,7 +10,6 @@ public class Minimap : MonoBehaviour
     public GameObject bigRoomNotExplored;
     public GameObject bigRoomExplored;
     public GameObject bossIcon;
-    public Vector3 pixelOffset;
 
     [HideInInspector]
     public int[,] floorMatrix;
@@ -29,7 +28,6 @@ public class Minimap : MonoBehaviour
     // 6 - big room subuints visited
     private int curRow;
     private int curCol;
-    private Transform player;
     private Transform minimapBase;
     private GameObject[,] notExploredRooms;
     private GameObject[,] exploredRooms;
@@ -43,7 +41,6 @@ public class Minimap : MonoBehaviour
         curCol = floorWidth / 2;
         pixARoom = pixHalfARoom * 2;
         floorExplored = new int[floorHeight, floorWidth];
-        player = GameObject.FindGameObjectWithTag("Player").transform;
         minimapBase = transform.Find("MinimapBase");
         notExploredRooms = new GameObject[floorHeight, floorWidth];
         exploredRooms = new GameObject[floorHeight, floorWidth];
@@ -53,15 +50,17 @@ public class Minimap : MonoBehaviour
             {
                 if (floorMatrix[i, j] == 4 || floorMatrix[i, j] == 8)
                 {
-                    notExploredRooms[i, j] = Instantiate(smallRoomNotExplored, pixelOffset + Camera.main.ScreenToWorldPoint(new Vector3(floorWidth / 2 + j * pixARoom, floorHeight / 2 - i * pixARoom, 0f)), Quaternion.identity, minimapBase);
+                    Vector3 tmpSmallRoomPos = transform.position + Camera.main.ScreenToWorldPoint(new Vector3((j - floorWidth / 2) * pixARoom, (floorHeight / 2 - i) * pixARoom, 0f)) - camOffset;
+                    notExploredRooms[i, j] = Instantiate(smallRoomNotExplored, tmpSmallRoomPos, Quaternion.identity, minimapBase);
                     notExploredRooms[i, j].SetActive(false);
-                    exploredRooms[i, j] = Instantiate(smallRoomExplored, pixelOffset + Camera.main.ScreenToWorldPoint(new Vector3(floorWidth / 2 + j * pixARoom, floorHeight / 2 - i * pixARoom, 0f)), Quaternion.identity, minimapBase);
+                    exploredRooms[i, j] = Instantiate(smallRoomExplored, tmpSmallRoomPos, Quaternion.identity, minimapBase);
                     exploredRooms[i, j].SetActive(false);
                 }
                 else if (floorMatrix[i, j] == 5 || floorMatrix[i, j] == 7)
                 {
-                    notExploredRooms[i, j] = notExploredRooms[i, j + 1] = notExploredRooms[i + 1, j] = notExploredRooms[i + 1, j + 1] = Instantiate(bigRoomNotExplored, pixelOffset + Camera.main.ScreenToWorldPoint(new Vector3(floorWidth / 2 + j * pixARoom + pixHalfARoom, floorHeight / 2 - i * pixARoom - pixHalfARoom, 0f)), Quaternion.identity, minimapBase);
-                    exploredRooms[i, j] = exploredRooms[i, j + 1] = exploredRooms[i + 1, j] = exploredRooms[i + 1, j + 1] = Instantiate(bigRoomExplored, pixelOffset + Camera.main.ScreenToWorldPoint(new Vector3(floorWidth / 2 + j * pixARoom + pixHalfARoom, floorHeight / 2 - i * pixARoom - pixHalfARoom, 0f)), Quaternion.identity, minimapBase);
+                    Vector3 tmpBigRoomPos = transform.position + Camera.main.ScreenToWorldPoint(new Vector3((j - floorWidth / 2) * pixARoom + pixHalfARoom, (floorHeight / 2 - i) * pixARoom - pixHalfARoom, 0f)) - camOffset;
+                    notExploredRooms[i, j] = notExploredRooms[i, j + 1] = notExploredRooms[i + 1, j] = notExploredRooms[i + 1, j + 1] = Instantiate(bigRoomNotExplored, tmpBigRoomPos, Quaternion.identity, minimapBase);
+                    exploredRooms[i, j] = exploredRooms[i, j + 1] = exploredRooms[i + 1, j] = exploredRooms[i + 1, j + 1] = Instantiate(bigRoomExplored, tmpBigRoomPos, Quaternion.identity, minimapBase);
                     if (floorMatrix[i, j] == 7)
                     {
                         Instantiate(bossIcon, notExploredRooms[i, j].transform.position, Quaternion.identity, notExploredRooms[i, j].transform);
@@ -79,8 +78,6 @@ public class Minimap : MonoBehaviour
     {
         int row = floorHeight / 2 - Mathf.RoundToInt(roomPos.y / 11f);
         int col = floorWidth / 2 + Mathf.RoundToInt(roomPos.x / 17.6f);
-        Debug.Log(row);
-        Debug.Log(col);
         if (floorExplored[row, col] < 4)
         {
             if (floorMatrix[row, col] == 4 || floorMatrix[row, col] == 8)
@@ -103,7 +100,7 @@ public class Minimap : MonoBehaviour
                 checkBigAround(row, col);
             }
         }
-        minimapBase.position = transform.position + Camera.main.ScreenToWorldPoint(new Vector3((curCol - col) * pixARoom, (row - curRow) * pixARoom, 0f)) - camOffset;
+        minimapBase.GetComponent<RectTransform>().anchoredPosition += new Vector2((curCol - col) * pixARoom, (row - curRow) * pixARoom);
         curRow = row;
         curCol = col;
         checkToActivate();

@@ -133,7 +133,6 @@ GameObject:
   m_Component:
   - component: {fileID: 17333522}
   - component: {fileID: 17333521}
-  - component: {fileID: 17333520}
   - component: {fileID: 17333523}
   m_Layer: 0
   m_Name: Main Camera
@@ -142,14 +141,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!81 &17333520
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 17333519}
-  m_Enabled: 1
 --- !u!20 &17333521
 Camera:
   m_ObjectHideFlags: 0
@@ -333,6 +324,46 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 2121556451}
     m_Modifications:
+    - target: {fileID: 1097839462, guid: 26273eeb44fa4664fad4d1c6d66f3484, type: 3}
+      propertyPath: m_Pivot.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1097839462, guid: 26273eeb44fa4664fad4d1c6d66f3484, type: 3}
+      propertyPath: m_Pivot.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1097839462, guid: 26273eeb44fa4664fad4d1c6d66f3484, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1097839462, guid: 26273eeb44fa4664fad4d1c6d66f3484, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1097839462, guid: 26273eeb44fa4664fad4d1c6d66f3484, type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1097839462, guid: 26273eeb44fa4664fad4d1c6d66f3484, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1097839462, guid: 26273eeb44fa4664fad4d1c6d66f3484, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 1097839462, guid: 26273eeb44fa4664fad4d1c6d66f3484, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 1097839462, guid: 26273eeb44fa4664fad4d1c6d66f3484, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1097839462, guid: 26273eeb44fa4664fad4d1c6d66f3484, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5395861895567193107, guid: 26273eeb44fa4664fad4d1c6d66f3484, type: 3}
       propertyPath: m_Name
       value: Minimap
@@ -612,8 +643,24 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 7309073861808278978, guid: eb8370d209416074aa3de4f765e5eefa, type: 3}
+      propertyPath: floorWidth
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 7309073861808278978, guid: eb8370d209416074aa3de4f765e5eefa, type: 3}
+      propertyPath: floorHeight
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 7309073861808278978, guid: eb8370d209416074aa3de4f765e5eefa, type: 3}
+      propertyPath: maxRoomCount
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 7309073861808278978, guid: eb8370d209416074aa3de4f765e5eefa, type: 3}
+      propertyPath: minRoomCount
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 7309073861808278978, guid: eb8370d209416074aa3de4f765e5eefa, type: 3}
       propertyPath: bigRoomProbability
-      value: 1
+      value: 0.15
       objectReference: {fileID: 0}
     - target: {fileID: 7309073861808278978, guid: eb8370d209416074aa3de4f765e5eefa, type: 3}
       propertyPath: bossDrops.Array.size
