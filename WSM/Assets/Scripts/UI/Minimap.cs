@@ -169,7 +169,7 @@ public class Minimap : MonoBehaviour
             {
                 if (floorExplored[i, j] > 0)
                 {
-                    if (Mathf.Abs(i - curRow) <= minimapHeight / 2 && Mathf.Abs(i - curCol) <= minimapWidth / 2)
+                    if (Mathf.Abs(i - curRow) <= minimapHeight / 2 - 1 && Mathf.Abs(j - curCol) <= minimapWidth / 2 - 1)
                     {
                         if (floorExplored[i, j] >= 1 && floorExplored[i, j] <= 3)
                         {
@@ -183,7 +183,7 @@ public class Minimap : MonoBehaviour
                     else
                     {
                         notExploredRooms[i, j].SetActive(false);
-                        exploredRooms[i, j].SetActive(true);
+                        exploredRooms[i, j].SetActive(false);
                     }
                 }
             }
