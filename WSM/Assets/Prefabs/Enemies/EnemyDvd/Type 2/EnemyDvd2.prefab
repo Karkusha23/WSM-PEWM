@@ -147,7 +147,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enemyWeapon: {fileID: 3384298221420424276, guid: 81ff993c67a49fd409d2df778ca83607, type: 3}
-  enemyHealth: 6
+  enemyHealth: 2
   enemySpeed: 8
   minSpeedScale: 0.8
   maxSpeedScale: 1.2

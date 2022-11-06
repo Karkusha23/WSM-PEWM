@@ -507,7 +507,7 @@ public class FloorGenerator : MonoBehaviour
         createBigDoors();
         if (isBoss)
         {
-            room.GetComponent<RoomController>().loadout = bossLoadouts[Random.Range(0, bigLoadouts.Length)];
+            room.GetComponent<RoomController>().loadout = bossLoadouts[Random.Range(0, bossLoadouts.Length)];
             room.GetComponent<RoomController>().roomDrops = bossDrops;
         }
         else

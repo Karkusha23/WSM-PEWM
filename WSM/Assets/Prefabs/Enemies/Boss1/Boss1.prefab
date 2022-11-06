@@ -54,9 +54,18 @@ MonoBehaviour:
   spearsDumping: 5
   changeDistance: 0.005
   spearsRotationDumping: 10
-  spiralAttackDuration: 3
-  spiralAttackTimeBetweenShots: 0.05
-  spiralAttackBulletSpeed: 5
+  attackDuration:
+  - 3
+  - 3
+  attackTimeBetweenShots:
+  - 0.05
+  - 0.025
+  attackBulletSpeed:
+  - 5
+  - 7
+  minBulSpeedScale: 1
+  maxBulSpeedScale: 1.2
+  maxBulDirectionDeviation: 1.5
   EnemyBullet: {fileID: 3239862130681951045, guid: 968b415287c1da04e99413c21c2792c3, type: 3}
 --- !u!95 &579386896
 Animator:
@@ -226,7 +235,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enemyWeapon: {fileID: 1820597459}
-  enemyHealth: 10
+  enemyHealth: 30
   enemySpeed: 0.5
   refreshPlayerPosTime: 0.5
   betweenAttacksTime: 1

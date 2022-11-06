@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 1017972510189653163}
   - component: {fileID: 1017972510706031599}
   m_Layer: 6
-  m_Name: EnemyDvd
+  m_Name: EnemyDvd3
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -147,7 +147,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enemyWeapon: {fileID: 3384298221420424276, guid: 9c4d3d7262965294280de5fc2f85dd4d, type: 3}
-  enemyHealth: 2
+  enemyHealth: 6
   enemySpeed: 5
   minSpeedScale: 0.8
   maxSpeedScale: 1.2

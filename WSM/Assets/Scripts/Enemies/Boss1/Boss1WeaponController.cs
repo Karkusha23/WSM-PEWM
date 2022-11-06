@@ -8,12 +8,9 @@ public class Boss1WeaponController : MonoBehaviour
     public float spearsDumping;
     public float changeDistance;
     public float spearsRotationDumping;
-    public float spiralAttackDuration;
-    public float spiralAttackTimeBetweenShots;
-    public float spiralAttackBulletSpeed;
-    public float machineGunAttackDuration;
-    public float machineGunAttackTimeBetweenShots;
-    public float machineGunAttackBulletSpeed;
+    public float[] attackDuration;
+    public float[] attackTimeBetweenShots;
+    public float[] attackBulletSpeed;
     public float minBulSpeedScale;
     public float maxBulSpeedScale;
     public float maxBulDirectionDeviation;
@@ -130,7 +127,7 @@ public class Boss1WeaponController : MonoBehaviour
     private IEnumerator spiralAttacking()
     {
         bosscon.stopMoving();
-        int count = Mathf.FloorToInt(spiralAttackDuration / spiralAttackTimeBetweenShots) + 1;
+        int count = Mathf.FloorToInt(attackDuration[0] / attackTimeBetweenShots[0]) + 1;
         spearsState = 1;
         yield return new WaitForSeconds(timeBetweenAttacks);
         GameObject bul;
@@ -139,9 +136,9 @@ public class Boss1WeaponController : MonoBehaviour
             foreach (int j in spSpiralAttack)
             {
                 bul = Instantiate(EnemyBullet, shootingPoints[j].transform.position, Quaternion.identity);
-                bul.GetComponent<Rigidbody2D>().velocity = (shootingPoints[j].transform.position - transform.position).normalized * spiralAttackBulletSpeed;
+                bul.GetComponent<Rigidbody2D>().velocity = (shootingPoints[j].transform.position - transform.position).normalized * attackBulletSpeed[0];
             }
-            yield return new WaitForSeconds(spiralAttackTimeBetweenShots);
+            yield return new WaitForSeconds(attackTimeBetweenShots[0]);
         }
         spearsState = 3;
         yield return new WaitForSeconds(timeBetweenAttacks);
@@ -150,7 +147,7 @@ public class Boss1WeaponController : MonoBehaviour
 
     private IEnumerator machineGunAttacking()
     {
-        int count = Mathf.FloorToInt(machineGunAttackDuration / machineGunAttackTimeBetweenShots) / 4 + 1;
+        int count = Mathf.FloorToInt(attackDuration[1] / attackTimeBetweenShots[1]) / 4 + 1;
         spearsState = 3;
         yield return new WaitForSeconds(timeBetweenAttacks);
         GameObject bul;
@@ -163,8 +160,8 @@ public class Boss1WeaponController : MonoBehaviour
                 tmp = new Vector3(destination.y, -destination.x, 0f);
                 destination += tmp * Random.Range(-maxBulDirectionDeviation, maxBulDirectionDeviation);
                 bul = Instantiate(EnemyBullet, shootingPoints[j].transform.position, Quaternion.identity);
-                bul.GetComponent<Rigidbody2D>().velocity = destination.normalized * machineGunAttackBulletSpeed * Random.Range(minBulSpeedScale, maxBulSpeedScale);
-                yield return new WaitForSeconds(machineGunAttackTimeBetweenShots);
+                bul.GetComponent<Rigidbody2D>().velocity = destination.normalized * attackBulletSpeed[1] * Random.Range(minBulSpeedScale, maxBulSpeedScale);
+                yield return new WaitForSeconds(attackTimeBetweenShots[1]);
             }
         }
         bosscon.refresh();
