@@ -494,6 +494,7 @@ MonoBehaviour:
   roomDrops:
   - {fileID: 0}
   doors: []
+  invincibleTime: 1
 --- !u!61 &3700888113171833834
 BoxCollider2D:
   m_ObjectHideFlags: 0

@@ -17,7 +17,6 @@ public class FloorGenerator : MonoBehaviour
     public EnemyLoadout[] smallLoadouts;
     public EnemyLoadout[] bigLoadouts;
     public EnemyLoadout[] bossLoadouts;
-    public WeaponsList weapons;
     public GameObject[] pickups;
     public GameObject[] bossDrops;
 
@@ -43,6 +42,7 @@ public class FloorGenerator : MonoBehaviour
     private Vector3[] doorPoss;
     private Vector3[] bigRoomDoorOffsets;
     private Minimap minimap;
+    private Vector3 bigRoomOffset;
 
     private void Awake()
     {
@@ -95,6 +95,7 @@ public class FloorGenerator : MonoBehaviour
         bigRoomDoorOffsets[1] = new Vector3(17.6f, 0f, 0f);
         bigRoomDoorOffsets[2] = new Vector3(0, -11f, 0f);
         bigRoomDoorOffsets[3] = new Vector3(17.6f, -11f, 0f);
+        bigRoomOffset = new Vector3(8.8f, -5.5f, 0f);
     }
 
     private void buildMatrix()
@@ -490,9 +491,9 @@ public class FloorGenerator : MonoBehaviour
         createSmallDoors();
         if (row == floorHeight / 2 && col == floorWidth / 2)
         {
-            Instantiate(weapons.weapons_dropped[0], room.transform.position + new Vector3(4f, 0f, 0f), Quaternion.Euler(0f, 0f, Random.Range(0f, 360f)));
+            return;
         }
-        else if (withEnemies)
+        if (withEnemies)
         {
             room.GetComponent<RoomController>().loadout = smallLoadouts[Random.Range(0, smallLoadouts.Length)];
             room.GetComponent<RoomController>().roomDrops = pickups;

@@ -32,6 +32,11 @@ public class PlayerController : MonoBehaviour
     private int invincible_dodgeroll;
     private float dodgeroolTimer;
 
+    private void Awake()
+    {
+        health = PlayerData.health;
+    }
+
     private void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -71,7 +76,7 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        if (Input.GetKey("f"))
+        if (hasWeapon && Input.GetKey("f"))
         {
             dropWeaponTimer += Time.deltaTime;
             if (dropWeaponTimer >= dropKeyTime)
