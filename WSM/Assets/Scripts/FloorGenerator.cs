@@ -41,7 +41,6 @@ public class FloorGenerator : MonoBehaviour
     private Vector3[] doorPoss;
     private Vector3[] bigRoomDoorOffsets;
     private Minimap minimap;
-    private Vector3 bigRoomOffset;
 
     private void Awake()
     {
@@ -94,7 +93,6 @@ public class FloorGenerator : MonoBehaviour
         bigRoomDoorOffsets[1] = new Vector3(17.6f, 0f, 0f);
         bigRoomDoorOffsets[2] = new Vector3(0, -11f, 0f);
         bigRoomDoorOffsets[3] = new Vector3(17.6f, -11f, 0f);
-        bigRoomOffset = new Vector3(8.8f, -5.5f, 0f);
     }
 
     private void buildMatrix()

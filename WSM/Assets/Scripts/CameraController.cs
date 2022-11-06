@@ -1,8 +1,5 @@
 using System;
-using System.Collections;
-using System.IO;
 using UnityEngine;
-using UnityEngine.Rendering;
 
 public class CameraController : MonoBehaviour
 {
@@ -13,6 +10,14 @@ public class CameraController : MonoBehaviour
 
     [HideInInspector]
     public int camMode;
+    // 0 - goes to static pos
+    // 1 - goes to dynamic pos
+    // 2 - staying in static pos
+    // 3 - following dynamic pos
+    // 4 - following mouse pos
+
+    [HideInInspector]
+    public bool isAllowedToMove;
 
     private Vector3 cameraOffset;
     private Vector3 target;
@@ -24,6 +29,7 @@ public class CameraController : MonoBehaviour
 
     private void Start()
     {
+        isAllowedToMove = true;
         cameraOffset = new Vector3(0f, 0f, transform.position.z);
         player = GameObject.FindGameObjectWithTag("Player").transform;
         doEveryFrame = null;
@@ -32,7 +38,7 @@ public class CameraController : MonoBehaviour
 
     private void Update()
     {
-        if (doEveryFrame != null)
+        if (doEveryFrame != null && isAllowedToMove)
         {
             doEveryFrame.Invoke();
         }
@@ -58,6 +64,26 @@ public class CameraController : MonoBehaviour
         camMode = 1;
     }
 
+    public void checkCamMode()
+    {
+        if (camMode == 4)
+        {
+            tmp = Camera.main.ScreenToWorldPoint(Input.mousePosition) - player.position;
+            if (tmp.sqrMagnitude <= sqrMaxCamMouseDistance)
+            {
+                tmp = tmp * camMouseMultiplicator + cameraOffset;
+            }
+            else
+            {
+                tmp = tmp.normalized * maxCamMouseDistance + cameraOffset;
+            }
+            if (tmp.magnitude > switchDistance)
+            {
+                followingMousePos();
+            }
+        }
+    }
+
     private void goingToStaticPos()
     {
         transform.position = Vector3.Lerp(transform.position, target, camDumping * Time.deltaTime);
@@ -65,6 +91,7 @@ public class CameraController : MonoBehaviour
         {
             transform.position = target;
             doEveryFrame = null;
+            camMode = 2;
         }
     }
 
@@ -79,6 +106,7 @@ public class CameraController : MonoBehaviour
         {
             transform.position = target;
             doEveryFrame = following;
+            camMode = 3;
         }
     }
 
@@ -106,6 +134,7 @@ public class CameraController : MonoBehaviour
         {
             transform.position = target;
             doEveryFrame = followingMousePos;
+            camMode = 4;
         }
     }
 

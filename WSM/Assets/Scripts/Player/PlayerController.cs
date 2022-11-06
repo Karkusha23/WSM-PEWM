@@ -17,6 +17,8 @@ public class PlayerController : MonoBehaviour
 
     [HideInInspector]
     public bool hasWeapon;
+    [HideInInspector]
+    public int weaponID;
 
     private Rigidbody2D rb;
     private Vector2 movement;
@@ -27,14 +29,20 @@ public class PlayerController : MonoBehaviour
     private Animator anim;
     private float dropKeyTime;
     private float dropWeaponTimer;
-    private GameObject weapon;
     private CameraController camcon;
     private int invincible_dodgeroll;
     private float dodgeroolTimer;
+    private GameObject weapon;
 
     private void Awake()
     {
         health = PlayerData.health;
+        hasWeapon = PlayerData.hasWeapon;
+        if (hasWeapon)
+        {
+            weapon = Instantiate(weaponsList.weapons[PlayerData.weaponID], transform.position, Quaternion.identity, transform);
+            weaponID = PlayerData.weaponID;
+        }
     }
 
     private void Start()
@@ -51,7 +59,6 @@ public class PlayerController : MonoBehaviour
         anim.SetBool("IsRolling", false);
         dropKeyTime = 1f;
         camcon = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraController>();
-        hasWeapon = false;
         invincible_dodgeroll = 0;
         dodgeroolTimer = 0f;
     }
@@ -76,7 +83,7 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        if (hasWeapon && Input.GetKey("f"))
+        if (hasWeapon && Input.GetKey(KeyCode.F))
         {
             dropWeaponTimer += Time.deltaTime;
             if (dropWeaponTimer >= dropKeyTime)
@@ -125,6 +132,22 @@ public class PlayerController : MonoBehaviour
         invincibleTimer = time;
     }
 
+    public void lockWeapon()
+    {
+        if (hasWeapon)
+        {
+            weapon.GetComponent<WeaponController>().isAllowedToAct = false;
+        }
+    }
+
+    public void unlockWeapon()
+    {
+        if (hasWeapon)
+        {
+            weapon.GetComponent<WeaponController>().isAllowedToAct = true;
+        }
+    }
+
     private void checkTakeDamage(Collision2D collision)
     {
         if (collision.collider.CompareTag("Enemy") || collision.collider.CompareTag("EnemyBullet"))
@@ -158,13 +181,13 @@ public class PlayerController : MonoBehaviour
 
     private void checkTakeWeapon(Collider2D other)
     {
-        if (other.CompareTag("Weapon_dropped") && Input.GetKey("e") && Vector3.Distance(transform.position, other.transform.position) <= 2f)
+        if (other.CompareTag("Weapon_dropped") && Input.GetKey(KeyCode.E) && Vector3.Distance(transform.position, other.transform.position) <= 2f)
         {
             dropWeapon();
             weapon = Instantiate(weaponsList.weapons[other.name[0] - '0'], transform.position, Quaternion.identity, transform);
             hasWeapon = true;
             Destroy(other.gameObject);
-            if (camcon.camMode > 0)
+            if (camcon.camMode == 1 || camcon.camMode == 3)
             {
                 camcon.followMousePos();
             }
@@ -178,6 +201,7 @@ public class PlayerController : MonoBehaviour
             Instantiate(weaponsList.weapons_dropped[weapon.name[0] - '0'], transform.position, Quaternion.Euler(0f, 0f, Random.Range(0f, 360f)));
             Destroy(weapon);
             hasWeapon = false;
+            weapon = null;
             if (camcon.camMode > 0)
             {
                 camcon.follow(gameObject);
