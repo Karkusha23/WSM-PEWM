@@ -1,6 +1,3 @@
-using System.Data;
-using System.Xml;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -202,7 +199,7 @@ public class PlayerController : MonoBehaviour
             Destroy(weapon);
             hasWeapon = false;
             weapon = null;
-            if (camcon.camMode > 0)
+            if (camcon.camMode == 1 || camcon.camMode == 3)
             {
                 camcon.follow(gameObject);
             }
