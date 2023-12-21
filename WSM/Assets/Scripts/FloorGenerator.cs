@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class FloorGenerator : MonoBehaviour
 {
@@ -7,6 +8,8 @@ public class FloorGenerator : MonoBehaviour
     public int floorHeight;
     public int floorWidth;
     public float bigRoomProbability;
+    public int minItemRoomCount;
+    public int maxItemRoomCount;
 
     public GameObject smallRoom;
     public GameObject bigRoom;
@@ -18,6 +21,7 @@ public class FloorGenerator : MonoBehaviour
     public EnemyLoadout[] bossLoadouts;
     public GameObject[] pickups;
     public GameObject[] bossDrops;
+    public ItemList itemList;
 
     private int[,] floorMatrix;
     // 0 - no room, can not build there
@@ -29,6 +33,7 @@ public class FloorGenerator : MonoBehaviour
     // 6 - big room subunits
     // 7 - boss room core
     // 8 - pre-boss room
+    // 9 - item room
     private int[] freeSmallRoomHeights;
     private int[] freeSmallRoomWidths;
     private int freeSmallRoomCount;
@@ -65,6 +70,10 @@ public class FloorGenerator : MonoBehaviour
                 else if (floorMatrix[i, j] == 8)
                 {
                     createSmallRoom(i, j, false);
+                }
+                else if (floorMatrix[i, j] == 9)
+                {
+                    createItemRoom(i, j);
                 }
             }
         }
@@ -108,6 +117,7 @@ public class FloorGenerator : MonoBehaviour
                 break;
             }
         }
+        buildItemRooms();
         buildBossRoom();
     }
 
@@ -480,7 +490,7 @@ public class FloorGenerator : MonoBehaviour
         --freeBigRoomCount;
     }
 
-    private void createSmallRoom(int row, int col, bool withEnemies)
+    private GameObject createSmallRoom(int row, int col, bool withEnemies)
     {
         Vector3 pos = new Vector3((col - floorWidth / 2) * 17.6f, (floorHeight / 2 - row) * 11f, 0f);
         room = Instantiate(smallRoom, pos, Quaternion.identity);
@@ -488,16 +498,25 @@ public class FloorGenerator : MonoBehaviour
         createSmallDoors();
         if (row == floorHeight / 2 && col == floorWidth / 2)
         {
-            return;
+            return room;
         }
         if (withEnemies)
         {
             room.GetComponent<RoomController>().loadout = smallLoadouts[Random.Range(0, smallLoadouts.Length)];
             room.GetComponent<RoomController>().roomDrops = pickups;
         }
+        return room;
     }
 
-    private void createBigRoom(int row, int col, bool isBoss)
+    private GameObject createItemRoom(int row, int col)
+    {
+        GameObject room = createSmallRoom(row, col, false);
+        GameObject item = itemList.items[Random.Range(0, itemList.items.Length)];
+        Instantiate(item, room.transform.position, Quaternion.identity);
+        return room;
+    }
+
+    private GameObject createBigRoom(int row, int col, bool isBoss)
     {
         Vector3 pos = new Vector3((col - floorWidth / 2) * 17.6f, (floorHeight / 2 - row) * 11f, 0f);
         room = Instantiate(bigRoom, pos, Quaternion.identity);
@@ -513,6 +532,7 @@ public class FloorGenerator : MonoBehaviour
             room.GetComponent<RoomController>().loadout = bigLoadouts[Random.Range(0, bigLoadouts.Length)];
             room.GetComponent<RoomController>().roomDrops = pickups;
         }
+        return room;
     }
 
     private void getSmallRoomType(int row, int col)
@@ -655,6 +675,55 @@ public class FloorGenerator : MonoBehaviour
                 roomcon.doors[counter++] = tmp;
             }
         }
+    }
+
+    private void buildItemRooms()
+    {
+        int itemRoomCount = Random.Range(minItemRoomCount, maxItemRoomCount + 1);
+        int[] smallRoomHeights = new int[floorHeight * floorWidth];
+        int[] smallRoomWidths = new int[floorHeight * floorWidth];
+        int smallRoomsCount = 0;
+        for (int i = 0; i < floorHeight; ++i)
+        {
+            for (int j = 0; j < floorWidth; ++j)
+            {
+                if (floorMatrix[i, j] == 4 && (i < floorHeight / 2 - 1 || i > floorHeight / 2 + 1) && (j < floorWidth / 2 - 1 || j > floorWidth / 2 + 1))
+                {
+                    smallRoomHeights[smallRoomsCount] = i;
+                    smallRoomWidths[smallRoomsCount] = j;
+                    ++smallRoomsCount;
+                }
+            }
+        }
+        for (int i = 0; i < itemRoomCount; ++i)
+        {
+            int room = 0, row = 0, col = 0;
+            do
+            {
+                room = Random.Range(0, smallRoomsCount);
+                row = smallRoomHeights[room];
+                col = smallRoomWidths[room];
+            } while (!checkItemRoomPlacement(row, col));
+            floorMatrix[row, col] = 9;
+        }
+    }
+
+    private bool checkItemRoomPlacement(int row, int col)
+    {
+        for (int i = row - 1; i <= row + 1; ++i)
+        {
+            for (int j = col - 1; j <= col + 1; ++j)
+            {
+                if (i > 0 && j > 0 && i < floorHeight && j < floorWidth)
+                {
+                    if (floorMatrix[i, j] == 9)
+                    {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
     }
 
     private void buildBossRoom()

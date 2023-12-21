@@ -1,4 +1,3 @@
-using System.Net.Http.Headers;
 using UnityEngine;
 
 public class RoomController : MonoBehaviour
@@ -9,7 +8,7 @@ public class RoomController : MonoBehaviour
     public float invincibleTime;
 
     private int enemyCount;
-    private bool isCleaned;
+    private bool isActivated;
     private CameraController camcon;
     private Vector3 bigRoomOffset;
     private int roomType;
@@ -29,7 +28,7 @@ public class RoomController : MonoBehaviour
         {
             roomType = 2;
         }
-        isCleaned = false;
+        isActivated = false;
         camcon = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraController>();
         openDoors();
     }
@@ -53,10 +52,11 @@ public class RoomController : MonoBehaviour
                     camcon.follow(other.gameObject);
                 }
             }
-            if (loadout != null && !isCleaned)
+            if (loadout != null && !isActivated)
             {
                 other.GetComponent<PlayerController>().setInvincible(invincibleTime);
                 lockDoors();
+                isActivated = true;
                 enemyCount = loadout.enemyPoss.Length;
                 if (roomType == 0)
                 {
@@ -83,7 +83,6 @@ public class RoomController : MonoBehaviour
         {
             openDoors();
             Instantiate(roomDrops[Random.Range(0, roomDrops.Length)], roomType == 1 ? transform.position + bigRoomOffset : transform.position, Quaternion.identity);
-            isCleaned = true;
         }
     }
 

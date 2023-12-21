@@ -49,6 +49,8 @@ MonoBehaviour:
   floorHeight: 10
   floorWidth: 10
   bigRoomProbability: 0.15
+  minItemRoomCount: 1
+  maxItemRoomCount: 3
   smallRoom: {fileID: 7288156958747843772, guid: 2b0ab6a6d4715f6488511e3614d3b4f5, type: 3}
   bigRoom: {fileID: 2322337418231900787, guid: e7b006119d6f79a44a0a0b59b7946fbd, type: 3}
   door: {fileID: 2980541394161524617, guid: 9f5b4032567f5f84687c48d05a1d50c4, type: 3}
@@ -61,8 +63,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: ee99bf502919a344cb446d56363cddfc, type: 2}
   bossLoadouts:
   - {fileID: 11400000, guid: 896bc78445cf9d64aa8ff697c7af9aee, type: 2}
-  weapons: {fileID: 11400000, guid: 75bd8bb901e71904ba857aa489ced5be, type: 2}
   pickups:
   - {fileID: 4370064962261114294, guid: 212499558dea19446856b3d5396767d1, type: 3}
   bossDrops:
   - {fileID: 5226305178060978302, guid: 5117aaf0ef5eda140a71a8a379ea2bca, type: 3}
+  itemList: {fileID: 11400000, guid: 94bc8820e052f2446afaecba9b4826a0, type: 2}

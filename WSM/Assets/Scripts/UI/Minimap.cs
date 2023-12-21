@@ -48,7 +48,7 @@ public class Minimap : MonoBehaviour
         {
             for (int j = 0; j < floorWidth; ++j)
             {
-                if (floorMatrix[i, j] == 4 || floorMatrix[i, j] == 8)
+                if (floorMatrix[i, j] == 4 || floorMatrix[i, j] == 8 || floorMatrix[i, j] == 9)
                 {
                     Vector3 tmpSmallRoomPos = transform.position + Camera.main.ScreenToWorldPoint(new Vector3((j - floorWidth / 2) * pixARoom, (floorHeight / 2 - i) * pixARoom, 0f)) - camOffset;
                     notExploredRooms[i, j] = Instantiate(smallRoomNotExplored, tmpSmallRoomPos, Quaternion.identity, minimapBase);

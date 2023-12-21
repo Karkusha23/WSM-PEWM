@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -11,6 +12,8 @@ public class PlayerController : MonoBehaviour
     public WeaponsList weaponsList;
     public GameObject HUD;
     public GameObject loseScreen;
+
+    public List<GameObject> items;
 
     [HideInInspector]
     public bool hasWeapon;
@@ -44,6 +47,7 @@ public class PlayerController : MonoBehaviour
 
     private void Start()
     {
+        items = new List<GameObject>();
         rb = GetComponent<Rigidbody2D>();
         invincible = false;
         invincibleTimer = 0f;
@@ -244,6 +248,20 @@ public class PlayerController : MonoBehaviour
                 }
                 invincible_dodgeroll = 0;
             }
+        }
+    }
+
+    public void GetItem(GameObject item)
+    {
+        items.Add(item);
+        ItemController itemCont = item.GetComponent<ItemController>();
+        WeaponController weaponCont = weapon.GetComponent<WeaponController>();
+        moveSpeed += itemCont.speedBoost;
+        weaponCont.damage += itemCont.damageBoost;
+        weaponCont.reloadTime -= itemCont.tearsBoost;
+        if (weaponCont.reloadTime < 0.05f)
+        {
+            weaponCont.reloadTime = 0.05f;
         }
     }
 }
