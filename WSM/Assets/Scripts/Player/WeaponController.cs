@@ -7,8 +7,8 @@ public class WeaponController : MonoBehaviour
     public GameObject shootingPoint;
     public GameObject bullet;
     public float bulletSpeed;
-    public float reloadTime;
-    public float damage;
+    public float reloadTimeMult;
+    public float damageMult;
 
     [HideInInspector]
     public bool isAllowedToAct;
@@ -20,10 +20,13 @@ public class WeaponController : MonoBehaviour
     private Vector3 direction;
     private float rotation;
 
+    private PlayerController playerCon;
+
     private void Start()
     {
         isAllowedToAct = true;
         sp = Instantiate(shootingPoint, transform.position + shootingPointOffset, Quaternion.identity, transform);
+        playerCon = transform.parent.GetComponent<PlayerController>();
     }
 
     private void Update()
@@ -39,8 +42,8 @@ public class WeaponController : MonoBehaviour
                 tmp.x = direction.x;
                 tmp.y = direction.y;
                 bul.GetComponent<Rigidbody2D>().velocity = tmp.normalized * bulletSpeed;
-                bul.GetComponent<Bullet>().damage = damage;
-                timer = reloadTime;
+                bul.GetComponent<Bullet>().damage = playerCon.damage * damageMult;
+                timer = playerCon.reloadTime * reloadTimeMult;
             }
             if (timer > 0f)
             {

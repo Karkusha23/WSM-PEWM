@@ -5,6 +5,8 @@ public class PlayerController : MonoBehaviour
 {
     public int health;
     public float moveSpeed;
+    public float damage;
+    public float reloadTime;
     public float invincibilityAfterDamage;
     public float dodgerollActivePhaseTime;
     public float dodgerollPassivePhaseTime;
@@ -13,7 +15,7 @@ public class PlayerController : MonoBehaviour
     public GameObject HUD;
     public GameObject loseScreen;
 
-    public List<GameObject> items;
+    public Dictionary<ItemController.Item, int> itemCounts;
 
     [HideInInspector]
     public bool hasWeapon;
@@ -26,6 +28,7 @@ public class PlayerController : MonoBehaviour
     private float invincibleTimer;
     private HUDHP hpMain;
     private Minimap minimap;
+    private ItemPanel itemPanel;
     private Animator anim;
     private float dropKeyTime;
     private float dropWeaponTimer;
@@ -43,17 +46,24 @@ public class PlayerController : MonoBehaviour
             weapon = Instantiate(weaponsList.weapons[PlayerData.weaponID], transform.position, Quaternion.identity, transform);
             weaponID = PlayerData.weaponID;
         }
+        damage = PlayerData.damage;
+        reloadTime = PlayerData.reloadTime;
+        moveSpeed = PlayerData.moveSpeed;
+        itemCounts = new Dictionary<ItemController.Item, int>();
+        itemCounts.Add(ItemController.Item.Damage, PlayerData.damageItemCount);
+        itemCounts.Add(ItemController.Item.Tears, PlayerData.tearsItemCount);
+        itemCounts.Add(ItemController.Item.Speed, PlayerData.speedItemCount);
     }
 
     private void Start()
     {
-        items = new List<GameObject>();
         rb = GetComponent<Rigidbody2D>();
         invincible = false;
         invincibleTimer = 0f;
         loseScreen.SetActive(false);
         hpMain = HUD.transform.Find("HPMain").GetComponent<HUDHP>();
         minimap = HUD.transform.Find("Minimap").GetComponent<Minimap>();
+        itemPanel = HUD.transform.Find("ItemPanel").GetComponent<ItemPanel>();
         anim = GetComponent<Animator>();
         anim.SetFloat("InvincibilityTime", invincibilityAfterDamage);
         anim.SetBool("Invincible", false);
@@ -251,17 +261,17 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    public void GetItem(GameObject item)
+    public void getItem(GameObject item)
     {
-        items.Add(item);
         ItemController itemCont = item.GetComponent<ItemController>();
-        WeaponController weaponCont = weapon.GetComponent<WeaponController>();
+        itemPanel.updateCountValue(itemCont.item, ++itemCounts[itemCont.item]);
+        Debug.Log(itemCounts[itemCont.item]);
         moveSpeed += itemCont.speedBoost;
-        weaponCont.damage += itemCont.damageBoost;
-        weaponCont.reloadTime -= itemCont.tearsBoost;
-        if (weaponCont.reloadTime < 0.05f)
+        damage += itemCont.damageBoost;
+        reloadTime -= itemCont.tearsBoost;
+        if (reloadTime < 0.05f)
         {
-            weaponCont.reloadTime = 0.05f;
+            reloadTime = 0.05f;
         }
     }
 }

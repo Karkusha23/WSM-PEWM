@@ -217,7 +217,7 @@ CapsuleCollider2D:
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
-  m_Size: {x: 0.5, y: 0.7}
+  m_Size: {x: 1, y: 1}
   m_Direction: 0
 --- !u!114 &425761267377817711
 MonoBehaviour:
@@ -231,7 +231,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ebb7d3ac4bd7e484fa8cec851026f09c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  item: 0
+  item: 1
   damageBoost: 0
-  tearsBoost: 0.1
+  tearsBoost: 0.05
   speedBoost: 0

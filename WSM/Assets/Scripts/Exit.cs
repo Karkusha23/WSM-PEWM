@@ -26,10 +26,21 @@ public class Exit : MonoBehaviour
     {
         if (Input.GetKey(KeyCode.E))
         {
-            PlayerData.health = playerCon.health;
-            PlayerData.hasWeapon = playerCon.hasWeapon;
-            PlayerData.weaponID = playerCon.weaponID;
-            SceneManager.LoadScene(sceneToLoad);
+            loadNextLevel();
         }
+    }
+
+    private void loadNextLevel()
+    {
+        PlayerData.health = playerCon.health;
+        PlayerData.hasWeapon = playerCon.hasWeapon;
+        PlayerData.weaponID = playerCon.weaponID;
+        PlayerData.damage = playerCon.damage;
+        PlayerData.reloadTime = playerCon.reloadTime;
+        PlayerData.moveSpeed = playerCon.moveSpeed;
+        PlayerData.damageItemCount = playerCon.itemCounts[ItemController.Item.Damage];
+        PlayerData.tearsItemCount = playerCon.itemCounts[ItemController.Item.Tears];
+        PlayerData.speedItemCount = playerCon.itemCounts[ItemController.Item.Speed];
+        SceneManager.LoadScene(sceneToLoad);
     }
 }

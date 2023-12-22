@@ -76,7 +76,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 2
+  m_SortingOrder: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
   m_Color: {r: 1, g: 0, b: 0, a: 1}
   m_FlipX: 0
@@ -149,6 +149,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   health: 3
   moveSpeed: 10
+  damage: 1
+  reloadTime: 0.5
   invincibilityAfterDamage: 1
   dodgerollActivePhaseTime: 0.3
   dodgerollPassivePhaseTime: 0.15
@@ -156,7 +158,6 @@ MonoBehaviour:
   weaponsList: {fileID: 11400000, guid: 75bd8bb901e71904ba857aa489ced5be, type: 2}
   HUD: {fileID: 0}
   loseScreen: {fileID: 0}
-  items: []
   hasWeapon: 0
   weaponID: 0
 --- !u!95 &833424501

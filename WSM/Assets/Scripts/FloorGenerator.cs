@@ -55,25 +55,23 @@ public class FloorGenerator : MonoBehaviour
         {
             for (int j = 0; j < floorWidth; ++j)
             {
-                if (floorMatrix[i, j] == 4)
+                switch (floorMatrix[i, j])
                 {
-                    createSmallRoom(i, j, true);
-                }
-                else if (floorMatrix[i, j] == 5)
-                {
-                    createBigRoom(i, j, false);
-                }
-                else if (floorMatrix[i, j] == 7)
-                {
-                    createBigRoom(i, j, true);
-                }
-                else if (floorMatrix[i, j] == 8)
-                {
-                    createSmallRoom(i, j, false);
-                }
-                else if (floorMatrix[i, j] == 9)
-                {
-                    createItemRoom(i, j);
+                    case 4:
+                        createSmallRoom(i, j, true);
+                        break;
+                    case 5:
+                        createBigRoom(i, j, false);
+                        break;
+                    case 7:
+                        createBigRoom(i, j, true);
+                        break;
+                    case 8:
+                        createSmallRoom(i, j, false);
+                        break;
+                    case 9:
+                        createItemRoom(i, j);
+                        break;
                 }
             }
         }
@@ -490,7 +488,7 @@ public class FloorGenerator : MonoBehaviour
         --freeBigRoomCount;
     }
 
-    private GameObject createSmallRoom(int row, int col, bool withEnemies)
+    private void createSmallRoom(int row, int col, bool withEnemies)
     {
         Vector3 pos = new Vector3((col - floorWidth / 2) * 17.6f, (floorHeight / 2 - row) * 11f, 0f);
         room = Instantiate(smallRoom, pos, Quaternion.identity);
@@ -498,25 +496,24 @@ public class FloorGenerator : MonoBehaviour
         createSmallDoors();
         if (row == floorHeight / 2 && col == floorWidth / 2)
         {
-            return room;
+            return;
         }
         if (withEnemies)
         {
             room.GetComponent<RoomController>().loadout = smallLoadouts[Random.Range(0, smallLoadouts.Length)];
             room.GetComponent<RoomController>().roomDrops = pickups;
         }
-        return room;
     }
 
-    private GameObject createItemRoom(int row, int col)
+    private void createItemRoom(int row, int col)
     {
-        GameObject room = createSmallRoom(row, col, false);
+        createSmallRoom(row, col, false);
         GameObject item = itemList.items[Random.Range(0, itemList.items.Length)];
         Instantiate(item, room.transform.position, Quaternion.identity);
-        return room;
+        room.transform.Find("Floor").GetComponent<SpriteRenderer>().color = new Color(217.0f / 256.0f, 212.0f / 256.0f, 105.0f / 256.0f, 1.0f);
     }
 
-    private GameObject createBigRoom(int row, int col, bool isBoss)
+    private void createBigRoom(int row, int col, bool isBoss)
     {
         Vector3 pos = new Vector3((col - floorWidth / 2) * 17.6f, (floorHeight / 2 - row) * 11f, 0f);
         room = Instantiate(bigRoom, pos, Quaternion.identity);
@@ -532,7 +529,6 @@ public class FloorGenerator : MonoBehaviour
             room.GetComponent<RoomController>().loadout = bigLoadouts[Random.Range(0, bigLoadouts.Length)];
             room.GetComponent<RoomController>().roomDrops = pickups;
         }
-        return room;
     }
 
     private void getSmallRoomType(int row, int col)
@@ -695,15 +691,18 @@ public class FloorGenerator : MonoBehaviour
                 }
             }
         }
+        Debug.Log(itemRoomCount);
+        Debug.Log(smallRoomsCount);
         for (int i = 0; i < itemRoomCount; ++i)
         {
-            int room = 0, row = 0, col = 0;
+            int room = 0, row = 0, col = 0, iter = 0;
             do
             {
                 room = Random.Range(0, smallRoomsCount);
                 row = smallRoomHeights[room];
                 col = smallRoomWidths[room];
-            } while (!checkItemRoomPlacement(row, col));
+                ++iter;
+            } while (!checkItemRoomPlacement(row, col) && iter < 100);
             floorMatrix[row, col] = 9;
         }
     }

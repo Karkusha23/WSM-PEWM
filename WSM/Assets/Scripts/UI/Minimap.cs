@@ -80,7 +80,7 @@ public class Minimap : MonoBehaviour
         int col = floorWidth / 2 + Mathf.RoundToInt(roomPos.x / 17.6f);
         if (floorExplored[row, col] < 4)
         {
-            if (floorMatrix[row, col] == 4 || floorMatrix[row, col] == 8)
+            if (floorMatrix[row, col] == 4 || floorMatrix[row, col] == 8 || floorMatrix[row, col] == 9)
             {
                 floorExplored[row, col] = 4;
             }
@@ -91,7 +91,7 @@ public class Minimap : MonoBehaviour
             }
             exploredRooms[row, col].SetActive(true);
             notExploredRooms[row, col].SetActive(false);
-            if (floorMatrix[row, col] == 4 || floorMatrix[row, col] == 8)
+            if (floorMatrix[row, col] == 4 || floorMatrix[row, col] == 8 || floorMatrix[row, col] == 9)
             {
                 checkSmallAround(row, col);
             }

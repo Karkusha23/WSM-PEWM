@@ -17,6 +17,9 @@ TagManager:
   - DoorTrigger
   - BigRoom
   - Minimap
+  - DamageCountText
+  - SpeedCountText
+  - TearsCountText
   layers:
   - Default
   - TransparentFX

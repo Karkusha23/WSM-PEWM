@@ -11,6 +11,13 @@ public class ItemController : MonoBehaviour
     public float tearsBoost;
     public float speedBoost;
 
+    private bool isPicked;
+
+    private void Start()
+    {
+        isPicked = false;
+    }
+
     private void OnTriggerEnter2D(Collider2D other)
     {
         checkItemPickup(other);
@@ -21,16 +28,12 @@ public class ItemController : MonoBehaviour
         checkItemPickup(other);
     }
 
-    private void OnTriggerExit2D(Collider2D other)
-    {
-        checkItemPickup(other);
-    }
-
     private void checkItemPickup(Collider2D other)
     {
-        if (other.CompareTag("Player") && Input.GetKey(KeyCode.E))
+        if (!isPicked && other.CompareTag("Player") && Input.GetKey(KeyCode.E))
         {
-            other.GetComponent<PlayerController>().GetItem(gameObject);
+            isPicked = true;
+            other.GetComponent<PlayerController>().getItem(gameObject);
             Destroy(gameObject);
         }
     }
