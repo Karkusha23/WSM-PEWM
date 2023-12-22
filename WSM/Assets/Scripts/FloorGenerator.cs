@@ -1,8 +1,37 @@
+using Mono.Cecil.Cil;
+using System.Collections.Generic;
+using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.Rendering;
 
 public class FloorGenerator : MonoBehaviour
 {
+    public struct FloorPoint
+    {
+        public int i { get; set; }
+        public int j { get; set; }
+
+        public FloorPoint(int row, int col)
+        {
+            i = row;
+            j = col;
+        }
+    };
+
+    public class PointList : List<FloorPoint>
+    {
+        public bool RemoveByPoint(int row, int col)
+        {
+            int index = IndexOf(new FloorPoint(row, col));
+            if (index < 0)
+            {
+                return false;
+            }
+            RemoveAt(index);
+            return true;
+        }
+    };
+
     public int minRoomCount;
     public int maxRoomCount;
     public int floorHeight;
@@ -34,12 +63,8 @@ public class FloorGenerator : MonoBehaviour
     // 7 - boss room core
     // 8 - pre-boss room
     // 9 - item room
-    private int[] freeSmallRoomHeights;
-    private int[] freeSmallRoomWidths;
-    private int freeSmallRoomCount;
-    private int[] freeBigRoomHeights;
-    private int[] freeBigRoomWidths;
-    private int freeBigRoomCount;
+    private PointList freeSmallRoom;
+    private PointList freeBigRoom;
     private GameObject room;
     private bool[] smallDoors;
     private bool[] bigDoors;
@@ -115,6 +140,7 @@ public class FloorGenerator : MonoBehaviour
                 break;
             }
         }
+        //Debug.Log(FloorMatrixStr());
         buildItemRooms();
         buildBossRoom();
     }
@@ -122,12 +148,8 @@ public class FloorGenerator : MonoBehaviour
     private void initMatrix()
     {
         floorMatrix = new int[floorHeight, floorWidth];
-        freeSmallRoomHeights = new int[floorHeight * floorWidth];
-        freeSmallRoomWidths = new int[floorWidth * floorWidth];
-        freeSmallRoomCount = 0;
-        freeBigRoomHeights = new int[floorHeight * floorWidth];
-        freeBigRoomWidths = new int[floorWidth * floorWidth];
-        freeBigRoomCount = 0;
+        freeSmallRoom = new PointList();
+        freeBigRoom = new PointList();
         for (int i = 0; i < floorHeight; ++i)
         {
             for (int j = 0; j < floorWidth; ++j)
@@ -141,30 +163,37 @@ public class FloorGenerator : MonoBehaviour
 
     private bool buildRandomRoom()
     {
-        if (Random.value <= bigRoomProbability && freeBigRoomCount > 0)
+        if (Random.value <= bigRoomProbability && freeBigRoom.Count > 0)
         {
-            int index = Random.Range(0, freeBigRoomCount);
-            checkBigFreeRoom(freeBigRoomHeights[index], freeBigRoomWidths[index]);
-            removeFreeBigAround(freeBigRoomHeights[index], freeBigRoomWidths[index]);
-            floorMatrix[freeBigRoomHeights[index], freeBigRoomWidths[index]] = 5;
+            int index = Random.Range(0, freeBigRoom.Count);
+            int row = freeBigRoom[index].i;
+            int col = freeBigRoom[index].j;
+            checkBigFreeRoom(row, col);
+            removeFreeBigAround(row, col);
+            floorMatrix[row, col] = 5;
             for (int i = 1; i < 4; ++i)
             {
-                floorMatrix[freeBigRoomHeights[index] + i / 2, freeBigRoomWidths[index] + i % 2] = 6;
+                floorMatrix[row + i / 2, col + i % 2] = 6;
             }
-            removeFreeBigRoom(index);
+            freeBigRoom.RemoveByPoint(row, col);
+            //removeFreeBigRoom(index);
         }
         else
         {
-            if (freeSmallRoomCount == 0)
+            if (freeSmallRoom.Count == 0)
             {
                 return false;
             }
-            int index = Random.Range(0, freeSmallRoomCount);
-            checkSmallFreeRoom(freeSmallRoomHeights[index], freeSmallRoomWidths[index]);
-            removeFreeSmallAround(freeSmallRoomHeights[index], freeSmallRoomWidths[index]);
-            floorMatrix[freeSmallRoomHeights[index], freeSmallRoomWidths[index]] = 4;
-            removeFreeSmallRoom(index);
+            int index = Random.Range(0, freeSmallRoom.Count);
+            int row = freeSmallRoom[index].i;
+            int col = freeSmallRoom[index].j;
+            checkSmallFreeRoom(row, col);
+            removeFreeSmallAround(row, col);
+            floorMatrix[row, col] = 4;
+            freeSmallRoom.RemoveByPoint(row, col);
+            //removeFreeSmallRoom(index);
         }
+        Debug.Log(FloorMatrixStr());
         return true;
     }
 
@@ -234,6 +263,7 @@ public class FloorGenerator : MonoBehaviour
 
     private void checkBigFreeRoom(int row, int col)
     {
+        Debug.Log(row.ToString() + " " + col);
         if (row > 0)
         {
             checkCell(row - 1, col);
@@ -309,9 +339,7 @@ public class FloorGenerator : MonoBehaviour
         if (floorMatrix[row, col] == 0 || floorMatrix[row, col] == 2)
         {
             floorMatrix[row, col] = floorMatrix[row, col] == 0 ? 1 : 3;
-            freeSmallRoomHeights[freeSmallRoomCount] = row;
-            freeSmallRoomWidths[freeSmallRoomCount] = col;
-            ++freeSmallRoomCount;
+            freeSmallRoom.Add(new FloorPoint(row, col));
         }
     }
 
@@ -331,49 +359,24 @@ public class FloorGenerator : MonoBehaviour
             if (tmp)
             {
                 floorMatrix[row, col] = floorMatrix[row, col] == 0 ? 2 : 3;
-                freeBigRoomHeights[freeBigRoomCount] = row;
-                freeBigRoomWidths[freeBigRoomCount] = col;
-                ++freeBigRoomCount;
+                freeBigRoom.Add(new FloorPoint(row, col));
             }
         }
-    }
-
-    private int findSmallFreeRoom(int row, int col)
-    {
-        for (int i = 0; i < freeSmallRoomCount; ++i)
-        {
-            if (freeSmallRoomHeights[i] == row && freeSmallRoomWidths[i] == col)
-            {
-                return i;
-            }
-        }
-        return -1;
-    }
-
-    private int findBigFreeRoom(int row, int col)
-    {
-        for (int i = 0; i < freeBigRoomCount; ++i)
-        {
-            if (freeBigRoomHeights[i] == row && freeBigRoomWidths[i] == col)
-            {
-                return i;
-            }
-        }
-        return -1;
     }
 
     private void removeFreeSmallAround(int row, int col)
     {
         if (floorMatrix[row, col] == 3)
         {
-            removeFreeBigRoom(findBigFreeRoom(row, col));
+            freeBigRoom.RemoveByPoint(row, col);
             floorMatrix[row, col] = 1;
         }
         if (row > 0 && col > 0)
         {
             if (floorMatrix[row - 1, col - 1] == 2 || floorMatrix[row - 1, col - 1] == 3)
             {
-                removeFreeBigRoom(findBigFreeRoom(row - 1, col - 1));
+                freeBigRoom.RemoveByPoint(row - 1, col - 1);
+                //removeFreeBigRoom(findBigFreeRoom(row - 1, col - 1));
                 floorMatrix[row - 1, col - 1] = floorMatrix[row - 1, col - 1] == 2 ? 0 : 1;
             }
         }
@@ -381,7 +384,8 @@ public class FloorGenerator : MonoBehaviour
         {
             if (floorMatrix[row - 1, col] == 2 || floorMatrix[row - 1, col] == 3)
             {
-                removeFreeBigRoom(findBigFreeRoom(row - 1, col));
+                freeBigRoom.RemoveByPoint(row - 1, col);
+                //removeFreeBigRoom(findBigFreeRoom(row - 1, col));
                 floorMatrix[row - 1, col] = floorMatrix[row - 1, col] == 2 ? 0 : 1;
             }
         }
@@ -389,7 +393,8 @@ public class FloorGenerator : MonoBehaviour
         {
             if (floorMatrix[row, col - 1] == 2 || floorMatrix[row, col - 1] == 3)
             {
-                removeFreeBigRoom(findBigFreeRoom(row, col - 1));
+                freeBigRoom.RemoveByPoint(row, col - 1);
+                //removeFreeBigRoom(findBigFreeRoom(row, col - 1));
                 floorMatrix[row, col - 1] = floorMatrix[row, col - 1] == 2 ? 0 : 1;
             }
         }
@@ -399,7 +404,7 @@ public class FloorGenerator : MonoBehaviour
     {
         if (floorMatrix[row, col] == 3)
         {
-            removeFreeSmallRoom(findSmallFreeRoom(row, col));
+            freeSmallRoom.RemoveByPoint(row, col);
             floorMatrix[row, col] = 2;
         }
         for (int i = 1; i < 4; ++i)
@@ -409,14 +414,17 @@ public class FloorGenerator : MonoBehaviour
             switch(floorMatrix[curRow, curCol])
             {
                 case 1:
-                    removeFreeSmallRoom(findSmallFreeRoom(curRow, curCol));
+                    freeSmallRoom.RemoveByPoint(curRow, curCol);
+                    //removeFreeSmallRoom(findSmallFreeRoom(curRow, curCol));
                     break;
                 case 2:
-                    removeFreeBigRoom(findBigFreeRoom(curRow, curCol));
+                    freeBigRoom.RemoveByPoint(curRow, curCol);
                     break;
                 case 3:
-                    removeFreeSmallRoom(findSmallFreeRoom(curRow, curCol));
-                    removeFreeBigRoom(findBigFreeRoom(curRow, curCol));
+                    freeSmallRoom.RemoveByPoint(curRow, curCol);
+                    freeBigRoom.RemoveByPoint(curRow, curCol);
+                    //removeFreeSmallRoom(findSmallFreeRoom(curRow, curCol));
+                    //removeFreeBigRoom(findBigFreeRoom(curRow, curCol));
                     break;
             }
         }
@@ -427,11 +435,13 @@ public class FloorGenerator : MonoBehaviour
                 switch(floorMatrix[curRow, col - 1])
                 {
                     case 2:
-                        removeFreeBigRoom(findBigFreeRoom(curRow, col - 1));
+                        freeBigRoom.RemoveByPoint(curRow, col - 1);
+                        //removeFreeBigRoom(findBigFreeRoom(curRow, col - 1));
                         floorMatrix[curRow, col - 1] = 0;
                         break;
                     case 3:
-                        removeFreeBigRoom(findBigFreeRoom(curRow, col - 1));
+                        freeBigRoom.RemoveByPoint(curRow, col - 1);
+                        //removeFreeBigRoom(findBigFreeRoom(curRow, col - 1));
                         floorMatrix[curRow, col - 1] = 1;
                         break;
                 }
@@ -441,11 +451,13 @@ public class FloorGenerator : MonoBehaviour
                 switch(floorMatrix[row - 1, col - 1])
                 {
                     case 2:
-                        removeFreeBigRoom(findBigFreeRoom(row - 1, col - 1));
+                        freeBigRoom.RemoveByPoint(row - 1, col - 1);
+                        //removeFreeBigRoom(findBigFreeRoom(row - 1, col - 1));
                         floorMatrix[row - 1, col - 1] = 0;
                         break;
                     case 3:
-                        removeFreeBigRoom(findBigFreeRoom(row - 1, col - 1));
+                        freeBigRoom.RemoveByPoint(row - 1, col - 1);
+                        //removeFreeBigRoom(findBigFreeRoom(row - 1, col - 1));
                         floorMatrix[row - 1, col - 1] = 1;
                         break;
                 }
@@ -458,34 +470,18 @@ public class FloorGenerator : MonoBehaviour
                 switch (floorMatrix[row - 1, curCol])
                 {
                     case 2:
-                        removeFreeBigRoom(findBigFreeRoom(row - 1, curCol));
+                        freeBigRoom.RemoveByPoint(row - 1, curCol);
+                        //removeFreeBigRoom(findBigFreeRoom(row - 1, curCol));
                         floorMatrix[row - 1, curCol] = 0;
                         break;
                     case 3:
-                        removeFreeBigRoom(findBigFreeRoom(row - 1, curCol));
+                        freeBigRoom.RemoveByPoint(row - 1, curCol);
+                        //removeFreeBigRoom(findBigFreeRoom(row - 1, curCol));
                         floorMatrix[row - 1, curCol] = 1;
                         break;
                 }
             }
         }
-    }
-
-    private void removeFreeSmallRoom(int index)
-    {
-        freeSmallRoomHeights[index] = freeSmallRoomHeights[freeSmallRoomCount - 1];
-        freeSmallRoomWidths[index] = freeSmallRoomWidths[freeSmallRoomCount - 1];
-        --freeSmallRoomCount;
-    }
-
-    private void removeFreeBigRoom(int index)
-    {
-        if (index < 0)
-        {
-            return;
-        }
-        freeBigRoomHeights[index] = freeBigRoomHeights[freeBigRoomCount - 1];
-        freeBigRoomWidths[index] = freeBigRoomWidths[freeBigRoomCount - 1];
-        --freeBigRoomCount;
     }
 
     private void createSmallRoom(int row, int col, bool withEnemies)
@@ -675,7 +671,35 @@ public class FloorGenerator : MonoBehaviour
 
     private void buildItemRooms()
     {
+        PointList freeItemRoom = new PointList();
+        foreach (FloorPoint point in freeSmallRoom)
+        {
+            if (!(isInMiddle(point.i, point.j) || getDoorCount(point.i, point.j) != 1))
+            {
+                freeItemRoom.Add(point);
+            }
+        }
         int itemRoomCount = Random.Range(minItemRoomCount, maxItemRoomCount + 1);
+        for (int i = 0; i < itemRoomCount; ++i)
+        {
+            if (freeItemRoom.Count == 0)
+            {
+                return;
+            }
+            int index = Random.Range(0, freeItemRoom.Count);
+            int row = freeItemRoom[index].i;
+            int col = freeItemRoom[index].j;
+            for (int curRow = row - 1; curRow <= row + 1; ++curRow)
+            {
+                for (int curCol = col - 1; curCol <= col + 1; ++curCol)
+                {
+                    freeItemRoom.RemoveByPoint(curRow, curCol);
+                }
+            }
+            floorMatrix[row, col] = 9;
+        }
+
+        /*int itemRoomCount = Random.Range(minItemRoomCount, maxItemRoomCount + 1);
         int[] smallRoomHeights = new int[floorHeight * floorWidth];
         int[] smallRoomWidths = new int[floorHeight * floorWidth];
         int smallRoomsCount = 0;
@@ -683,7 +707,7 @@ public class FloorGenerator : MonoBehaviour
         {
             for (int j = 0; j < floorWidth; ++j)
             {
-                if (floorMatrix[i, j] == 4 && (i < floorHeight / 2 - 1 || i > floorHeight / 2 + 1) && (j < floorWidth / 2 - 1 || j > floorWidth / 2 + 1))
+                if (floorMatrix[i, j] == 4 && !(i >= floorHeight / 2 - 1 && i <= floorHeight / 2 + 1 && j >= floorWidth / 2 - 1 && j <= floorWidth / 2 + 1))
                 {
                     smallRoomHeights[smallRoomsCount] = i;
                     smallRoomWidths[smallRoomsCount] = j;
@@ -704,25 +728,7 @@ public class FloorGenerator : MonoBehaviour
                 ++iter;
             } while (!checkItemRoomPlacement(row, col) && iter < 100);
             floorMatrix[row, col] = 9;
-        }
-    }
-
-    private bool checkItemRoomPlacement(int row, int col)
-    {
-        for (int i = row - 1; i <= row + 1; ++i)
-        {
-            for (int j = col - 1; j <= col + 1; ++j)
-            {
-                if (i > 0 && j > 0 && i < floorHeight && j < floorWidth)
-                {
-                    if (floorMatrix[i, j] == 9)
-                    {
-                        return false;
-                    }
-                }
-            }
-        }
-        return true;
+        }*/
     }
 
     private void buildBossRoom()
@@ -869,5 +875,46 @@ public class FloorGenerator : MonoBehaviour
             floorMatrix[row + 2, tmpPos] = 7;
             floorMatrix[row + 2, tmpPos + 1] = floorMatrix[row + 3, tmpPos] = floorMatrix[row + 3, tmpPos + 1] = 6;
         }
+    }
+
+    private int getDoorCount(int row, int col)
+    {
+        int result = 0;
+        if (row < floorHeight - 1 && floorMatrix[row + 1, col] >= 4)
+        {
+            ++result;
+        }
+        if (col < floorWidth - 1 && floorMatrix[row, col + 1] >= 4)
+        {
+            ++result;
+        }
+        if (row > 0 && floorMatrix[row - 1, col] >= 4)
+        {
+            ++result;
+        }
+        if (col > 0 && floorMatrix[row, col - 1] >= 4)
+        {
+            ++result;
+        }
+        return result;
+    }
+
+    private bool isInMiddle(int row, int col)
+    {
+        return row >= floorHeight / 2 - 1 && row <= floorHeight / 2 + 1 && col >= floorWidth / 2 - 1 && col <= floorWidth / 2 + 1;
+    }
+
+    public string FloorMatrixStr()
+    {
+        string str = "Free small count: " + freeSmallRoom.Count + "\nFree big count: " + freeBigRoom.Count + "\n";
+        for (int i = 0; i < floorHeight; ++i)
+        {
+            for (int j = 0; j < floorWidth; ++j)
+            {
+                str += floorMatrix[i, j].ToString();
+            }
+            str += "\n";
+        }
+        return str;
     }
 }
