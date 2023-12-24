@@ -38,17 +38,22 @@ public class WeaponController : MonoBehaviour
             transform.rotation = Quaternion.Euler(0f, 0f, rotation + angleOffset);
             if (Input.GetMouseButton(0) && timer <= 0f)
             {
-                bul = Instantiate(bullet, sp.transform.position, Quaternion.identity);
-                tmp.x = direction.x;
-                tmp.y = direction.y;
-                bul.GetComponent<Rigidbody2D>().velocity = tmp.normalized * bulletSpeed;
-                bul.GetComponent<Bullet>().damage = playerCon.damage * damageMult;
-                timer = playerCon.reloadTime * reloadTimeMult;
+                Shoot();
             }
             if (timer > 0f)
             {
                 timer -= Time.deltaTime;
             }
         }
+    }
+
+    public void Shoot()
+    {
+        bul = Instantiate(bullet, sp.transform.position, Quaternion.identity);
+        tmp.x = direction.x;
+        tmp.y = direction.y;
+        bul.GetComponent<Rigidbody2D>().velocity = tmp.normalized * bulletSpeed;
+        bul.GetComponent<Bullet>().damage = playerCon.damage * damageMult;
+        timer = playerCon.reloadTime * reloadTimeMult;
     }
 }

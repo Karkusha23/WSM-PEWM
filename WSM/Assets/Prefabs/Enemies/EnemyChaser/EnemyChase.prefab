@@ -120,10 +120,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c2abfc0ec49b8d489d5a272c2ba639f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enemyHealth: 3
-  enemySpeed: 7
-  refreshFrequency: 0.1
+  health: 3
+  speed: 10
   activationTime: 0.5
+  refreshPlayerTime: 0.1
+  canChase: 0
 --- !u!61 &1371662492
 BoxCollider2D:
   m_ObjectHideFlags: 0

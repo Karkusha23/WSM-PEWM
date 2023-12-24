@@ -101,5 +101,5 @@ MonoBehaviour:
   shootingPointOffset: {x: 0, y: -1.5, z: 0}
   reloadTime: 0.75
   bulletSpeed: 12
-  shootingPoint: {fileID: 4295056590415269802, guid: 8d59d55f60d910b4cabf53f2e085aa52, type: 3}
+  shootingPointSample: {fileID: 4295056590415269802, guid: e2de74ea94a67d84d9587a1bbd44f4d8, type: 3}
   bullet: {fileID: 3239862130681951045, guid: 467bd36679752da43956f1daf63f7d1b, type: 3}

@@ -146,9 +146,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ad587c8152c650488ccf190fe061d04, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enemyHealth: 3
-  enemySpeed: 5
-  refreshFrequency: 0.1
-  enemyWeapon: {fileID: 211350373683881708, guid: feb7a32c35080fe479aceee777c98f03, type: 3}
-  stayDistanceSqr: 20
+  health: 3
+  speed: 5
   activationTime: 0.5
+  refreshPlayerTime: 0.1
+  weapon: {fileID: 211350373683881708, guid: feb7a32c35080fe479aceee777c98f03, type: 3}
+  chaseDistance: 5
+  canChase: 0

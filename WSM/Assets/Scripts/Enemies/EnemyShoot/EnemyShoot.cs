@@ -1,61 +1,30 @@
 using UnityEngine;
 using System.Collections;
 
-public class EnemyShoot : MonoBehaviour
+public class EnemyShoot : Enemy
 {
-    public float enemyHealth;
-    public float enemySpeed;
-    public float refreshFrequency;
-    public GameObject enemyWeapon;
-    public float stayDistanceSqr;
-    public float activationTime;
+    public GameObject weapon;
+    public float chaseDistance;
 
-    private Rigidbody2D rb;
-    private Transform player;
-    private Vector3 destination;
+    [HideInInspector]
+    public bool canChase = false;
 
-    private void Start()
+    protected override void Start()
     {
-        rb = GetComponent<Rigidbody2D>();
-        player = GameObject.FindGameObjectWithTag("Player").transform;
-        Instantiate(enemyWeapon, transform.position, Quaternion.identity, transform);
-        StartCoroutine("activateEnemy");
+        Instantiate(weapon, transform.position, Quaternion.identity, transform);
+        base.Start();
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    protected override void onActivation()
     {
-        if (collision.collider.CompareTag("Bullet"))
+        canChase = true;
+    }
+
+    protected virtual void Update()
+    {
+        if (canChase)
         {
-            enemyHealth -= collision.collider.GetComponent<Bullet>().damage;
-            if (enemyHealth <= 0)
-            {
-                transform.parent.GetComponent<RoomController>().checkEnemyKilled();
-                Destroy(gameObject);
-            }
-        }
-    }
-
-    private IEnumerator activateEnemy()
-    {
-        yield return new WaitForSeconds(activationTime);
-        StartCoroutine("refreshPlayerPos");
-    }
-
-
-    private IEnumerator refreshPlayerPos()
-    {
-        for (; ; )
-        {
-            destination = player.position - transform.position;
-            if (destination.sqrMagnitude > stayDistanceSqr)
-            {
-                rb.velocity = destination.normalized * enemySpeed;
-            }
-            else
-            {
-                rb.velocity = Vector2.zero;
-            }
-            yield return new WaitForSeconds(refreshFrequency);
+            rigidBody.velocity = destination.magnitude > chaseDistance ? destination.normalized * speed : Vector2.zero;
         }
     }
 }
