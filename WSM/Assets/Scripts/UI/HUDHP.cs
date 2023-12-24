@@ -10,7 +10,7 @@ public class HUDHP : MonoBehaviour
     private void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player");
-        addHP(player.GetComponent<PlayerController>().health - 1);
+        addHP(player.GetComponent<Player>().health - 1);
     }
 
     public void addHP()

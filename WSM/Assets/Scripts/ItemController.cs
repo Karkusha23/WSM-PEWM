@@ -33,7 +33,7 @@ public class ItemController : MonoBehaviour
         if (!isPicked && other.CompareTag("Player") && Input.GetKey(KeyCode.E))
         {
             isPicked = true;
-            other.GetComponent<PlayerController>().getItem(gameObject);
+            other.GetComponent<Player>().getItem(gameObject);
             Destroy(gameObject);
         }
     }

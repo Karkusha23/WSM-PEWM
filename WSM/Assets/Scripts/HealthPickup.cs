@@ -6,8 +6,8 @@ public class HealthPickup : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            other.GetComponent<PlayerController>().health += 1;
-            other.GetComponent<PlayerController>().HUD.transform.Find("HPMain").GetComponent<HUDHP>().addHP();
+            other.GetComponent<Player>().health += 1;
+            other.GetComponent<Player>().HUD.transform.Find("HPMain").GetComponent<HUDHP>().addHP();
             Destroy(gameObject);
         }
     }

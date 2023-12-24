@@ -5,11 +5,11 @@ public class Exit : MonoBehaviour
 {
     public int sceneToLoad;
 
-    private PlayerController playerCon;
+    private Player player;
 
     private void Start()
     {
-        playerCon = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
+        player = GameObject.FindGameObjectWithTag("Player").GetComponent<Player>();
     }
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -32,15 +32,15 @@ public class Exit : MonoBehaviour
 
     private void loadNextLevel()
     {
-        PlayerData.health = playerCon.health;
-        PlayerData.hasWeapon = playerCon.hasWeapon;
-        PlayerData.weaponID = playerCon.weaponID;
-        PlayerData.damage = playerCon.damage;
-        PlayerData.reloadTime = playerCon.reloadTime;
-        PlayerData.moveSpeed = playerCon.moveSpeed;
-        PlayerData.damageItemCount = playerCon.itemCounts[ItemController.Item.Damage];
-        PlayerData.tearsItemCount = playerCon.itemCounts[ItemController.Item.Tears];
-        PlayerData.speedItemCount = playerCon.itemCounts[ItemController.Item.Speed];
+        PlayerData.health = player.health;
+        PlayerData.hasWeapon = player.hasWeapon;
+        PlayerData.weaponID = player.weaponID;
+        PlayerData.damage = player.damage;
+        PlayerData.reloadTime = player.reloadTime;
+        PlayerData.moveSpeed = player.moveSpeed;
+        PlayerData.damageItemCount = player.itemCounts[ItemController.Item.Damage];
+        PlayerData.tearsItemCount = player.itemCounts[ItemController.Item.Tears];
+        PlayerData.speedItemCount = player.itemCounts[ItemController.Item.Speed];
         SceneManager.LoadScene(sceneToLoad);
     }
 }

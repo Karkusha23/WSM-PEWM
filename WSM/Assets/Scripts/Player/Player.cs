@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerController : MonoBehaviour
+public class Player : MonoBehaviour
 {
     public int health;
     public float moveSpeed;
@@ -147,7 +147,7 @@ public class PlayerController : MonoBehaviour
     {
         if (hasWeapon)
         {
-            weapon.GetComponent<WeaponController>().isAllowedToAct = false;
+            weapon.GetComponent<PlayerWeapon>().canPlayerControlWeapon = false;
         }
     }
 
@@ -155,7 +155,7 @@ public class PlayerController : MonoBehaviour
     {
         if (hasWeapon)
         {
-            weapon.GetComponent<WeaponController>().isAllowedToAct = true;
+            weapon.GetComponent<PlayerWeapon>().canPlayerControlWeapon = true;
         }
     }
 

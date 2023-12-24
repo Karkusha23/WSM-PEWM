@@ -121,7 +121,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   health: 3
-  speed: 10
+  speed: 8
   activationTime: 0.5
   refreshPlayerTime: 0.1
   canChase: 0

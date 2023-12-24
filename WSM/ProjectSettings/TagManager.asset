@@ -20,6 +20,7 @@ TagManager:
   - DamageCountText
   - SpeedCountText
   - TearsCountText
+  - ShootingPoint
   layers:
   - Default
   - TransparentFX

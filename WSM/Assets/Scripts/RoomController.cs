@@ -43,7 +43,7 @@ public class RoomController : MonoBehaviour
             }
             else if (roomType == 1)
             {
-                if (other.GetComponent<PlayerController>().hasWeapon)
+                if (other.GetComponent<Player>().hasWeapon)
                 {
                     camcon.followMousePos();
                 }
@@ -54,7 +54,7 @@ public class RoomController : MonoBehaviour
             }
             if (loadout != null && !isActivated)
             {
-                other.GetComponent<PlayerController>().setInvincible(invincibleTime);
+                other.GetComponent<Player>().setInvincible(invincibleTime);
                 lockDoors();
                 isActivated = true;
                 enemyCount = loadout.enemyPoss.Length;

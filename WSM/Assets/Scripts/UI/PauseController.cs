@@ -4,7 +4,7 @@ public class PauseController : MonoBehaviour
 {
     private GameObject pauseScreen;
     private CameraController camcon;
-    private PlayerController playerCon;
+    private Player player;
     private bool onPause;
 
     private void Start()
@@ -12,7 +12,7 @@ public class PauseController : MonoBehaviour
         pauseScreen = transform.GetChild(0).gameObject;
         pauseScreen.SetActive(false);
         camcon = Camera.main.GetComponent<CameraController>();
-        playerCon = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
+        player = GameObject.FindGameObjectWithTag("Player").GetComponent<Player>();
         onPause = false;
     }
 
@@ -37,7 +37,7 @@ public class PauseController : MonoBehaviour
         Time.timeScale = 0f;
         pauseScreen.SetActive(true);
         camcon.isAllowedToMove = false;
-        playerCon.lockWeapon();
+        player.lockWeapon();
     }
 
     public void unPause()
@@ -46,6 +46,6 @@ public class PauseController : MonoBehaviour
         Time.timeScale = 1f;
         pauseScreen.SetActive(false);
         camcon.isAllowedToMove = true;
-        playerCon.unlockWeapon();
+        player.unlockWeapon();
     }
 }
