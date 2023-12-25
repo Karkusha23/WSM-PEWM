@@ -1,7 +1,9 @@
 using UnityEngine;
 
-public class Weapon_dropped : MonoBehaviour
+public class WeaponDropped : MonoBehaviour
 {
+    public GameObject weaponSample;
+
     private Animator anim;
 
     private void Start()

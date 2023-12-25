@@ -33,14 +33,11 @@ public class Exit : MonoBehaviour
     private void loadNextLevel()
     {
         PlayerData.health = player.health;
-        PlayerData.hasWeapon = player.hasWeapon;
-        PlayerData.weaponID = player.weaponID;
+        PlayerData.weaponSample = player.weapon.GetComponent<PlayerWeapon>().weaponDroppedSample.GetComponent<WeaponDropped>().weaponSample;
         PlayerData.damage = player.damage;
         PlayerData.reloadTime = player.reloadTime;
         PlayerData.moveSpeed = player.moveSpeed;
-        PlayerData.damageItemCount = player.itemCounts[ItemController.Item.Damage];
-        PlayerData.tearsItemCount = player.itemCounts[ItemController.Item.Tears];
-        PlayerData.speedItemCount = player.itemCounts[ItemController.Item.Speed];
+        PlayerData.itemCounts = player.itemCounts;
         SceneManager.LoadScene(sceneToLoad);
     }
 }

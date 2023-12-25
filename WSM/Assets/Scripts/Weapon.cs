@@ -31,5 +31,12 @@ public abstract class Weapon : MonoBehaviour
         transform.rotation = Quaternion.Euler(0f, 0f, rotation + angleOffset);
     }
 
-    public abstract void Shoot();
+    public abstract void shoot();
+
+    public GameObject launchBullet(int shootingPointIndex, Vector2 bulletDirection)
+    {
+        GameObject bullet = Instantiate(bulletSample, shootingPoints[shootingPointIndex].transform.position, Quaternion.identity);
+        bullet.GetComponent<Rigidbody2D>().velocity = bulletDirection.normalized * bulletSpeed;
+        return bullet;
+    }
 }

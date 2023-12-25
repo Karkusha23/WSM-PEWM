@@ -11,16 +11,15 @@ public class Player : MonoBehaviour
     public float dodgerollActivePhaseTime;
     public float dodgerollPassivePhaseTime;
     public float dodgerollSpeedBoost;
-    public WeaponsList weaponsList;
+
+    public GameObject weapon;
     public GameObject HUD;
     public GameObject loseScreen;
 
-    public Dictionary<ItemController.Item, int> itemCounts;
+    public Dictionary<Item.Items, int> itemCounts;
 
     [HideInInspector]
     public bool hasWeapon;
-    [HideInInspector]
-    public int weaponID;
 
     private Rigidbody2D rb;
     private Vector2 movement;
@@ -35,24 +34,26 @@ public class Player : MonoBehaviour
     private CameraController camcon;
     private int invincible_dodgeroll;
     private float dodgeroolTimer;
-    private GameObject weapon;
 
     private void Awake()
     {
         health = PlayerData.health;
-        hasWeapon = PlayerData.hasWeapon;
+        hasWeapon = PlayerData.weaponSample != null;
         if (hasWeapon)
         {
-            weapon = Instantiate(weaponsList.weapons[PlayerData.weaponID], transform.position, Quaternion.identity, transform);
-            weaponID = PlayerData.weaponID;
+            weapon = Instantiate(PlayerData.weaponSample, transform.position, Quaternion.identity, transform);
         }
         damage = PlayerData.damage;
         reloadTime = PlayerData.reloadTime;
         moveSpeed = PlayerData.moveSpeed;
-        itemCounts = new Dictionary<ItemController.Item, int>();
-        itemCounts.Add(ItemController.Item.Damage, PlayerData.damageItemCount);
-        itemCounts.Add(ItemController.Item.Tears, PlayerData.tearsItemCount);
-        itemCounts.Add(ItemController.Item.Speed, PlayerData.speedItemCount);
+        itemCounts = PlayerData.itemCounts;
+        if (itemCounts == null)
+        {
+            itemCounts = new Dictionary<Item.Items, int>();
+            itemCounts.Add(Item.Items.Damage, 0);
+            itemCounts.Add(Item.Items.Tears, 0);
+            itemCounts.Add(Item.Items.Speed, 0);
+        }
     }
 
     private void Start()
@@ -192,10 +193,10 @@ public class Player : MonoBehaviour
 
     private void checkTakeWeapon(Collider2D other)
     {
-        if (other.CompareTag("Weapon_dropped") && Input.GetKey(KeyCode.E) && Vector3.Distance(transform.position, other.transform.position) <= 2f)
+        if (other.CompareTag("WeaponDropped") && Input.GetKey(KeyCode.E) && Vector3.Distance(transform.position, other.transform.position) <= 2f)
         {
             dropWeapon();
-            weapon = Instantiate(weaponsList.weapons[other.name[0] - '0'], transform.position, Quaternion.identity, transform);
+            weapon = Instantiate(other.gameObject.GetComponent<WeaponDropped>().weaponSample, transform.position, Quaternion.identity, transform);
             hasWeapon = true;
             Destroy(other.gameObject);
             if (camcon.camMode == 1 || camcon.camMode == 3)
@@ -209,7 +210,7 @@ public class Player : MonoBehaviour
     {
         if (hasWeapon)
         {
-            Instantiate(weaponsList.weapons_dropped[weapon.name[0] - '0'], transform.position, Quaternion.Euler(0f, 0f, Random.Range(0f, 360f)));
+            Instantiate(weapon.GetComponent<PlayerWeapon>().weaponDroppedSample, transform.position, Quaternion.Euler(0f, 0f, Random.Range(0f, 360f)));
             Destroy(weapon);
             hasWeapon = false;
             weapon = null;
@@ -263,7 +264,7 @@ public class Player : MonoBehaviour
 
     public void getItem(GameObject item)
     {
-        ItemController itemCont = item.GetComponent<ItemController>();
+        Item itemCont = item.GetComponent<Item>();
         itemPanel.updateCountValue(itemCont.item, ++itemCounts[itemCont.item]);
         Debug.Log(itemCounts[itemCont.item]);
         moveSpeed += itemCont.speedBoost;

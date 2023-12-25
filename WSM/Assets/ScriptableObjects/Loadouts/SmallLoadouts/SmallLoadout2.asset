@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: SmallLoadout2
   m_EditorClassIdentifier: 
   enemyTypes:
-  - {fileID: 8768637141398408717, guid: 59ab025d62114f348b2d071f6f6ee7d2, type: 3}
+  - {fileID: 8768637141398408717, guid: 9c06c5e99c41df34e8ffe4fb4abab4f4, type: 3}
   enemyPoss:
   - {x: 0, y: 0, z: 0}

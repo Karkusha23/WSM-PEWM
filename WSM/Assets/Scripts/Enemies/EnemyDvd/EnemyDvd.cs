@@ -1,36 +1,40 @@
 using UnityEngine;
 using System.Collections;
 
-public class EnemyDvd : MonoBehaviour
+public class EnemyDvd : Enemy
 {
-    public GameObject enemyWeapon;
-    public float enemyHealth;
-    public float enemySpeed;
-    public float minSpeedScale;
-    public float maxSpeedScale;
-    public float activationTime;
+    public float reloadTime = 2.5f;
+    public float minSpeedScale = 0.9f;
+    public float maxSpeedScale = 1.2f;
 
-    [HideInInspector]
-    public bool allowedToMove;
+    public GameObject weapon;
+
     [HideInInspector]
     public Vector2 direction;
 
-    private Rigidbody2D rb;
-    private Vector2 tmp;
+    private EnemyDvdWeapon weaponCon;
 
-    private void Start()
+    protected override void Start()
     {
+        if (weapon == null)
+        {
+            weapon = findWeapon();
+        }
+        weaponCon = weapon.GetComponent<EnemyDvdWeapon>();
         direction = new Vector2(Random.Range(0, 2) == 0 ? -1f : 1f, Random.Range(0, 2) == 0 ? -1f : 1f);
-        rb = GetComponent<Rigidbody2D>();
-        Instantiate(enemyWeapon, transform.position, Quaternion.identity, transform);
-        StartCoroutine("activateEnemy");
+        base.Start();
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    protected override void onActivation()
+    {
+        rigidBody.velocity = direction.normalized * speed;
+    }
+
+    protected override void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.collider.CompareTag("Wall"))
         {
-            tmp = -transform.position * collision.contactCount;
+            Vector2 tmp = -transform.position * collision.contactCount;
             for (int i = collision.contactCount - 1; i >= 0; --i)
             {
                 tmp += collision.GetContact(i).point;
@@ -61,26 +65,17 @@ public class EnemyDvd : MonoBehaviour
             {
                 direction *= -1;
             }
-            if (allowedToMove)
-            {
-                rb.velocity = direction * enemySpeed * Random.Range(minSpeedScale, maxSpeedScale);
-            }
+            rigidBody.velocity = direction.normalized * speed * Random.Range(minSpeedScale, maxSpeedScale);
         }
-        else if (collision.collider.CompareTag("Bullet"))
-        {
-            enemyHealth -= collision.collider.GetComponent<Bullet>().damage;
-            if (enemyHealth <= 0)
-            {
-                transform.parent.GetComponent<RoomController>().checkEnemyKilled();
-                Destroy(gameObject);
-            }
-        }
+        base.OnCollisionEnter2D(collision);
     }
 
-    private IEnumerator activateEnemy()
+    private IEnumerator shootingSequence()
     {
-        yield return new WaitForSeconds(activationTime);
-        rb.velocity = direction * enemySpeed;
-        allowedToMove = true;
+        for (; ; )
+        {
+            weaponCon.shoot();
+            yield return new WaitForSeconds(reloadTime);
+        }
     }
 }

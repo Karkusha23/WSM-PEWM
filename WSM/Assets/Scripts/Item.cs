@@ -1,12 +1,10 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class ItemController : MonoBehaviour
+public class Item : MonoBehaviour
 {
-    public enum Item { Damage, Tears, Speed };
+    public enum Items { Damage, Tears, Speed };
 
-    public Item item;
+    public Items item;
     public float damageBoost;
     public float tearsBoost;
     public float speedBoost;

@@ -24,7 +24,20 @@ public abstract class Enemy : MonoBehaviour
         }
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    public GameObject findWeapon()
+    {
+        for (int i = 0; i < transform.childCount; ++i)
+        {
+            GameObject child = transform.GetChild(i).gameObject;
+            if (child.CompareTag("EnemyWeapon"))
+            {
+                return child;
+            }
+        }
+        return null;
+    }
+
+    protected virtual void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.collider.CompareTag("Bullet"))
         {

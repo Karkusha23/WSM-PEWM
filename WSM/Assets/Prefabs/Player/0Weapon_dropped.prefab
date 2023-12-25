@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 976617927}
   m_Layer: 0
   m_Name: 0Weapon_dropped
-  m_TagString: Weapon_dropped
+  m_TagString: WeaponDropped
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -135,3 +135,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6edb332d572827d41bb8ac7e76986ab3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  weaponSample: {fileID: 8779896814758420375, guid: 2303f4a16fee3cf49a611951939e3a71, type: 3}

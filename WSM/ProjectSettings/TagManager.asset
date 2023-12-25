@@ -5,7 +5,6 @@ TagManager:
   serializedVersion: 2
   tags:
   - Weapon
-  - Weapon_dropped
   - Wall
   - Enemy
   - Bullet
@@ -21,6 +20,9 @@ TagManager:
   - SpeedCountText
   - TearsCountText
   - ShootingPoint
+  - EnemyWeapon
+  - WeaponDropped
+  - Weapon_dropped
   layers:
   - Default
   - TransparentFX

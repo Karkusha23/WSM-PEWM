@@ -1,18 +1,15 @@
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.UIElements;
-using static UnityEngine.RuleTile.TilingRuleOutput;
 
 public class PlayerWeapon : Weapon
 {
-    public Player player;
-
     public float reloadTimeMult;
     public float damageMult;
+    public bool canPlayerControlWeapon = true;
+
+    public GameObject weaponDroppedSample;
 
     private float timer;
-
-    public bool canPlayerControlWeapon = true;
+    private Player player;
 
     protected override void Start()
     {
@@ -31,21 +28,20 @@ public class PlayerWeapon : Weapon
 
             base.Update();
 
-            if (timer <= 0f && Input.GetMouseButton(0))
-            {
-                Shoot();
-            }
             if (timer > 0.0f)
             {
                 timer -= Time.deltaTime;
             }
+            if (timer <= 0f && Input.GetMouseButton(0))
+            {
+                shoot();
+            }
         }
     }
 
-    public override void Shoot()
+    public override void shoot()
     {
-        GameObject bullet = Instantiate(bulletSample, shootingPoints[0].transform.position, Quaternion.identity);
-        bullet.GetComponent<Rigidbody2D>().velocity = direction.normalized * bulletSpeed;
+        GameObject bullet = launchBullet(0, direction);
         bullet.GetComponent<Bullet>().damage = player.damage * damageMult;
         timer = player.reloadTime * reloadTimeMult;
     }
