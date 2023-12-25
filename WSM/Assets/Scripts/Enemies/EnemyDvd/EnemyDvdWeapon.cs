@@ -1,37 +1,28 @@
 using UnityEngine;
 using System.Collections;
-using Unity.VisualScripting;
 
 public class EnemyDvdWeapon : Weapon
 {
     public float timeBetweenBullets = 0.2f;
     public int bulletAmount = 5;
 
-    public float directionChangeAlpha = 0.5f;
+    public float directionChangeSpeed = 1.0f;
 
     [HideInInspector]
     bool isShooting = false;
 
     [HideInInspector]
-    public Vector2 targetDirection = new Vector2(0.0f, 1.0f);
+    public Quaternion targetRotation;
 
     protected override void Start()
     {
+        targetRotation = Quaternion.identity;
         base.Start();
     }
 
     protected override void Update()
     {
-        if (Vector2.Distance(direction.normalized, targetDirection.normalized) > 0.1f)
-        {
-            direction = Vector2.Lerp(direction.normalized, targetDirection.normalized, directionChangeAlpha);
-        }
-        else
-        {
-            direction = targetDirection;
-        }
-
-        base.Update();
+        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, directionChangeSpeed * Time.deltaTime);
     }
 
     public override void shoot()

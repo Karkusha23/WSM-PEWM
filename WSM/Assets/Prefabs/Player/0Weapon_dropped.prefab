@@ -135,4 +135,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6edb332d572827d41bb8ac7e76986ab3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  weaponSample: {fileID: 8779896814758420375, guid: 2303f4a16fee3cf49a611951939e3a71, type: 3}
+  weaponPrefab: {fileID: 8779896814758420375, guid: 2303f4a16fee3cf49a611951939e3a71, type: 3}

@@ -2,13 +2,20 @@ using UnityEngine;
 
 public class PlayerWeapon : Weapon
 {
+    // Multiplicator of firerate
     public float reloadTimeMult;
+
+    // Multiplicator of damage
     public float damageMult;
+
     public bool canPlayerControlWeapon = true;
 
-    public GameObject weaponDroppedSample;
+    // Prefab of pickup of this weapon
+    public GameObject weaponDroppedPrefab;
 
+    // Timer that counds the reload time
     private float timer;
+
     private Player player;
 
     protected override void Start()

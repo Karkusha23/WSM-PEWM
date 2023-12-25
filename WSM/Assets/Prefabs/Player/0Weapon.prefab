@@ -102,12 +102,12 @@ MonoBehaviour:
   - {fileID: 5847008671145603876}
   direction: {x: 1, y: -1}
   angleOffset: 90
-  bulletSample: {fileID: 3239862130681951045, guid: 53666d4f76fd6d34b875a01f19bf4501, type: 3}
+  bulletPrefab: {fileID: 3239862130681951045, guid: 53666d4f76fd6d34b875a01f19bf4501, type: 3}
   bulletSpeed: 15
   reloadTimeMult: 1
   damageMult: 1
   canPlayerControlWeapon: 1
-  weaponDroppedSample: {fileID: 8372400299945040955, guid: c7b8058686a5df444a446f5f569510d5, type: 3}
+  weaponDroppedPrefab: {fileID: 8372400299945040955, guid: c7b8058686a5df444a446f5f569510d5, type: 3}
 --- !u!1001 &7692047412803943566
 PrefabInstance:
   m_ObjectHideFlags: 0

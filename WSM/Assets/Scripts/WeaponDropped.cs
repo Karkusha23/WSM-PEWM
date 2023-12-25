@@ -2,7 +2,8 @@ using UnityEngine;
 
 public class WeaponDropped : MonoBehaviour
 {
-    public GameObject weaponSample;
+    // Prefab of this weapon as part of player
+    public GameObject weaponPrefab;
 
     private Animator anim;
 

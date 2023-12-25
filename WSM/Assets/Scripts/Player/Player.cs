@@ -196,7 +196,7 @@ public class Player : MonoBehaviour
         if (other.CompareTag("WeaponDropped") && Input.GetKey(KeyCode.E) && Vector3.Distance(transform.position, other.transform.position) <= 2f)
         {
             dropWeapon();
-            weapon = Instantiate(other.gameObject.GetComponent<WeaponDropped>().weaponSample, transform.position, Quaternion.identity, transform);
+            weapon = Instantiate(other.gameObject.GetComponent<WeaponDropped>().weaponPrefab, transform.position, Quaternion.identity, transform);
             hasWeapon = true;
             Destroy(other.gameObject);
             if (camcon.camMode == 1 || camcon.camMode == 3)
@@ -210,7 +210,7 @@ public class Player : MonoBehaviour
     {
         if (hasWeapon)
         {
-            Instantiate(weapon.GetComponent<PlayerWeapon>().weaponDroppedSample, transform.position, Quaternion.Euler(0f, 0f, Random.Range(0f, 360f)));
+            Instantiate(weapon.GetComponent<PlayerWeapon>().weaponDroppedPrefab, transform.position, Quaternion.Euler(0f, 0f, Random.Range(0f, 360f)));
             Destroy(weapon);
             hasWeapon = false;
             weapon = null;

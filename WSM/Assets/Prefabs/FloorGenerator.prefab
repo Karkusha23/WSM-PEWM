@@ -51,10 +51,10 @@ MonoBehaviour:
   bigRoomProbability: 0.15
   minItemRoomCount: 1
   maxItemRoomCount: 3
-  smallRoom: {fileID: 7288156958747843772, guid: 2b0ab6a6d4715f6488511e3614d3b4f5, type: 3}
-  bigRoom: {fileID: 2322337418231900787, guid: e7b006119d6f79a44a0a0b59b7946fbd, type: 3}
-  door: {fileID: 2980541394161524617, guid: 9f5b4032567f5f84687c48d05a1d50c4, type: 3}
-  wallPlug: {fileID: 6542898871119334974, guid: d5e7e321bf02efa418c3c731acf458b3, type: 3}
+  smallRoomPrefab: {fileID: 7288156958747843772, guid: 2b0ab6a6d4715f6488511e3614d3b4f5, type: 3}
+  bigRoomPrefab: {fileID: 2322337418231900787, guid: e7b006119d6f79a44a0a0b59b7946fbd, type: 3}
+  doorPrefab: {fileID: 2980541394161524617, guid: 9f5b4032567f5f84687c48d05a1d50c4, type: 3}
+  wallPlugPrefab: {fileID: 6542898871119334974, guid: d5e7e321bf02efa418c3c731acf458b3, type: 3}
   smallLoadouts:
   - {fileID: 11400000, guid: a00ce937e80906844887e3bdf8d4b7ca, type: 2}
   - {fileID: 11400000, guid: 9d73bbaee9e00c4409561bb05e8664e0, type: 2}

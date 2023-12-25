@@ -5,13 +5,18 @@ public abstract class Enemy : MonoBehaviour
 {
     public float health = 3.0f;
     public float speed = 10.0f;
+
+    // Time between spawn and player attacking start
     public float activationTime = 0.5f;
+
+    // How frequent does player position refreshing
     public float refreshPlayerTime = 0.1f;
 
     protected Rigidbody2D rigidBody;
     protected Transform player;
     protected Vector3 destination;
 
+    // Called activationTime seconds after spawning
     protected abstract void onActivation();
 
     public void takeDamage(float damage)
@@ -24,6 +29,7 @@ public abstract class Enemy : MonoBehaviour
         }
     }
 
+    //Find weapon among children of gameObject
     public GameObject findWeapon()
     {
         for (int i = 0; i < transform.childCount; ++i)
@@ -52,6 +58,7 @@ public abstract class Enemy : MonoBehaviour
         StartCoroutine("activateEnemy");
     }
 
+    // Activate enemy on spawn
     private IEnumerator activateEnemy()
     {
         yield return new WaitForSeconds(activationTime);
@@ -59,6 +66,7 @@ public abstract class Enemy : MonoBehaviour
         onActivation();
     }
 
+    // Refresh player position
     private IEnumerator refreshPlayerPos()
     {
         for (; ; )

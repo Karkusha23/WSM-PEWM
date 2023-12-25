@@ -32,7 +32,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 9121730269973601046}
+  - {fileID: 4598669456489254503}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -148,15 +148,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   health: 3
-  speed: 10
+  speed: 7
   activationTime: 0.5
   refreshPlayerTime: 0.1
-  reloadTime: 2.5
+  reloadTime: 1
   minSpeedScale: 0.8
   maxSpeedScale: 1.2
-  weapon: {fileID: 7458533587488305036}
+  isAllowedToMoveWhileShooting: 0
+  weapon: {fileID: 2793687658130324221}
   direction: {x: 0, y: 0}
---- !u!1001 &5293270574251852760
+--- !u!1001 &590637110751401641
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -213,13 +214,13 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9c4d3d7262965294280de5fc2f85dd4d, type: 3}
---- !u!1 &7458533587488305036 stripped
+--- !u!1 &2793687658130324221 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 3384298221420424276, guid: 9c4d3d7262965294280de5fc2f85dd4d, type: 3}
-  m_PrefabInstance: {fileID: 5293270574251852760}
+  m_PrefabInstance: {fileID: 590637110751401641}
   m_PrefabAsset: {fileID: 0}
---- !u!4 &9121730269973601046 stripped
+--- !u!4 &4598669456489254503 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4027234922538932430, guid: 9c4d3d7262965294280de5fc2f85dd4d, type: 3}
-  m_PrefabInstance: {fileID: 5293270574251852760}
+  m_PrefabInstance: {fileID: 590637110751401641}
   m_PrefabAsset: {fileID: 0}

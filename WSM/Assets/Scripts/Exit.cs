@@ -33,7 +33,7 @@ public class Exit : MonoBehaviour
     private void loadNextLevel()
     {
         PlayerData.health = player.health;
-        PlayerData.weaponSample = player.weapon.GetComponent<PlayerWeapon>().weaponDroppedSample.GetComponent<WeaponDropped>().weaponSample;
+        PlayerData.weaponSample = player.weapon.GetComponent<PlayerWeapon>().weaponDroppedPrefab.GetComponent<WeaponDropped>().weaponPrefab;
         PlayerData.damage = player.damage;
         PlayerData.reloadTime = player.reloadTime;
         PlayerData.moveSpeed = player.moveSpeed;

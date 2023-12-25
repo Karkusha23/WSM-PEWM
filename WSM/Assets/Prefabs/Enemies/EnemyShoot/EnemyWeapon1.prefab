@@ -102,7 +102,7 @@ MonoBehaviour:
   - {fileID: 4191698273412180890}
   direction: {x: 1, y: -1}
   angleOffset: 90
-  bulletSample: {fileID: 3239862130681951045, guid: 467bd36679752da43956f1daf63f7d1b, type: 3}
+  bulletPrefab: {fileID: 3239862130681951045, guid: 467bd36679752da43956f1daf63f7d1b, type: 3}
   bulletSpeed: 12
 --- !u!1001 &121874719883322416
 PrefabInstance:

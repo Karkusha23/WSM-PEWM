@@ -1,11 +1,9 @@
-using Mono.Cecil.Cil;
 using System.Collections.Generic;
-using System.Linq;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class FloorGenerator : MonoBehaviour
 {
+    // Struct for storing points on floor matrix
     public struct FloorPoint
     {
         public int i { get; set; }
@@ -20,6 +18,7 @@ public class FloorGenerator : MonoBehaviour
 
     public class PointList : List<FloorPoint>
     {
+        // Remove point by coordinates
         public bool RemoveByPoint(int row, int col)
         {
             int index = IndexOf(new FloorPoint(row, col));
@@ -32,18 +31,26 @@ public class FloorGenerator : MonoBehaviour
         }
     };
 
+    // Room count limitations
     public int minRoomCount;
     public int maxRoomCount;
+
+    // Floor size limitations
     public int floorHeight;
     public int floorWidth;
+
+    // Probability of big room creating (between [0, 1])
     public float bigRoomProbability;
+
+    // Item room count limitation
     public int minItemRoomCount;
     public int maxItemRoomCount;
 
-    public GameObject smallRoom;
-    public GameObject bigRoom;
-    public GameObject door;
-    public GameObject wallPlug;
+    // Prefabs of floor elements
+    public GameObject smallRoomPrefab;
+    public GameObject bigRoomPrefab;
+    public GameObject doorPrefab;
+    public GameObject wallPlugPrefab;
 
     public EnemyLoadout[] smallLoadouts;
     public EnemyLoadout[] bigLoadouts;
@@ -63,8 +70,11 @@ public class FloorGenerator : MonoBehaviour
     // 7 - boss room core
     // 8 - pre-boss room
     // 9 - item room
+
+    // Lists of coordinates of possible rooms
     private PointList freeSmallRoom;
     private PointList freeBigRoom;
+
     private GameObject room;
     private bool[] smallDoors;
     private bool[] bigDoors;
@@ -487,7 +497,7 @@ public class FloorGenerator : MonoBehaviour
     private void createSmallRoom(int row, int col, bool withEnemies)
     {
         Vector3 pos = new Vector3((col - floorWidth / 2) * 17.6f, (floorHeight / 2 - row) * 11f, 0f);
-        room = Instantiate(smallRoom, pos, Quaternion.identity);
+        room = Instantiate(smallRoomPrefab, pos, Quaternion.identity);
         getSmallRoomType(row, col);
         createSmallDoors();
         if (row == floorHeight / 2 && col == floorWidth / 2)
@@ -512,7 +522,7 @@ public class FloorGenerator : MonoBehaviour
     private void createBigRoom(int row, int col, bool isBoss)
     {
         Vector3 pos = new Vector3((col - floorWidth / 2) * 17.6f, (floorHeight / 2 - row) * 11f, 0f);
-        room = Instantiate(bigRoom, pos, Quaternion.identity);
+        room = Instantiate(bigRoomPrefab, pos, Quaternion.identity);
         getBigRoomType(row, col);
         createBigDoors();
         if (isBoss)
@@ -615,7 +625,7 @@ public class FloorGenerator : MonoBehaviour
         int counter = 0;
         for (int i = 0; i < 4; ++i)
         {
-            tmp = Instantiate(smallDoors[i] ? door : wallPlug, room.transform.position + doorPoss[i], i == 0 || i == 3 ? Quaternion.identity : Quaternion.Euler(0f, 0f, 90f), room.transform);
+            tmp = Instantiate(smallDoors[i] ? doorPrefab : wallPlugPrefab, room.transform.position + doorPoss[i], i == 0 || i == 3 ? Quaternion.identity : Quaternion.Euler(0f, 0f, 90f), room.transform);
             if (smallDoors[i])
             {
                 roomcon.doors[counter++] = tmp;
@@ -631,7 +641,7 @@ public class FloorGenerator : MonoBehaviour
         int counter = 0;
         for (int i = 0; i < 8; ++i)
         {
-            tmp = Instantiate(bigDoors[i] ? door : wallPlug, room.transform);
+            tmp = Instantiate(bigDoors[i] ? doorPrefab : wallPlugPrefab, room.transform);
             tmp.transform.position = room.transform.position;
             tmp.transform.localScale = new Vector3(4.4f, 1.1f, 1f);
             if (i < 4)
