@@ -9,10 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fd933ec0a47a6f04e8a7020a662eb58b, type: 3}
-  m_Name: SmallLoadout2
+  m_Script: {fileID: 11500000, guid: d65055952ec93bd4090c801c56f65980, type: 3}
+  m_Name: Room2
   m_EditorClassIdentifier: 
-  enemyTypes:
+  prefabs:
   - {fileID: 8768637141398408717, guid: 9c06c5e99c41df34e8ffe4fb4abab4f4, type: 3}
-  enemyPoss:
-  - {x: 0, y: 0, z: 0}
+  roomPointXs: 07000000
+  roomPointYs: 04000000

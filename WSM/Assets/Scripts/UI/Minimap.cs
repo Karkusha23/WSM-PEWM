@@ -12,7 +12,7 @@ public class Minimap : MonoBehaviour
     public GameObject bossIcon;
 
     [HideInInspector]
-    public int[,] floorMatrix;
+    public byte[,] floorMatrix;
     [HideInInspector]
     public int floorHeight;
     [HideInInspector]

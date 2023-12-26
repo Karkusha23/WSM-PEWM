@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FloorGenerator : MonoBehaviour
+public class Floor : MonoBehaviour
 {
     // Struct for storing points on floor matrix
     public struct FloorPoint
@@ -52,14 +52,18 @@ public class FloorGenerator : MonoBehaviour
     public GameObject doorPrefab;
     public GameObject wallPlugPrefab;
 
-    public EnemyLoadout[] smallLoadouts;
-    public EnemyLoadout[] bigLoadouts;
-    public EnemyLoadout[] bossLoadouts;
-    public GameObject[] pickups;
-    public GameObject[] bossDrops;
+    // Room consts
+    public const float roomHeight = 12.0f;
+    public const float roomWidth = 19.2f;
+
+    public RoomLoadout[] smallLoadouts;
+    public RoomLoadout[] bigLoadouts;
+    public RoomLoadout[] bossLoadouts;
+    public List<GameObject> pickups;
+    public List<GameObject> bossDrops;
     public ItemList itemList;
 
-    private int[,] floorMatrix;
+    private byte[,] floorMatrix;
     // 0 - no room, can not build there
     // 1 - no room, free only for small room
     // 2 - no room, free only for big room
@@ -84,6 +88,7 @@ public class FloorGenerator : MonoBehaviour
 
     private void Awake()
     {
+        transform.position = Vector3.zero;
         initVectors();
         buildMatrix();
         for (int i = 0; i < floorHeight; ++i)
@@ -107,6 +112,8 @@ public class FloorGenerator : MonoBehaviour
                     case 9:
                         createItemRoom(i, j);
                         break;
+                    default:
+                        break;
                 }
             }
         }
@@ -122,19 +129,15 @@ public class FloorGenerator : MonoBehaviour
         smallDoors = new bool[4];
         bigDoors = new bool[8];
         doorPoss = new Vector3[4];
-        doorPoss[0] = new Vector3(0f, 5f, 0f);
-        doorPoss[1] = new Vector3(-8f, 0f, 0f);
-        doorPoss[2] = new Vector3(8f, 0f, 0f);
-        doorPoss[3] = new Vector3(0f, -5f, 0f);
-        for (int i = 0; i < 4; ++i)
-        {
-            doorPoss[i] *= 1.1f;
-        }
+        doorPoss[0] = new Vector3(0f, roomHeight / 2.0f, 0.0f);
+        doorPoss[1] = new Vector3(-roomWidth / 2.0f, 0.0f, 0.0f);
+        doorPoss[2] = new Vector3(roomWidth / 2.0f, 0f, 0f);
+        doorPoss[3] = new Vector3(0f, -roomHeight / 2.0f, 0f);
         bigRoomDoorOffsets = new Vector3[4];
         bigRoomDoorOffsets[0] = Vector3.zero;
-        bigRoomDoorOffsets[1] = new Vector3(17.6f, 0f, 0f);
-        bigRoomDoorOffsets[2] = new Vector3(0, -11f, 0f);
-        bigRoomDoorOffsets[3] = new Vector3(17.6f, -11f, 0f);
+        bigRoomDoorOffsets[1] = new Vector3(roomWidth, 0.0f, 0.0f);
+        bigRoomDoorOffsets[2] = new Vector3(0.0f, -roomHeight, 0.0f);
+        bigRoomDoorOffsets[3] = new Vector3(roomWidth, -roomHeight, 0.0f);
     }
 
     private void buildMatrix()
@@ -150,14 +153,13 @@ public class FloorGenerator : MonoBehaviour
                 break;
             }
         }
-        //Debug.Log(FloorMatrixStr());
         buildItemRooms();
         buildBossRoom();
     }
 
     private void initMatrix()
     {
-        floorMatrix = new int[floorHeight, floorWidth];
+        floorMatrix = new byte[floorHeight, floorWidth];
         freeSmallRoom = new PointList();
         freeBigRoom = new PointList();
         for (int i = 0; i < floorHeight; ++i)
@@ -186,7 +188,6 @@ public class FloorGenerator : MonoBehaviour
                 floorMatrix[row + i / 2, col + i % 2] = 6;
             }
             freeBigRoom.RemoveByPoint(row, col);
-            //removeFreeBigRoom(index);
         }
         else
         {
@@ -201,9 +202,7 @@ public class FloorGenerator : MonoBehaviour
             removeFreeSmallAround(row, col);
             floorMatrix[row, col] = 4;
             freeSmallRoom.RemoveByPoint(row, col);
-            //removeFreeSmallRoom(index);
         }
-        Debug.Log(FloorMatrixStr());
         return true;
     }
 
@@ -273,7 +272,6 @@ public class FloorGenerator : MonoBehaviour
 
     private void checkBigFreeRoom(int row, int col)
     {
-        Debug.Log(row.ToString() + " " + col);
         if (row > 0)
         {
             checkCell(row - 1, col);
@@ -348,7 +346,7 @@ public class FloorGenerator : MonoBehaviour
     {
         if (floorMatrix[row, col] == 0 || floorMatrix[row, col] == 2)
         {
-            floorMatrix[row, col] = floorMatrix[row, col] == 0 ? 1 : 3;
+            floorMatrix[row, col] = (byte)(floorMatrix[row, col] == 0 ? 1 : 3);
             freeSmallRoom.Add(new FloorPoint(row, col));
         }
     }
@@ -368,7 +366,7 @@ public class FloorGenerator : MonoBehaviour
             }
             if (tmp)
             {
-                floorMatrix[row, col] = floorMatrix[row, col] == 0 ? 2 : 3;
+                floorMatrix[row, col] = (byte)(floorMatrix[row, col] == 0 ? 2 : 3);
                 freeBigRoom.Add(new FloorPoint(row, col));
             }
         }
@@ -386,8 +384,7 @@ public class FloorGenerator : MonoBehaviour
             if (floorMatrix[row - 1, col - 1] == 2 || floorMatrix[row - 1, col - 1] == 3)
             {
                 freeBigRoom.RemoveByPoint(row - 1, col - 1);
-                //removeFreeBigRoom(findBigFreeRoom(row - 1, col - 1));
-                floorMatrix[row - 1, col - 1] = floorMatrix[row - 1, col - 1] == 2 ? 0 : 1;
+                floorMatrix[row - 1, col - 1] = (byte)(floorMatrix[row - 1, col - 1] == 2 ? 0 : 1);
             }
         }
         if (row > 0)
@@ -395,8 +392,7 @@ public class FloorGenerator : MonoBehaviour
             if (floorMatrix[row - 1, col] == 2 || floorMatrix[row - 1, col] == 3)
             {
                 freeBigRoom.RemoveByPoint(row - 1, col);
-                //removeFreeBigRoom(findBigFreeRoom(row - 1, col));
-                floorMatrix[row - 1, col] = floorMatrix[row - 1, col] == 2 ? 0 : 1;
+                floorMatrix[row - 1, col] = (byte)(floorMatrix[row - 1, col] == 2 ? 0 : 1);
             }
         }
         if (col > 0)
@@ -404,8 +400,7 @@ public class FloorGenerator : MonoBehaviour
             if (floorMatrix[row, col - 1] == 2 || floorMatrix[row, col - 1] == 3)
             {
                 freeBigRoom.RemoveByPoint(row, col - 1);
-                //removeFreeBigRoom(findBigFreeRoom(row, col - 1));
-                floorMatrix[row, col - 1] = floorMatrix[row, col - 1] == 2 ? 0 : 1;
+                floorMatrix[row, col - 1] = (byte)(floorMatrix[row, col - 1] == 2 ? 0 : 1);
             }
         }
     }
@@ -425,7 +420,6 @@ public class FloorGenerator : MonoBehaviour
             {
                 case 1:
                     freeSmallRoom.RemoveByPoint(curRow, curCol);
-                    //removeFreeSmallRoom(findSmallFreeRoom(curRow, curCol));
                     break;
                 case 2:
                     freeBigRoom.RemoveByPoint(curRow, curCol);
@@ -433,8 +427,6 @@ public class FloorGenerator : MonoBehaviour
                 case 3:
                     freeSmallRoom.RemoveByPoint(curRow, curCol);
                     freeBigRoom.RemoveByPoint(curRow, curCol);
-                    //removeFreeSmallRoom(findSmallFreeRoom(curRow, curCol));
-                    //removeFreeBigRoom(findBigFreeRoom(curRow, curCol));
                     break;
             }
         }
@@ -446,12 +438,10 @@ public class FloorGenerator : MonoBehaviour
                 {
                     case 2:
                         freeBigRoom.RemoveByPoint(curRow, col - 1);
-                        //removeFreeBigRoom(findBigFreeRoom(curRow, col - 1));
                         floorMatrix[curRow, col - 1] = 0;
                         break;
                     case 3:
                         freeBigRoom.RemoveByPoint(curRow, col - 1);
-                        //removeFreeBigRoom(findBigFreeRoom(curRow, col - 1));
                         floorMatrix[curRow, col - 1] = 1;
                         break;
                 }
@@ -462,12 +452,10 @@ public class FloorGenerator : MonoBehaviour
                 {
                     case 2:
                         freeBigRoom.RemoveByPoint(row - 1, col - 1);
-                        //removeFreeBigRoom(findBigFreeRoom(row - 1, col - 1));
                         floorMatrix[row - 1, col - 1] = 0;
                         break;
                     case 3:
                         freeBigRoom.RemoveByPoint(row - 1, col - 1);
-                        //removeFreeBigRoom(findBigFreeRoom(row - 1, col - 1));
                         floorMatrix[row - 1, col - 1] = 1;
                         break;
                 }
@@ -481,12 +469,10 @@ public class FloorGenerator : MonoBehaviour
                 {
                     case 2:
                         freeBigRoom.RemoveByPoint(row - 1, curCol);
-                        //removeFreeBigRoom(findBigFreeRoom(row - 1, curCol));
                         floorMatrix[row - 1, curCol] = 0;
                         break;
                     case 3:
                         freeBigRoom.RemoveByPoint(row - 1, curCol);
-                        //removeFreeBigRoom(findBigFreeRoom(row - 1, curCol));
                         floorMatrix[row - 1, curCol] = 1;
                         break;
                 }
@@ -496,8 +482,8 @@ public class FloorGenerator : MonoBehaviour
 
     private void createSmallRoom(int row, int col, bool withEnemies)
     {
-        Vector3 pos = new Vector3((col - floorWidth / 2) * 17.6f, (floorHeight / 2 - row) * 11f, 0f);
-        room = Instantiate(smallRoomPrefab, pos, Quaternion.identity);
+        Vector3 pos = floorMatrixToWorld(row, col);
+        room = Instantiate(smallRoomPrefab, pos, Quaternion.identity, transform);
         getSmallRoomType(row, col);
         createSmallDoors();
         if (row == floorHeight / 2 && col == floorWidth / 2)
@@ -506,8 +492,8 @@ public class FloorGenerator : MonoBehaviour
         }
         if (withEnemies)
         {
-            room.GetComponent<RoomController>().loadout = smallLoadouts[Random.Range(0, smallLoadouts.Length)];
-            room.GetComponent<RoomController>().roomDrops = pickups;
+            room.GetComponent<Room>().loadout = smallLoadouts[Random.Range(0, smallLoadouts.Length)];
+            room.GetComponent<Room>().roomDrops = pickups;
         }
     }
 
@@ -521,19 +507,19 @@ public class FloorGenerator : MonoBehaviour
 
     private void createBigRoom(int row, int col, bool isBoss)
     {
-        Vector3 pos = new Vector3((col - floorWidth / 2) * 17.6f, (floorHeight / 2 - row) * 11f, 0f);
-        room = Instantiate(bigRoomPrefab, pos, Quaternion.identity);
+        Vector3 pos = floorMatrixToWorld(row, col);
+        room = Instantiate(bigRoomPrefab, pos, Quaternion.identity, transform);
         getBigRoomType(row, col);
         createBigDoors();
         if (isBoss)
         {
-            room.GetComponent<RoomController>().loadout = bossLoadouts[Random.Range(0, bossLoadouts.Length)];
-            room.GetComponent<RoomController>().roomDrops = bossDrops;
+            room.GetComponent<Room>().loadout = bossLoadouts[Random.Range(0, bossLoadouts.Length)];
+            room.GetComponent<Room>().roomDrops = bossDrops;
         }
         else
         {
-            room.GetComponent<RoomController>().loadout = bigLoadouts[Random.Range(0, bigLoadouts.Length)];
-            room.GetComponent<RoomController>().roomDrops = pickups;
+            room.GetComponent<Room>().loadout = bigLoadouts[Random.Range(0, bigLoadouts.Length)];
+            room.GetComponent<Room>().roomDrops = pickups;
         }
     }
 
@@ -620,15 +606,14 @@ public class FloorGenerator : MonoBehaviour
     private void createSmallDoors()
     {
         GameObject tmp;
-        RoomController roomcon = room.GetComponent<RoomController>();
-        roomcon.doors = new GameObject[4];
+        Room roomcon = room.GetComponent<Room>();
         int counter = 0;
         for (int i = 0; i < 4; ++i)
         {
             tmp = Instantiate(smallDoors[i] ? doorPrefab : wallPlugPrefab, room.transform.position + doorPoss[i], i == 0 || i == 3 ? Quaternion.identity : Quaternion.Euler(0f, 0f, 90f), room.transform);
             if (smallDoors[i])
             {
-                roomcon.doors[counter++] = tmp;
+                roomcon.doors.Add(tmp);
             }
         }
     }
@@ -636,14 +621,11 @@ public class FloorGenerator : MonoBehaviour
     private void createBigDoors()
     {
         GameObject tmp;
-        RoomController roomcon = room.GetComponent<RoomController>();
-        roomcon.doors = new GameObject[8];
-        int counter = 0;
+        Room roomcon = room.GetComponent<Room>();
         for (int i = 0; i < 8; ++i)
         {
             tmp = Instantiate(bigDoors[i] ? doorPrefab : wallPlugPrefab, room.transform);
             tmp.transform.position = room.transform.position;
-            tmp.transform.localScale = new Vector3(4.4f, 1.1f, 1f);
             if (i < 4)
             {
                 tmp.transform.position += bigRoomDoorOffsets[i % 2];
@@ -674,7 +656,7 @@ public class FloorGenerator : MonoBehaviour
             }
             if (bigDoors[i])
             {
-                roomcon.doors[counter++] = tmp;
+                roomcon.doors.Add(tmp);
             }
         }
     }
@@ -708,42 +690,11 @@ public class FloorGenerator : MonoBehaviour
             }
             floorMatrix[row, col] = 9;
         }
-
-        /*int itemRoomCount = Random.Range(minItemRoomCount, maxItemRoomCount + 1);
-        int[] smallRoomHeights = new int[floorHeight * floorWidth];
-        int[] smallRoomWidths = new int[floorHeight * floorWidth];
-        int smallRoomsCount = 0;
-        for (int i = 0; i < floorHeight; ++i)
-        {
-            for (int j = 0; j < floorWidth; ++j)
-            {
-                if (floorMatrix[i, j] == 4 && !(i >= floorHeight / 2 - 1 && i <= floorHeight / 2 + 1 && j >= floorWidth / 2 - 1 && j <= floorWidth / 2 + 1))
-                {
-                    smallRoomHeights[smallRoomsCount] = i;
-                    smallRoomWidths[smallRoomsCount] = j;
-                    ++smallRoomsCount;
-                }
-            }
-        }
-        Debug.Log(itemRoomCount);
-        Debug.Log(smallRoomsCount);
-        for (int i = 0; i < itemRoomCount; ++i)
-        {
-            int room = 0, row = 0, col = 0, iter = 0;
-            do
-            {
-                room = Random.Range(0, smallRoomsCount);
-                row = smallRoomHeights[room];
-                col = smallRoomWidths[room];
-                ++iter;
-            } while (!checkItemRoomPlacement(row, col) && iter < 100);
-            floorMatrix[row, col] = 9;
-        }*/
     }
 
     private void buildBossRoom()
     {
-        int[,] tmpMatrix = new int[floorHeight + 6, floorWidth + 6];
+        byte[,] tmpMatrix = new byte[floorHeight + 6, floorWidth + 6];
         for (int i = 0; i < floorHeight; ++i)
         {
             for (int j = 0; j < floorWidth; ++j)
@@ -909,12 +860,17 @@ public class FloorGenerator : MonoBehaviour
         return result;
     }
 
+    public Vector3 floorMatrixToWorld(int row, int col)
+    {
+        return new Vector3((col - floorWidth / 2) * roomWidth, (floorHeight / 2 - row) * roomHeight, 0.0f);
+    }
+
     private bool isInMiddle(int row, int col)
     {
         return row >= floorHeight / 2 - 1 && row <= floorHeight / 2 + 1 && col >= floorWidth / 2 - 1 && col <= floorWidth / 2 + 1;
     }
 
-    public string FloorMatrixStr()
+    public string floorMatrixStr()
     {
         string str = "Free small count: " + freeSmallRoom.Count + "\nFree big count: " + freeBigRoom.Count + "\n";
         for (int i = 0; i < floorHeight; ++i)

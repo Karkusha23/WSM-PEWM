@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 7309073861808278981}
   - component: {fileID: 7309073861808278978}
   m_Layer: 0
-  m_Name: FloorGenerator
+  m_Name: Floor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -56,11 +56,10 @@ MonoBehaviour:
   doorPrefab: {fileID: 2980541394161524617, guid: 9f5b4032567f5f84687c48d05a1d50c4, type: 3}
   wallPlugPrefab: {fileID: 6542898871119334974, guid: d5e7e321bf02efa418c3c731acf458b3, type: 3}
   smallLoadouts:
-  - {fileID: 11400000, guid: a00ce937e80906844887e3bdf8d4b7ca, type: 2}
-  - {fileID: 11400000, guid: 9d73bbaee9e00c4409561bb05e8664e0, type: 2}
+  - {fileID: 11400000, guid: 6397f6ef160481a47a2228b7ec7b81a7, type: 2}
+  - {fileID: 11400000, guid: cf146f8e9c3463d4d946ea78c917ae78, type: 2}
   bigLoadouts:
-  - {fileID: 11400000, guid: b717a4f6dd0e1364fb0c4df37ca82c96, type: 2}
-  - {fileID: 11400000, guid: ee99bf502919a344cb446d56363cddfc, type: 2}
+  - {fileID: 11400000, guid: b91115882f6839141892d4d65db132e4, type: 2}
   bossLoadouts:
   - {fileID: 11400000, guid: 896bc78445cf9d64aa8ff697c7af9aee, type: 2}
   pickups:

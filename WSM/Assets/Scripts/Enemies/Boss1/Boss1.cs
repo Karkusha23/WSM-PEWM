@@ -40,7 +40,7 @@ public class Boss1 : MonoBehaviour
             {
                 if (transform.parent != null)
                 {
-                    transform.parent.GetComponent<RoomController>().checkEnemyKilled();
+                    transform.parent.GetComponent<Room>().checkEnemyKilled();
                 }
                 Destroy(healthBar.gameObject);
                 Destroy(gameObject);

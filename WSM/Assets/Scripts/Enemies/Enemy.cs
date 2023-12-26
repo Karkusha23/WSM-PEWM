@@ -24,7 +24,7 @@ public abstract class Enemy : MonoBehaviour
         health -= damage;
         if (health <= 0)
         {
-            transform.parent.GetComponent<RoomController>().checkEnemyKilled();
+            transform.parent.GetComponent<Room>().checkEnemyKilled();
             Destroy(gameObject);
         }
     }
