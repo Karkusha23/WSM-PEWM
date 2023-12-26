@@ -12,7 +12,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d65055952ec93bd4090c801c56f65980, type: 3}
   m_Name: Room2
   m_EditorClassIdentifier: 
-  prefabs:
-  - {fileID: 8768637141398408717, guid: 9c06c5e99c41df34e8ffe4fb4abab4f4, type: 3}
-  roomPointXs: 07000000
-  roomPointYs: 04000000
+  loadout:
+  - prefab: {fileID: 8768637141398408717, guid: 9c06c5e99c41df34e8ffe4fb4abab4f4, type: 3}
+    row: 4
+    col: 7
+  - prefab: {fileID: 3399728581602776512, guid: 9cb7e639c8c8d2d4eb28c51badb6c0ed, type: 3}
+    row: 2
+    col: 3
+  - prefab: {fileID: 3399728581602776512, guid: 9cb7e639c8c8d2d4eb28c51badb6c0ed, type: 3}
+    row: 6
+    col: 3
+  - prefab: {fileID: 3399728581602776512, guid: 9cb7e639c8c8d2d4eb28c51badb6c0ed, type: 3}
+    row: 2
+    col: 11
+  - prefab: {fileID: 3399728581602776512, guid: 9cb7e639c8c8d2d4eb28c51badb6c0ed, type: 3}
+    row: 6
+    col: 11

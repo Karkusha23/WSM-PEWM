@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
+using static RoomLoadout;
 
 public class Room : MonoBehaviour
 {
@@ -22,16 +24,21 @@ public class Room : MonoBehaviour
     public List<GameObject> doors;
     public float invincibleTime;
 
+    // Tiling consts
     public const int roomTileWidthCount = 15;
     public const int roomTileHeightCount = 9;
-    public const float tileWidth = (15.0f * 1.2f) / roomTileWidthCount;
-    public const float tileHeight = (9.0f * 1.2f) / roomTileHeightCount;
+    public const float tileSize = 1.2f;
+
+    // Tile grid for enemy navigation. 0 if can not go through tile, otherwise value is traveling cost for tile
+    public byte[,] roomGrid;
 
     private int enemyCount;
     private bool isActivated;
     private CameraController camcon;
     private Vector3 bigRoomOffset;
     private RoomType roomType;
+
+    private List<RoomLoadout.LoadoutUnit> enemyLoadout;
 
     private void Start()
     {
@@ -85,28 +92,60 @@ public class Room : MonoBehaviour
     // Return local coordinates of point on room grid
     public static Vector3 roomPointToLocal(int row, int col)
     {
-        return new Vector3((col - roomTileWidthCount / 2) * tileWidth, (row - roomTileHeightCount / 2) * tileHeight, 0.0f);
+        return tileSize * new Vector3((col - roomTileWidthCount / 2), (roomTileHeightCount / 2 - row), 0.0f);
     }
 
     // Returns room grid point from room local coordinates
     public static RoomPoint localToRoomPoint(Vector3 pos)
     {
-        return new RoomPoint(roomTileHeightCount / 2 + Mathf.RoundToInt(pos.y / tileHeight), roomTileWidthCount / 2 + Mathf.RoundToInt(pos.x / tileWidth));
+        return new RoomPoint(roomTileHeightCount / 2 - Mathf.RoundToInt(pos.y / tileSize), roomTileWidthCount / 2 + Mathf.RoundToInt(pos.x / tileSize));
+    }
+
+    // Get traveling cost for tile from prefav
+    public static byte getTravelingCost(GameObject prefab)
+    {
+        if (prefab.CompareTag("Wall"))
+        {
+            return 0;
+        }
+        return 1;
+    }
+
+    public void spawnProps()
+    {
+        if (loadout == null || enemyLoadout != null)
+        {
+            return;
+        }
+        enemyLoadout = new List<RoomLoadout.LoadoutUnit>();
+        initRoomGrid();
+        foreach (var loadoutUnit in loadout.loadout)
+        {
+            if (loadoutUnit.prefab.CompareTag("Enemy"))
+            {
+                enemyLoadout.Add(loadoutUnit);
+            }
+            else
+            {
+                Instantiate(loadoutUnit.prefab, transform.position + roomPointToLocal(loadoutUnit.row, loadoutUnit.col), Quaternion.identity, transform);
+                roomGrid[loadoutUnit.row, loadoutUnit.col] = getTravelingCost(loadoutUnit.prefab);
+            }
+        }
     }
 
     public void activateEnemyRoom(GameObject player)
     {
+        if (enemyLoadout == null)
+        {
+            spawnProps();
+        }
         player.GetComponent<Player>().setInvincible(invincibleTime);
         lockDoors();
         isActivated = true;
-        enemyCount = 0;
-        for (int i = 0; i < loadout.prefabs.Length; ++i)
+        enemyCount = enemyLoadout.Count;
+        foreach (var enemyLoadoutUnit in enemyLoadout)
         {
-            GameObject roomObject = Instantiate(loadout.prefabs[i], transform.position + roomPointToLocal(loadout.roomPointYs[i], loadout.roomPointXs[i]), Quaternion.identity, transform);
-            if (roomObject.CompareTag("Enemy"))
-            {
-                ++enemyCount;
-            }
+            Instantiate(enemyLoadoutUnit.prefab, transform.position + roomPointToLocal(enemyLoadoutUnit.row, enemyLoadoutUnit.col), Quaternion.identity, transform);
         }
     }
 
@@ -118,6 +157,18 @@ public class Room : MonoBehaviour
         {
             openDoors();
             Instantiate(roomDrops[Random.Range(0, roomDrops.Count)], roomType == RoomType.BigRoom ? transform.position + bigRoomOffset : transform.position, Quaternion.identity);
+        }
+    }
+
+    private void initRoomGrid()
+    {
+        roomGrid = new byte[roomTileHeightCount, roomTileWidthCount];
+        for (int i = 0; i < roomTileHeightCount; ++i)
+        {
+            for (int j = 0; j < roomTileWidthCount; ++j)
+            {
+                roomGrid[i, j] = 1;
+            }
         }
     }
 

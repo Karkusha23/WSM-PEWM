@@ -494,6 +494,7 @@ public class Floor : MonoBehaviour
         {
             room.GetComponent<Room>().loadout = smallLoadouts[Random.Range(0, smallLoadouts.Length)];
             room.GetComponent<Room>().roomDrops = pickups;
+            room.GetComponent<Room>().spawnProps();
         }
     }
 
@@ -521,6 +522,7 @@ public class Floor : MonoBehaviour
             room.GetComponent<Room>().loadout = bigLoadouts[Random.Range(0, bigLoadouts.Length)];
             room.GetComponent<Room>().roomDrops = pickups;
         }
+        room.GetComponent<Room>().spawnProps();
     }
 
     private void getSmallRoomType(int row, int col)
@@ -607,7 +609,6 @@ public class Floor : MonoBehaviour
     {
         GameObject tmp;
         Room roomcon = room.GetComponent<Room>();
-        int counter = 0;
         for (int i = 0; i < 4; ++i)
         {
             tmp = Instantiate(smallDoors[i] ? doorPrefab : wallPlugPrefab, room.transform.position + doorPoss[i], i == 0 || i == 3 ? Quaternion.identity : Quaternion.Euler(0f, 0f, 90f), room.transform);

@@ -12,12 +12,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d65055952ec93bd4090c801c56f65980, type: 3}
   m_Name: BigRoom1
   m_EditorClassIdentifier: 
-  prefabs:
-  - {fileID: 8615638558430931514, guid: 24892b3ca33ad8b458c47c39b337678a, type: 3}
-  - {fileID: 8615638558430931514, guid: 24892b3ca33ad8b458c47c39b337678a, type: 3}
-  - {fileID: 8615638558430931514, guid: 24892b3ca33ad8b458c47c39b337678a, type: 3}
-  - {fileID: 4081609876960264284, guid: ad04bcd936384894b9b232f7afd088fd, type: 3}
-  - {fileID: 4081609876960264284, guid: ad04bcd936384894b9b232f7afd088fd, type: 3}
-  - {fileID: 4081609876960264284, guid: ad04bcd936384894b9b232f7afd088fd, type: 3}
-  roomPointXs: 0f0000000e0000001000000005000000190000000f000000
-  roomPointYs: 080000000a0000000a00000005000000050000000d000000
+  loadout:
+  - prefab: {fileID: 8615638558430931514, guid: 24892b3ca33ad8b458c47c39b337678a, type: 3}
+    row: 8
+    col: 15
+  - prefab: {fileID: 8615638558430931514, guid: 24892b3ca33ad8b458c47c39b337678a, type: 3}
+    row: 10
+    col: 14
+  - prefab: {fileID: 8615638558430931514, guid: 24892b3ca33ad8b458c47c39b337678a, type: 3}
+    row: 10
+    col: 16
+  - prefab: {fileID: 4081609876960264284, guid: ad04bcd936384894b9b232f7afd088fd, type: 3}
+    row: 5
+    col: 5
+  - prefab: {fileID: 4081609876960264284, guid: ad04bcd936384894b9b232f7afd088fd, type: 3}
+    row: 5
+    col: 25
+  - prefab: {fileID: 4081609876960264284, guid: ad04bcd936384894b9b232f7afd088fd, type: 3}
+    row: 13
+    col: 15
