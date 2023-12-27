@@ -1,7 +1,5 @@
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
-using static RoomLoadout;
 
 public class Room : MonoBehaviour
 {
@@ -17,6 +15,21 @@ public class Room : MonoBehaviour
             i = row;
             j = col;
         }
+
+        public static bool operator==(RoomPoint point1, RoomPoint point2)
+        {
+            return point1.i == point2.i && point1.j == point2.j;
+        }
+
+        public static bool operator!=(RoomPoint point1, RoomPoint point2)
+        {
+            return !(point1 == point2);
+        }
+
+        public static int Distance(RoomPoint point1, RoomPoint point2)
+        {
+            return Mathf.RoundToInt(Mathf.Sqrt((point1.i - point2.i) * (point1.i - point2.i) + (point1.j - point2.j) * (point1.j - point2.j)));
+        }
     }
 
     public RoomLoadout loadout;
@@ -31,6 +44,9 @@ public class Room : MonoBehaviour
 
     // Tile grid for enemy navigation. 0 if can not go through tile, otherwise value is traveling cost for tile
     public byte[,] roomGrid;
+
+    // Deafult travel cost for normal tile
+    public const int defaultTravelCost = 1;
 
     private int enemyCount;
     private bool isActivated;
@@ -101,14 +117,14 @@ public class Room : MonoBehaviour
         return new RoomPoint(roomTileHeightCount / 2 - Mathf.RoundToInt(pos.y / tileSize), roomTileWidthCount / 2 + Mathf.RoundToInt(pos.x / tileSize));
     }
 
-    // Get traveling cost for tile from prefav
+    // Get traveling cost for tile from prefab
     public static byte getTravelingCost(GameObject prefab)
     {
         if (prefab.CompareTag("Wall"))
         {
             return 0;
         }
-        return 1;
+        return defaultTravelCost;
     }
 
     public void spawnProps()
@@ -167,7 +183,7 @@ public class Room : MonoBehaviour
         {
             for (int j = 0; j < roomTileWidthCount; ++j)
             {
-                roomGrid[i, j] = 1;
+                roomGrid[i, j] = defaultTravelCost;
             }
         }
     }
