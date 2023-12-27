@@ -9,12 +9,20 @@ public abstract class Enemy : MonoBehaviour
     // Time between spawn and player attacking start
     public float activationTime = 0.5f;
 
+    // If enemy is able to build path to player. Set false if enemy don't need chase player
+    public bool canBuildPaths = true;
+
+    // Enemy will count waypoint as reached when this close to it
+    public float waypointReachDistance = 0.1f;
+
     // How frequent does player position refreshing
     public float refreshPlayerTime = 0.1f;
 
     protected Rigidbody2D rigidBody;
     protected Transform player;
-    protected Vector3 destination;
+    protected Room room;
+    protected Vector2 destination;
+    protected RoomPath.Path path;
 
     // Called activationTime seconds after spawning
     protected abstract void onActivation();
@@ -55,14 +63,43 @@ public abstract class Enemy : MonoBehaviour
     {
         rigidBody = GetComponent<Rigidbody2D>();
         player = GameObject.FindGameObjectWithTag("Player").transform;
+        room = transform.parent.GetComponent<Room>();
         StartCoroutine("activateEnemy");
+    }
+
+    protected virtual void Update()
+    {
+        if (canBuildPaths)
+        {
+            if (Vector3.Distance(transform.position, player.position) <= Room.tileSize)
+            {
+                destination = player.position - transform.position;
+            }
+            else if (!(path is null))
+            {
+                Vector3 waypoint = Room.RoomPointToLocal(path[1]) + transform.parent.position;
+                destination = waypoint - transform.position;
+                if (destination.magnitude < waypointReachDistance)
+                {
+                    path.RemoveAt(1);
+                    if (path.Count > 1)
+                    {
+                        waypoint = Room.RoomPointToLocal(path[1]) + transform.parent.position;
+                        destination = waypoint - transform.position;
+                    }
+                }
+            }
+        }
     }
 
     // Activate enemy on spawn
     private IEnumerator activateEnemy()
     {
         yield return new WaitForSeconds(activationTime);
-        StartCoroutine("refreshPlayerPos");
+        if (canBuildPaths)
+        {
+            StartCoroutine("refreshPlayerPos");
+        }
         onActivation();
     }
 
@@ -71,7 +108,7 @@ public abstract class Enemy : MonoBehaviour
     {
         for (; ; )
         {
-            destination = player.position - transform.position;
+            path = RoomPath.BuildPath(transform.position - transform.parent.position, player.position - transform.parent.position, room.roomGrid);
             yield return new WaitForSeconds(refreshPlayerTime);
         }
     }

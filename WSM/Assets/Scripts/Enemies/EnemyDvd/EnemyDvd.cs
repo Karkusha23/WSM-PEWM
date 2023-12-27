@@ -24,6 +24,7 @@ public class EnemyDvd : Enemy
         }
         weaponCon = weapon.GetComponent<EnemyDvdWeapon>();
         direction = new Vector2(Random.Range(0, 2) == 0 ? -1f : 1f, Random.Range(0, 2) == 0 ? -1f : 1f);
+        canBuildPaths = false;
         base.Start();
     }
 

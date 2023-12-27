@@ -29,11 +29,13 @@ public class EnemyShoot : Enemy
         StartCoroutine("shootingSequence");
     }
 
-    protected virtual void Update()
+    protected override void Update()
     {
+        base.Update();
+
         if (canChase)
         {
-            rigidBody.velocity = destination.magnitude > chaseDistance ? destination.normalized * speed : Vector2.zero;
+            rigidBody.velocity = (transform.position - player.position).magnitude > chaseDistance ? destination.normalized * speed : Vector2.zero;
         }
     }
 
