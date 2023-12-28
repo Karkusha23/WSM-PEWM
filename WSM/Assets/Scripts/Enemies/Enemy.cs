@@ -21,11 +21,37 @@ public abstract class Enemy : MonoBehaviour
     protected Rigidbody2D rigidBody;
     protected Transform player;
     protected Room room;
-    protected Vector2 destination;
+
+    // vec from current location to next path waypoint
+    protected Vector3 destination;
+
     protected RoomPath.Path path;
 
     // Called activationTime seconds after spawning
     protected abstract void onActivation();
+
+    protected virtual void Start()
+    {
+        rigidBody = GetComponent<Rigidbody2D>();
+        player = GameObject.FindGameObjectWithTag("Player").transform;
+        room = transform.parent.GetComponent<Room>();
+        StartCoroutine("activateEnemy");
+    }
+
+    protected virtual void Update()
+    {
+        if (canBuildPaths)
+        {
+            if (canTravelDirectlyToPlayer())
+            {
+                destination = player.position - transform.position;
+            }
+            else
+            {
+                setDestinationToPath();
+            }
+        }
+    }
 
     public void takeDamage(float damage)
     {
@@ -51,34 +77,23 @@ public abstract class Enemy : MonoBehaviour
         return null;
     }
 
+    // If enemy has direct sight on player
+    public bool canSeePlayer()
+    {
+        return RoomPath.Raycast(transform.position - transform.parent.position, player.position - transform.parent.position, room.roomGrid, false);
+    }
+
+    // If enemy can travel directly to the player
+    public bool canTravelDirectlyToPlayer()
+    {
+        return RoomPath.Raycast(transform.position - transform.parent.position, player.position - transform.parent.position, room.roomGrid, true);
+    }
+
     protected virtual void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.collider.CompareTag("Bullet"))
         {
             takeDamage(collision.collider.GetComponent<Bullet>().damage);
-        }
-    }
-
-    protected virtual void Start()
-    {
-        rigidBody = GetComponent<Rigidbody2D>();
-        player = GameObject.FindGameObjectWithTag("Player").transform;
-        room = transform.parent.GetComponent<Room>();
-        StartCoroutine("activateEnemy");
-    }
-
-    protected virtual void Update()
-    {
-        if (canBuildPaths)
-        {
-            if (Vector3.Distance(transform.position, player.position) <= Room.tileSize / 2.0f)
-            {
-                destination = player.position - transform.position;
-            }
-            else if (!(path is null))
-            {
-                setDestinationToPath();
-            }
         }
     }
 
@@ -88,17 +103,20 @@ public abstract class Enemy : MonoBehaviour
         yield return new WaitForSeconds(activationTime);
         if (canBuildPaths)
         {
-            StartCoroutine("refreshPlayerPos");
+            StartCoroutine("refreshPlayerPath");
         }
         onActivation();
     }
 
-    // Refresh player position
-    private IEnumerator refreshPlayerPos()
+    // Refresh path to player
+    private IEnumerator refreshPlayerPath()
     {
         for (; ; )
         {
             path = RoomPath.BuildPathSmoothed(transform.position - transform.parent.position, player.position - transform.parent.position, room.roomGrid);
+            Debug.Log(room.pathToString(path));
+            Debug.Log(getNormalToPath());
+            Debug.Log(canSeePlayer());
             yield return new WaitForSeconds(refreshPathsTime);
         }
     }
@@ -106,21 +124,28 @@ public abstract class Enemy : MonoBehaviour
     // Set destination variable according to calculated path
     private void setDestinationToPath()
     {
-        Vector3 waypoint = Room.RoomPointToLocal(path[1]) + transform.parent.position;
-        Vector3 norm = getNormalToPath();
-        norm *= norm.magnitude > 0.5f ? 3.0f : 1.0f;
-        destination = waypoint - transform.position + norm;
+        if (path is null || path.Count == 0)
+        {
+            destination = Vector3.zero;
+        }
+        destination = getDestination();
         if (destination.magnitude < waypointReachDistance)
         {
             path.RemoveAt(0);
             if (path.Count > 1)
             {
-                waypoint = Room.RoomPointToLocal(path[1]) + transform.parent.position;
-                norm = getNormalToPath();
-                norm *= norm.magnitude > 0.5f ? 3.0f : 1.0f;
-                destination = waypoint - transform.position + norm;
+                destination = getDestination();
             }
         }
+    }
+
+    private Vector3 getDestination()
+    {
+        Vector3 waypoint = Room.RoomPointToLocal(path[1]);
+        Vector3 norm = getNormalToPath();
+        norm.Scale(norm);
+        Vector3 result = waypoint - (transform.position - transform.parent.position);
+        return result;
     }
 
     // Get vector towards the line of path

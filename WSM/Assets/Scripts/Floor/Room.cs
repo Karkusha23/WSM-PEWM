@@ -78,7 +78,6 @@ public class Room : MonoBehaviour
             if (loadout != null && !isActivated)
             {
                 activateEnemyRoom(other.gameObject);
-                Debug.Log(pathToString(RoomPath.BuildPathSmoothed(new RoomPath.RoomPoint(2, 2), new RoomPath.RoomPoint(2, 4), roomGrid)));
             }
         }
     }
@@ -98,6 +97,12 @@ public class Room : MonoBehaviour
     public static RoomPath.RoomPoint LocalToRoomPoint(Vector3 pos)
     {
         return new RoomPath.RoomPoint(roomTileHeightCount / 2 - Mathf.RoundToInt(pos.y / tileSize), roomTileWidthCount / 2 + Mathf.RoundToInt(pos.x / tileSize));
+    }
+
+    // Returns fractional room grid point from room local coordinates. x is row, y is col
+    public static Vector2 LocalToFractionalRoomPoint(Vector3 pos)
+    {
+        return new Vector2(roomTileHeightCount / 2 - pos.y / tileSize, roomTileWidthCount / 2 + pos.x / tileSize);
     }
 
     // Get traveling cost for tile from prefab
