@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -9,7 +11,7 @@ public static class RoomPath
     public const float actorSize = 0.8f;
 
     // Stores coordinates in room grid
-    public struct RoomPoint
+    public class RoomPoint
     {
         public int i { get; set; }
         public int j { get; set; }
@@ -33,6 +35,11 @@ public static class RoomPath
         public override int GetHashCode()
         {
             return (i << 8) | j;
+        }
+
+        public override string ToString()
+        {
+            return string.Format("RoomPoint({0}, {1})", i, j);
         }
 
         public static bool operator ==(RoomPoint point1, RoomPoint point2)
@@ -86,6 +93,8 @@ public static class RoomPath
                 return makePathFromNode(curNode);
             }
 
+            closedSet.Add(curNode);
+
             int newFromStartToThis = curNode.fromStartToThis + roomGrid[curNode.point.i, curNode.point.j];
 
             var neighbors = findNeighbors(curNode, roomGrid);
@@ -118,9 +127,6 @@ public static class RoomPath
                     openList.Add(neighbor);
                 }
             }
-
-            closedSet.Add(curNode);
-
         }
 
         return new Path();
@@ -136,6 +142,13 @@ public static class RoomPath
     public static Path BuildPathSmoothed(RoomPoint start, RoomPoint end, byte[,] roomGrid)
     {
         Path path = BuildPath(start, end, roomGrid);
+        for (int i = 0; i < path.Count - 2; ++i)
+        {
+            while (i < path.Count - 2 && Raycast(path[i], path[i + 2], roomGrid, true))
+            {
+                path.RemoveAt(i + 1);
+            }
+        }
         return path;
     }
 
@@ -143,6 +156,117 @@ public static class RoomPath
     public static Path BuildPathSmoothed(Vector3 start, Vector3 end, byte[,] roomGrid)
     {
         return BuildPathSmoothed(Room.LocalToRoomPoint(start), Room.LocalToRoomPoint(end), roomGrid);
+    }
+
+    // Returns true if there's no obstacles between start and end
+    // If considerTravelCost is true, points with travel cost greater than maximum of start and end points travel cost will be counted as untravable
+    public static bool Raycast(RoomPoint start, RoomPoint end, byte[,] roomGrid, bool considerTravelCost)
+    {
+        if (start == end)
+        {
+            return true;
+        }
+
+        int maxTravelCost = considerTravelCost ? Mathf.Max(roomGrid[start.i, start.j], roomGrid[end.i, end.j]) : 0;
+
+        if (start.i == end.i)
+        {
+            if (start.j > end.j)
+            {
+                RoomPoint tmp = start;
+                start = end;
+                end = tmp;
+            }
+            for (int j = start.j; j <= end.j; ++j)
+            {
+                if (!IsPointTravable(start.i, j, roomGrid, maxTravelCost))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        if (start.j == end.j)
+        {
+            if (start.i > end.i)
+            {
+                RoomPoint tmp = start;
+                start = end;
+                end = tmp;
+            }
+            for (int i = start.i; i <= end.i; ++i)
+            {
+                if (!IsPointTravable(i, start.j, roomGrid, maxTravelCost))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        if (Mathf.Abs(end.i - start.i) == Mathf.Abs(end.j - start.j))
+        {
+            if (start.i > end.i)
+            {
+                RoomPoint tmp = start;
+                start = end;
+                end = tmp;
+            }
+            int direction = start.j < end.j ? 1 : -1;
+            for (int i = start.i; i <= end.i; ++i)
+            {
+                if (!IsPointTravable(i, start.j + (start.i - i), roomGrid, maxTravelCost) || !IsPointTravable(i + 1, start.j + (start.i - i), roomGrid, maxTravelCost) ||
+                    !IsPointTravable(i, start.j + (start.i - i) + direction, roomGrid, maxTravelCost))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        if (Mathf.Abs(end.i - start.i) < Mathf.Abs(end.j - start.j))
+        {
+            if (start.j > end.j)
+            {
+                RoomPoint tmp = start;
+                start = end;
+                end = tmp;
+            }
+            float rowDirection = (float)(end.i - start.i) / (float)(end.j - start.j);
+            float row = (float)start.i;
+            for (int j = start.j; j <= end.j; ++j)
+            {
+                int rowInt = Mathf.RoundToInt(row);
+                if (!IsPointTravable(rowInt, j, roomGrid, maxTravelCost) || !IsPointTravable(rowInt - 1, j, roomGrid, maxTravelCost) ||
+                    !IsPointTravable(rowInt + 1, j, roomGrid, maxTravelCost))
+                {
+                    return false;
+                }
+                row += rowDirection;
+            }
+            return true;
+        }
+
+        if (start.i > end.i)
+        {
+            RoomPoint tmp = start;
+            start = end;
+            end = tmp;
+        }
+        float colDirection = (float)(end.j - start.j) / (float)(end.i - start.i);
+        float col = (float)start.j;
+        for (int i = start.i; i <= end.i; ++i)
+        {
+            int colInt = Mathf.RoundToInt(col);
+            if (!IsPointTravable(i, colInt, roomGrid, maxTravelCost) || !IsPointTravable(i, colInt - 1, roomGrid, maxTravelCost) ||
+                !IsPointTravable(i, colInt + 1, roomGrid, maxTravelCost))
+            {
+                return false;
+            }
+            col += colDirection;
+        }
+        return true;
     }
 
     // Class used in A* algorithm
@@ -247,7 +371,7 @@ public static class RoomPath
             neighbors.Add(new PathNode(new RoomPoint(row - 1, col)));
             hasUp = true;
         }
-        if (row < Room.roomTileHeightCount - 1 && roomGrid[row + 1, col] > 0)
+        if (row < roomGrid.GetLength(0) - 1 && roomGrid[row + 1, col] > 0)
         {
             neighbors.Add(new PathNode(new RoomPoint(row + 1, col)));
             hasDown = true;
@@ -257,7 +381,7 @@ public static class RoomPath
             neighbors.Add(new PathNode(new RoomPoint(row, col - 1)));
             hasLeft = true;
         }
-        if (col < Room.roomTileWidthCount - 1 && roomGrid[row, col + 1] > 0)
+        if (col < roomGrid.GetLength(1) - 1 && roomGrid[row, col + 1] > 0)
         {
             neighbors.Add(new PathNode(new RoomPoint(row, col + 1)));
             hasRight = true;
@@ -283,9 +407,47 @@ public static class RoomPath
         return neighbors;
     }
 
-    // If actor can move directly from start to end ignoring room grid and not collide with obstacles
-    private static bool CanTravelDirectly(RoomPoint start, RoomPoint end, byte[,] roomGrid)
+    private static bool IsNeighborhoodTravable(float row, float col, byte[,] roomGrid, int maxTravelCost)
     {
-        return false;
+        var rows = new List<int>();
+        var cols = new List<int>();
+
+        if (row - Mathf.Floor(row) <= (1.0f - actorSize) / 2)
+        {
+            rows.Add(Mathf.RoundToInt(row));
+        }
+        else
+        {
+            rows.Add(Mathf.FloorToInt(row));
+            rows.Add(Mathf.CeilToInt(row));
+        }
+
+        if (Mathf.Abs(col - Mathf.Round(col)) <= (1.0f - actorSize) / 2)
+        {
+            cols.Add(Mathf.RoundToInt(col));
+        }
+        else
+        {
+            cols.Add(Mathf.FloorToInt(col));
+            cols.Add(Mathf.CeilToInt(col));
+        }
+
+        foreach (var i in rows)
+        {
+            foreach (var j in cols)
+            {
+                if (!IsPointTravable(i, j, roomGrid, maxTravelCost))
+                {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    private static bool IsPointTravable(int row, int col, byte[,] roomGrid, int maxTravelCost)
+    {
+        return row > 0 && col > 0 && row < roomGrid.GetLength(0) && col < roomGrid.GetLength(1) && roomGrid[row, col] > 0 && (maxTravelCost == 0 || !(roomGrid[row, col] > maxTravelCost));
     }
 }

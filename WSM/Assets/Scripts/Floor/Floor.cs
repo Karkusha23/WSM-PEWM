@@ -494,6 +494,7 @@ public class Floor : MonoBehaviour
         {
             room.GetComponent<Room>().loadout = smallLoadouts[Random.Range(0, smallLoadouts.Length)];
             room.GetComponent<Room>().roomDrops = pickups;
+            room.GetComponent<Room>().roomType = Room.RoomType.SmallRoom;
             room.GetComponent<Room>().spawnProps();
         }
     }
@@ -522,6 +523,7 @@ public class Floor : MonoBehaviour
             room.GetComponent<Room>().loadout = bigLoadouts[Random.Range(0, bigLoadouts.Length)];
             room.GetComponent<Room>().roomDrops = pickups;
         }
+        room.GetComponent<Room>().roomType = Room.RoomType.BigRoom;
         room.GetComponent<Room>().spawnProps();
     }
 

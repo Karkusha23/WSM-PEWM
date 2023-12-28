@@ -10,6 +10,7 @@ public class Room : MonoBehaviour
     public List<GameObject> roomDrops;
     public List<GameObject> doors;
     public float invincibleTime;
+    public RoomType roomType;
 
     // Tiling consts
     public const int roomTileWidthCount = 15;
@@ -29,7 +30,6 @@ public class Room : MonoBehaviour
     private bool isActivated;
     private CameraController camcon;
     private Vector3 bigRoomOffset;
-    private RoomType roomType;
 
     private List<RoomLoadout.LoadoutUnit> enemyLoadout;
 
@@ -78,8 +78,7 @@ public class Room : MonoBehaviour
             if (loadout != null && !isActivated)
             {
                 activateEnemyRoom(other.gameObject);
-                Debug.Log(pathToString(RoomPath.BuildPath(new RoomPath.RoomPoint(0, 3), new RoomPath.RoomPoint(5, 3), roomGrid)));
-                Debug.Log(pathToString(RoomPath.BuildPath(new RoomPath.RoomPoint(8, 11), new RoomPath.RoomPoint(4, 11), roomGrid)));
+                Debug.Log(pathToString(RoomPath.BuildPathSmoothed(new RoomPath.RoomPoint(2, 2), new RoomPath.RoomPoint(2, 4), roomGrid)));
             }
         }
     }

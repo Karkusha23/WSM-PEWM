@@ -121,8 +121,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   health: 3
-  speed: 8
+  speed: 4
   activationTime: 0.5
+  canBuildPaths: 1
+  waypointReachDistance: 0.1
   refreshPlayerTime: 0.1
   canChase: 0
 --- !u!61 &1371662492
