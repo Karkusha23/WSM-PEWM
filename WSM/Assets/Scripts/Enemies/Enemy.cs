@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using System.Linq;
 
 public abstract class Enemy : MonoBehaviour
 {
@@ -13,7 +14,7 @@ public abstract class Enemy : MonoBehaviour
     public bool canBuildPaths = true;
 
     // Enemy will count waypoint as reached when this close to it
-    public float waypointReachDistance = 0.1f;
+    public float waypointReachDistance = 0.05f;
 
     // How frequent does paths refreshing
     public float refreshPathsTime = 0.1f;
@@ -29,6 +30,14 @@ public abstract class Enemy : MonoBehaviour
 
     // Called activationTime seconds after spawning
     protected abstract void onActivation();
+
+    // Defines to which point enemy is going to build paths
+    // Default is player position
+    // Override for diffrenet destinations
+    public virtual Vector3 getGoalLocalPosition()
+    {
+        return player.position - transform.parent.position;
+    }
 
     protected virtual void Start()
     {
@@ -77,16 +86,27 @@ public abstract class Enemy : MonoBehaviour
         return null;
     }
 
+    // Returns local position that is not affected by parent scale
+    public Vector3 getUnscaledLocalPosition()
+    {
+        return transform.position - transform.parent.position;
+    }
+
     // If enemy has direct sight on player
     public bool canSeePlayer()
     {
-        return RoomPath.Raycast(transform.position - transform.parent.position, player.position - transform.parent.position, room.roomGrid, false);
+        return RoomPath.Raycast(getUnscaledLocalPosition(), player.position - transform.parent.position, room.roomGrid, false);
     }
 
     // If enemy can travel directly to the player
     public bool canTravelDirectlyToPlayer()
     {
-        return RoomPath.Raycast(transform.position - transform.parent.position, player.position - transform.parent.position, room.roomGrid, true);
+        return RoomPath.Raycast(getUnscaledLocalPosition(), player.position - transform.parent.position, room.roomGrid, true);
+    }
+
+    public bool canTravelDirectlyToGoal()
+    {
+        return RoomPath.Raycast(getUnscaledLocalPosition(), getGoalLocalPosition(), room.roomGrid, true);
     }
 
     protected virtual void OnCollisionEnter2D(Collision2D collision)
@@ -113,10 +133,12 @@ public abstract class Enemy : MonoBehaviour
     {
         for (; ; )
         {
-            path = RoomPath.BuildPathSmoothed(transform.position - transform.parent.position, player.position - transform.parent.position, room.roomGrid);
-            Debug.Log(room.pathToString(path));
-            Debug.Log(getNormalToPath());
-            Debug.Log(canSeePlayer());
+            Vector3 localPosition = getUnscaledLocalPosition();
+            Vector3 goalPosition = getGoalLocalPosition();
+            if (path is null || path.Count == 0 || Room.LocalToRoomPoint(goalPosition) != path.Last())
+            {
+                path = RoomPath.BuildPathSmoothed(localPosition, goalPosition, room.roomGrid);
+            }
             yield return new WaitForSeconds(refreshPathsTime);
         }
     }
@@ -127,6 +149,7 @@ public abstract class Enemy : MonoBehaviour
         if (path is null || path.Count == 0)
         {
             destination = Vector3.zero;
+            return;
         }
         destination = getDestination();
         if (destination.magnitude < waypointReachDistance)
@@ -139,12 +162,16 @@ public abstract class Enemy : MonoBehaviour
         }
     }
 
+    // Returns destination in which enemy have to go according to path
     private Vector3 getDestination()
     {
         Vector3 waypoint = Room.RoomPointToLocal(path[1]);
         Vector3 norm = getNormalToPath();
-        norm.Scale(norm);
-        Vector3 result = waypoint - (transform.position - transform.parent.position);
+        Vector3 result = waypoint - getUnscaledLocalPosition();
+        if (!RoomPath.Raycast(getUnscaledLocalPosition(), getUnscaledLocalPosition() + result.normalized * Room.tileSize, room.roomGrid, true))
+        {
+            result += norm * result.magnitude * 10.0f;
+        }
         return result;
     }
 
@@ -153,7 +180,7 @@ public abstract class Enemy : MonoBehaviour
     {
         Vector3 startVec = Room.RoomPointToLocal(path[0]);
         Vector3 endVec = Room.RoomPointToLocal(path[1]);
-        Vector3 localPosition = transform.position - transform.parent.position;
+        Vector3 localPosition = getUnscaledLocalPosition();
 
         // Vector of line of path
         Vector2 pathVec = endVec - startVec;

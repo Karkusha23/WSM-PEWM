@@ -18,7 +18,7 @@ public class Room : MonoBehaviour
     public const float tileSize = 1.2f;
 
     // Tile grid for enemy navigation. 0 if can not go through tile, otherwise value is traveling cost for tile
-    public byte[,] roomGrid;
+    public RoomPath.RoomGrid roomGrid;
 
     // Deafult travel cost for normal tile
     public const int defaultTravelCost = 1;
@@ -122,7 +122,7 @@ public class Room : MonoBehaviour
             return;
         }
         enemyLoadout = new List<RoomLoadout.LoadoutUnit>();
-        initRoomGrid();
+        roomGrid = new RoomPath.RoomGrid(roomType);
         foreach (var loadoutUnit in loadout.loadout)
         {
             if (loadoutUnit.prefab.CompareTag("Enemy"))
@@ -185,18 +185,6 @@ public class Room : MonoBehaviour
             result += '\n';
         }
         return result;
-    }
-
-    private void initRoomGrid()
-    {
-        roomGrid = new byte[roomTileHeightCount, roomTileWidthCount];
-        for (int i = 0; i < roomTileHeightCount; ++i)
-        {
-            for (int j = 0; j < roomTileWidthCount; ++j)
-            {
-                roomGrid[i, j] = defaultTravelCost;
-            }
-        }
     }
 
     private IEnumerator spawnEnemies()
