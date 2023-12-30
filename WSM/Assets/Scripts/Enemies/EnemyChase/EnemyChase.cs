@@ -10,10 +10,8 @@ public class EnemyChase : Enemy
         canChase = true;
     }
 
-    protected override void Update()
+    protected virtual void Update()
     {
-        base.Update();
-
         if (canChase)
         {
             rigidBody.velocity = destination.normalized * speed;

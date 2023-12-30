@@ -1,7 +1,5 @@
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public static class RoomPath
@@ -10,7 +8,7 @@ public static class RoomPath
     public const float actorSize = 0.8f;
 
     // Maximum actor offset relative to room grid with which it still can fit through narrow paths
-    public const float maxAllowedActorGridOffset = Room.tileSize * (1.0f - RoomPath.actorSize) / 2.0f;
+    public const float maxAllowedActorGridOffset = Room.tileSize * (1.0f - actorSize) / 2.0f;
 
     // Stores coordinates in room grid
     public class RoomPoint
@@ -457,6 +455,77 @@ public static class RoomPath
         return true;
     }
 
+    // Returns random point that can be travelled to from start point and which satisfies condition minRadius <= Distance(start, end) <= maxRadius
+    public static RoomPoint GetRandomTravablePointInRadius(RoomPoint start, RoomGrid roomGrid, int minRadius, int maxRadius)
+    {
+        if (maxRadius == 0 || minRadius > maxRadius)
+        {
+            return start;
+        }
+
+        var openList = new HashSet<RoomPoint>();
+        var travablePoints = new HashSet<RoomPoint>();
+        var neighbors = findNeighbors(start, roomGrid);
+        foreach (var neighbor in neighbors)
+        {
+            if (RoomPoint.Distance(start, neighbor) <= maxRadius)
+            {
+                openList.Add(neighbor);
+            }
+        }
+
+        while (openList.Count > 0)
+        {
+            var curPoint = openList.Last();
+            openList.Remove(curPoint);
+
+            travablePoints.Add(curPoint);
+
+            neighbors = findNeighbors(curPoint, roomGrid);
+
+            foreach (var neighbor in neighbors)
+            {
+                if (!travablePoints.Contains(neighbor) && !openList.Contains(neighbor) && RoomPoint.Distance(start, neighbor) <= maxRadius)
+                {
+                    openList.Add(neighbor);
+                }
+            }
+        }
+
+        List<RoomPoint> finalPoints = travablePoints.ToList();
+
+        if (minRadius > 1)
+        {
+            for (int i = 0; i < finalPoints.Count; ++i)
+            {
+                while (i < finalPoints.Count && RoomPoint.Distance(start, finalPoints[i]) < minRadius)
+                {
+                    finalPoints.RemoveAt(i);
+                }
+            }
+        }
+
+        return finalPoints[Random.Range(0, finalPoints.Count)];
+    }
+
+    // Returns random point that can be travelled to from start point and which satisfies condition Distance(start, end) <= maxRadius
+    public static RoomPoint GetRandomTravablePointInRadius(RoomPoint start, RoomGrid roomGrid, int maxRadius)
+    {
+        return GetRandomTravablePointInRadius(start, roomGrid, 0, maxRadius);
+    }
+
+    // Returns local coordinates random point that can be travelled to from start point and which satisfies condition minRadius <= Distance(start, end) <= maxRadius
+    public static Vector3 GetRandomTravablePointInRadius(Vector3 start, RoomGrid roomGrid, int minRadius, int maxRadius)
+    {
+        return Room.RoomPointToLocal(GetRandomTravablePointInRadius(Room.LocalToRoomPoint(start), roomGrid, minRadius, maxRadius));
+    }
+
+    // Returns local coordinates of point that can be travelled to from start point and which satisfies condition Distance(start, end) <= maxRadius
+    public static Vector3 GetRandomTravablePointInRadius(Vector3 start, RoomGrid roomGrid, int maxRadius)
+    {
+        return GetRandomTravablePointInRadius(start, roomGrid, 0, maxRadius);
+    }
+
     // Class used in A* algorithm
     private class PathNode
     {
@@ -607,6 +676,57 @@ public static class RoomPath
         if (hasDown && hasRight && roomGrid[row + 1, col + 1] > 0)
         {
             neighbors.Add(new PathNode(new RoomPoint(row + 1, col + 1)));
+        }
+
+        return neighbors;
+    }
+
+    // Returns list of nearest nodes that are avaliable for travel
+    private static List<RoomPoint> findNeighbors(RoomPoint point, RoomGrid roomGrid)
+    {
+        var neighbors = new List<RoomPoint>();
+        int row = point.i;
+        int col = point.j;
+
+        bool hasUp, hasDown, hasLeft, hasRight;
+        hasUp = hasDown = hasLeft = hasRight = false;
+
+        if (row > 0 && roomGrid[row - 1, col] > 0)
+        {
+            neighbors.Add(new RoomPoint(row - 1, col));
+            hasUp = true;
+        }
+        if (row < roomGrid.rows - 1 && roomGrid[row + 1, col] > 0)
+        {
+            neighbors.Add(new RoomPoint(row + 1, col));
+            hasDown = true;
+        }
+        if (col > 0 && roomGrid[row, col - 1] > 0)
+        {
+            neighbors.Add(new RoomPoint(row, col - 1));
+            hasLeft = true;
+        }
+        if (col < roomGrid.cols - 1 && roomGrid[row, col + 1] > 0)
+        {
+            neighbors.Add(new RoomPoint(row, col + 1));
+            hasRight = true;
+        }
+
+        if (hasUp && hasLeft && roomGrid[row - 1, col - 1] > 0)
+        {
+            neighbors.Add(new RoomPoint(row - 1, col - 1));
+        }
+        if (hasUp && hasRight && roomGrid[row - 1, col + 1] > 0)
+        {
+            neighbors.Add(new RoomPoint(row - 1, col + 1));
+        }
+        if (hasDown && hasLeft && roomGrid[row + 1, col - 1] > 0)
+        {
+            neighbors.Add(new RoomPoint(row + 1, col - 1));
+        }
+        if (hasDown && hasRight && roomGrid[row + 1, col + 1] > 0)
+        {
+            neighbors.Add(new RoomPoint(row + 1, col + 1));
         }
 
         return neighbors;

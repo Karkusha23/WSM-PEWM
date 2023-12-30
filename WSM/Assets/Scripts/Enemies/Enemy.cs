@@ -10,7 +10,8 @@ public abstract class Enemy : MonoBehaviour
     // Time between spawn and player attacking start
     public float activationTime = 0.5f;
 
-    // If enemy is able to build path to player. Set false if enemy don't need chase player
+    // If enemy is able to build paths. Set false if enemy don't need it
+    [HideInInspector]
     public bool canBuildPaths = true;
 
     // Enemy will count waypoint as reached when this close to it
@@ -24,9 +25,16 @@ public abstract class Enemy : MonoBehaviour
     protected Room room;
 
     // vec from current location to next path waypoint
-    protected Vector3 destination;
+    public Vector3 destination { get => getDestination(); }
 
+    // Current path
     protected RoomPath.Path path;
+
+    // If enemy has reached end of its path
+    private bool hasReachedPathEnd = false;
+
+    [HideInInspector]
+    public bool HasReachedPathEnd { get => hasReachedPathEnd; }
 
     // Called activationTime seconds after spawning
     protected abstract void onActivation();
@@ -47,18 +55,11 @@ public abstract class Enemy : MonoBehaviour
         StartCoroutine("activateEnemy");
     }
 
-    protected virtual void Update()
+    protected virtual void OnCollisionEnter2D(Collision2D collision)
     {
-        if (canBuildPaths)
+        if (collision.collider.CompareTag("Bullet"))
         {
-            if (canTravelDirectlyToPlayer())
-            {
-                destination = player.position - transform.position;
-            }
-            else
-            {
-                setDestinationToPath();
-            }
+            takeDamage(collision.collider.GetComponent<Bullet>().damage);
         }
     }
 
@@ -104,16 +105,21 @@ public abstract class Enemy : MonoBehaviour
         return RoomPath.Raycast(getUnscaledLocalPosition(), player.position - transform.parent.position, room.roomGrid, true);
     }
 
+    // If enemy can travel directly to its goal
     public bool canTravelDirectlyToGoal()
     {
         return RoomPath.Raycast(getUnscaledLocalPosition(), getGoalLocalPosition(), room.roomGrid, true);
     }
 
-    protected virtual void OnCollisionEnter2D(Collision2D collision)
+    public void drawPath()
     {
-        if (collision.collider.CompareTag("Bullet"))
+        if (path is null)
         {
-            takeDamage(collision.collider.GetComponent<Bullet>().damage);
+            return;
+        }
+        for (int i = 0; i < path.Count - 1; ++i)
+        {
+            Debug.DrawLine(Room.RoomPointToLocal(path[i]) + transform.parent.position, Room.RoomPointToLocal(path[i + 1]) + transform.parent.position, Color.green, refreshPathsTime);
         }
     }
 
@@ -138,32 +144,42 @@ public abstract class Enemy : MonoBehaviour
             if (path is null || path.Count == 0 || Room.LocalToRoomPoint(goalPosition) != path.Last())
             {
                 path = RoomPath.BuildPathSmoothed(localPosition, goalPosition, room.roomGrid);
+                hasReachedPathEnd = false;
             }
+            drawPath();
             yield return new WaitForSeconds(refreshPathsTime);
         }
     }
 
     // Set destination variable according to calculated path
-    private void setDestinationToPath()
+    private Vector3 getDestination()
     {
-        if (path is null || path.Count == 0)
+        if (path is null || path.Count < 2)
         {
-            destination = Vector3.zero;
-            return;
+            hasReachedPathEnd = true;
+            return Vector3.zero;
         }
-        destination = getDestination();
-        if (destination.magnitude < waypointReachDistance)
+
+        if (Vector3.Distance(getUnscaledLocalPosition(), Room.RoomPointToLocal(path[1])) < waypointReachDistance)
         {
             path.RemoveAt(0);
-            if (path.Count > 1)
+            if (path.Count < 2)
             {
-                destination = getDestination();
+                hasReachedPathEnd = true;
+                return Vector3.zero;
             }
         }
+
+        if (canTravelDirectlyToGoal())
+        {
+            return getGoalLocalPosition() - getUnscaledLocalPosition();
+        }
+        
+        return getPathDestination();
     }
 
     // Returns destination in which enemy have to go according to path
-    private Vector3 getDestination()
+    private Vector3 getPathDestination()
     {
         Vector3 waypoint = Room.RoomPointToLocal(path[1]);
         Vector3 norm = getNormalToPath();
