@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+// Static class that implements pathfinding algorithms and structs that are being used in them
+
 public static class RoomPath
 {
     // Size of actor box collider divided by tile size

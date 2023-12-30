@@ -1,6 +1,8 @@
 using UnityEngine;
 using System.Collections;
-using System.Linq;
+
+// Base class for enemy
+// Implements basic mechanics such as health, taking damage from player bullets, moving and pathfinding
 
 public abstract class Enemy : MonoBehaviour
 {
@@ -11,6 +13,7 @@ public abstract class Enemy : MonoBehaviour
     public float activationTime = 0.5f;
 
     // If enemy is able to build paths. Set false if enemy don't need it
+    // If set true, enemy will be moving to getGoalLocalPosition()
     [HideInInspector]
     public bool canBuildPaths = true;
 
@@ -24,8 +27,11 @@ public abstract class Enemy : MonoBehaviour
     protected Transform player;
     protected Room room;
 
-    // vec from current location to next path waypoint
+    // Vector in which enemy must move according to path
     public Vector3 destination { get => getDestination(); }
+
+    // Defines if enemy is allowed to act
+    protected bool canAct;
 
     // Current path
     protected RoomPath.Path path;
@@ -37,7 +43,10 @@ public abstract class Enemy : MonoBehaviour
     public bool HasReachedPathEnd { get => hasReachedPathEnd; }
 
     // Called activationTime seconds after spawning
-    protected abstract void onActivation();
+    protected virtual void onActivation()
+    {
+        canAct = true;
+    }
 
     // Defines to which point enemy is going to build paths
     // Default is player position
@@ -47,12 +56,36 @@ public abstract class Enemy : MonoBehaviour
         return player.position - transform.parent.position;
     }
 
+    // Called when following path to define speed
+    // Default is speed variable
+    // Override for speed differentiation
+    public virtual float getSpeed()
+    {
+        return speed;
+    }
+
     protected virtual void Start()
     {
         rigidBody = GetComponent<Rigidbody2D>();
         player = GameObject.FindGameObjectWithTag("Player").transform;
         room = transform.parent.GetComponent<Room>();
+        canAct = false;
         StartCoroutine("activateEnemy");
+    }
+
+    protected virtual void Update()
+    {
+        if (canBuildPaths && canAct)
+        {
+            if (destination != Vector3.zero)
+            {
+                rigidBody.velocity = destination.normalized * getSpeed();
+            }
+            else
+            {
+                rigidBody.velocity = Vector3.zero;
+            }
+        }
     }
 
     protected virtual void OnCollisionEnter2D(Collision2D collision)
@@ -111,6 +144,15 @@ public abstract class Enemy : MonoBehaviour
         return RoomPath.Raycast(getUnscaledLocalPosition(), getGoalLocalPosition(), room.roomGrid, true);
     }
 
+    // Recalculate path to goal
+    public void refreshGoalPath()
+    {
+        Vector3 localPosition = getUnscaledLocalPosition();
+        Vector3 goalPosition = getGoalLocalPosition();
+        path = RoomPath.BuildPathSmoothed(localPosition, goalPosition, room.roomGrid);
+        hasReachedPathEnd = false;
+    }
+
     public void drawPath()
     {
         if (path is null)
@@ -129,31 +171,30 @@ public abstract class Enemy : MonoBehaviour
         yield return new WaitForSeconds(activationTime);
         if (canBuildPaths)
         {
-            StartCoroutine("refreshPlayerPath");
+            StartCoroutine("findingPathSequence");
         }
         onActivation();
     }
 
-    // Refresh path to player
-    private IEnumerator refreshPlayerPath()
+    // Refresh path to goal
+    private IEnumerator findingPathSequence()
     {
         for (; ; )
         {
-            Vector3 localPosition = getUnscaledLocalPosition();
-            Vector3 goalPosition = getGoalLocalPosition();
-            if (path is null || path.Count == 0 || Room.LocalToRoomPoint(goalPosition) != path.Last())
-            {
-                path = RoomPath.BuildPathSmoothed(localPosition, goalPosition, room.roomGrid);
-                hasReachedPathEnd = false;
-            }
+            refreshGoalPath();
             drawPath();
             yield return new WaitForSeconds(refreshPathsTime);
         }
     }
 
-    // Set destination variable according to calculated path
+    // Get vector in which enemy must move according to path
     private Vector3 getDestination()
     {
+        if (hasReachedPathEnd)
+        {
+            return Vector3.zero;
+        }
+
         if (path is null || path.Count < 2)
         {
             hasReachedPathEnd = true;

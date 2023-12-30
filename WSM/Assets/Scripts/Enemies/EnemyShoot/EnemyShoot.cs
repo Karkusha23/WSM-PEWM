@@ -1,6 +1,8 @@
 using UnityEngine;
 using System.Collections;
 
+// Enemy that chases player but tries to keep some distance and shoots
+
 public class EnemyShoot : Enemy
 {
     public GameObject weapon;
@@ -27,14 +29,6 @@ public class EnemyShoot : Enemy
     {
         canChase = true;
         StartCoroutine("shootingSequence");
-    }
-
-    protected virtual void Update()
-    {
-        if (canChase)
-        {
-            rigidBody.velocity = (transform.position - player.position).magnitude > chaseDistance ? destination.normalized * speed : Vector2.zero;
-        }
     }
 
     private IEnumerator shootingSequence()
