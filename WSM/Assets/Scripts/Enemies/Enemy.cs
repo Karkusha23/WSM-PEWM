@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using System.IO;
 
 // Base class for enemy
 // Implements basic mechanics such as health, taking damage from player bullets, moving and pathfinding
@@ -54,6 +55,14 @@ public abstract class Enemy : MonoBehaviour
     public virtual Vector3 getGoalLocalPosition()
     {
         return player.position - transform.parent.position;
+    }
+
+    // Defines path that enemy is following
+    // Default is build path to goal local position
+    // Override for different paths
+    public virtual RoomPath.Path getPath()
+    {
+        return RoomPath.BuildPath(getUnscaledLocalPosition(), getGoalLocalPosition(), room.roomGrid);
     }
 
     // Called when following path to define speed
@@ -147,9 +156,7 @@ public abstract class Enemy : MonoBehaviour
     // Recalculate path to goal
     public void refreshGoalPath()
     {
-        Vector3 localPosition = getUnscaledLocalPosition();
-        Vector3 goalPosition = getGoalLocalPosition();
-        path = RoomPath.BuildPathSmoothed(localPosition, goalPosition, room.roomGrid);
+        path = getPath();
         hasReachedPathEnd = false;
     }
 

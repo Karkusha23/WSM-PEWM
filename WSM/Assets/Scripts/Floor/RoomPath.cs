@@ -1,6 +1,9 @@
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Playables;
+using static RoomPath;
 
 // Static class that implements pathfinding algorithms and structs that are being used in them
 
@@ -54,9 +57,9 @@ public static class RoomPath
             return !(point1 == point2);
         }
 
-        public static int Distance(RoomPoint point1, RoomPoint point2)
+        public static float Distance(RoomPoint point1, RoomPoint point2)
         {
-            return Mathf.RoundToInt(Mathf.Sqrt((point1.i - point2.i) * (point1.i - point2.i) + (point1.j - point2.j) * (point1.j - point2.j)));
+            return Mathf.Sqrt((point1.i - point2.i) * (point1.i - point2.i) + (point1.j - point2.j) * (point1.j - point2.j));
         }
     }
 
@@ -126,9 +129,9 @@ public static class RoomPath
     // Used to store waypoints of path
     public class Path : List<RoomPoint>
     {
-        public int GetPathLength()
+        public float GetPathLength()
         {
-            int result = 0;
+            float result = 0;
             for (int i = 0; i < this.Count - 1; ++i)
             {
                 result += RoomPoint.Distance(this[i], this[i + 1]);
@@ -154,6 +157,18 @@ public static class RoomPath
             if (this.Count == 1)
             {
                 this.Add(this[0]);
+            }
+        }
+
+        // Smoothe path by deleting redundant waypoints
+        public void Smoothe(RoomGrid roomGrid)
+        {
+            for (int i = 0; i < this.Count - 2; ++i)
+            {
+                while (i < this.Count - 2 && Raycast(this[i], this[i + 2], roomGrid, true))
+                {
+                    this.RemoveAt(i + 1);
+                }
             }
         }
     }
@@ -185,7 +200,7 @@ public static class RoomPath
 
             if (curNode == endNode)
             {
-                return makePathFromNode(curNode);
+                return makePathFromNode(curNode, roomGrid);
             }
 
             closedSet.Add(curNode);
@@ -207,7 +222,7 @@ public static class RoomPath
                     {
                         openList.Remove(openListNeighbor);
                         openListNeighbor.fromStartToThis = newFromStartToThis;
-                        openListNeighbor.fromThisToEnd = RoomPoint.Distance(openListNeighbor.point, end);
+                        openListNeighbor.fromThisToEnd = Mathf.RoundToInt(RoomPoint.Distance(openListNeighbor.point, end));
                         openListNeighbor.fullPath = newFromStartToThis + openListNeighbor.fromThisToEnd;
                         openListNeighbor.parent = curNode;
                         openList.Add(openListNeighbor);
@@ -216,7 +231,7 @@ public static class RoomPath
                 else
                 {
                     neighbor.fromStartToThis = newFromStartToThis;
-                    neighbor.fromThisToEnd = RoomPoint.Distance(neighbor.point, end);
+                    neighbor.fromThisToEnd = Mathf.RoundToInt(RoomPoint.Distance(neighbor.point, end));
                     neighbor.fullPath = newFromStartToThis + neighbor.fromThisToEnd;
                     neighbor.parent = curNode;
                     openList.Add(neighbor);
@@ -231,26 +246,6 @@ public static class RoomPath
     public static Path BuildPath(Vector3 start, Vector3 end, RoomGrid roomGrid)
     {
         return BuildPath(Room.LocalToRoomPoint(start), Room.LocalToRoomPoint(end), roomGrid);
-    }
-
-    // Builds smoothed path by removing redundant waypoints
-    public static Path BuildPathSmoothed(RoomPoint start, RoomPoint end, RoomGrid roomGrid)
-    {
-        Path path = BuildPath(start, end, roomGrid);
-        for (int i = 0; i < path.Count - 2; ++i)
-        {
-            while (i < path.Count - 2 && Raycast(path[i], path[i + 2], roomGrid, true))
-            {
-                path.RemoveAt(i + 1);
-            }
-        }
-        return path;
-    }
-
-    // Build smoothed path using local coordinates of start and end points
-    public static Path BuildPathSmoothed(Vector3 start, Vector3 end, RoomGrid roomGrid)
-    {
-        return BuildPathSmoothed(Room.LocalToRoomPoint(start), Room.LocalToRoomPoint(end), roomGrid);
     }
 
     // Returns true if there's no obstacles between start and end
@@ -458,9 +453,9 @@ public static class RoomPath
     }
 
     // Returns random point that can be travelled to from start point and which satisfies condition minRadius <= Distance(start, end) <= maxRadius
-    public static RoomPoint GetRandomTravablePointInRadius(RoomPoint start, RoomGrid roomGrid, int minRadius, int maxRadius)
+    public static RoomPoint GetRandomTravablePointInRadius(RoomPoint start, RoomGrid roomGrid, float minRadius, float maxRadius)
     {
-        if (maxRadius == 0 || minRadius > maxRadius)
+        if (maxRadius < 0 || minRadius > maxRadius)
         {
             return start;
         }
@@ -511,21 +506,90 @@ public static class RoomPath
     }
 
     // Returns random point that can be travelled to from start point and which satisfies condition Distance(start, end) <= maxRadius
-    public static RoomPoint GetRandomTravablePointInRadius(RoomPoint start, RoomGrid roomGrid, int maxRadius)
+    public static RoomPoint GetRandomTravablePointInRadius(RoomPoint start, RoomGrid roomGrid, float maxRadius)
     {
-        return GetRandomTravablePointInRadius(start, roomGrid, 0, maxRadius);
+        return GetRandomTravablePointInRadius(start, roomGrid, 0.0f, maxRadius);
     }
 
     // Returns local coordinates random point that can be travelled to from start point and which satisfies condition minRadius <= Distance(start, end) <= maxRadius
-    public static Vector3 GetRandomTravablePointInRadius(Vector3 start, RoomGrid roomGrid, int minRadius, int maxRadius)
+    public static Vector3 GetRandomTravablePointInRadius(Vector3 start, RoomGrid roomGrid, float minRadius, float maxRadius)
     {
         return Room.RoomPointToLocal(GetRandomTravablePointInRadius(Room.LocalToRoomPoint(start), roomGrid, minRadius, maxRadius));
     }
 
     // Returns local coordinates of point that can be travelled to from start point and which satisfies condition Distance(start, end) <= maxRadius
-    public static Vector3 GetRandomTravablePointInRadius(Vector3 start, RoomGrid roomGrid, int maxRadius)
+    public static Vector3 GetRandomTravablePointInRadius(Vector3 start, RoomGrid roomGrid, float maxRadius)
     {
-        return GetRandomTravablePointInRadius(start, roomGrid, 0, maxRadius);
+        return GetRandomTravablePointInRadius(start, roomGrid, 0.0f, maxRadius);
+    }
+
+    // Builds path from start point to point from which sightPoint can be directly viewed 
+    // Result point is chosen based on how far is it from start and how near is it to maxDistance
+    public static Path BuildPathToPointWithSightOn(RoomPoint start, RoomPoint sightPoint, RoomGrid roomGrid, float maxDistance)
+    {
+        if (maxDistance < 1.0f)
+        {
+            return new Path();
+        }
+
+        var openList = new HashSet<RoomPoint>();
+        var travablePoints = new HashSet<RoomPoint>();
+        var neighbors = findNeighbors(sightPoint, roomGrid);
+        foreach (var neighbor in neighbors)
+        {
+            if (RoomPoint.Distance(sightPoint, neighbor) <= maxDistance && Raycast(neighbor, sightPoint, roomGrid, false))
+            {
+                openList.Add(neighbor);
+            }
+        }
+
+        while (openList.Count > 0)
+        {
+            var curPoint = openList.Last();
+            openList.Remove(curPoint);
+
+            travablePoints.Add(curPoint);
+
+            neighbors = findNeighbors(curPoint, roomGrid);
+
+            foreach (var neighbor in neighbors)
+            {
+                if (!travablePoints.Contains(neighbor) && !openList.Contains(neighbor) && RoomPoint.Distance(sightPoint, neighbor) <= maxDistance && Raycast(neighbor, sightPoint, roomGrid, false))
+                {
+                    openList.Add(neighbor);
+                }
+            }
+        }
+
+        if (travablePoints.Contains(start))
+        {
+            if (RoomPoint.Distance(start, sightPoint) >= maxDistance - 1.0f)
+            {
+                return BuildPath(start, start, roomGrid);
+            }
+
+            travablePoints.RemoveWhere(x => IsFacingSameDirection(start, sightPoint, x));
+        }
+
+        var finalPoints = travablePoints.ToList();
+        finalPoints = finalPoints.OrderBy(x => -RoomPoint.Distance(x, sightPoint)).ToList();
+
+        for (int i = 0; i < finalPoints.Count; ++i)
+        {
+            Path path = BuildPath(start, finalPoints[i], roomGrid);
+
+            if (path.Count > 0)
+            {
+                return path;
+            }
+        }
+
+        return new Path();
+    }
+
+    public static Path BuildPathToPointWithSightOn(Vector3 start, Vector3 sightPoint, RoomGrid roomGrid, float maxDistance)
+    {
+        return BuildPathToPointWithSightOn(Room.LocalToRoomPoint(start), Room.LocalToRoomPoint(sightPoint), roomGrid, maxDistance);
     }
 
     // Class used in A* algorithm
@@ -616,7 +680,7 @@ public static class RoomPath
     }
 
     // Makes path list from end node of path
-    private static Path makePathFromNode(PathNode node)
+    private static Path makePathFromNode(PathNode node, RoomGrid roomGrid)
     {
         var path = new Path();
         while (node != null)
@@ -629,6 +693,7 @@ public static class RoomPath
         {
             path.Add(path[0]);
         }
+        path.Smoothe(roomGrid);
         return path;
     }
 
@@ -781,5 +846,14 @@ public static class RoomPath
     private static bool IsPointTravable(int row, int col, RoomGrid roomGrid, int maxTravelCost)
     {
         return roomGrid.hasPoint(row, col) && roomGrid[row, col] > 0 && (maxTravelCost == 0 || !(roomGrid[row, col] > maxTravelCost));
+    }
+
+    private static bool IsFacingSameDirection(RoomPoint start, RoomPoint end1, RoomPoint end2)
+    {
+        Vector2 startVec = Room.RoomPointToLocal(start);
+        Vector2 endVec1 = Room.RoomPointToLocal(end1);
+        Vector2 endVec2 = Room.RoomPointToLocal(end2);
+
+        return Vector2.Dot(endVec1 - startVec, endVec2 - startVec) >= 0;
     }
 }
