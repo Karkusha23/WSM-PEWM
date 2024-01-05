@@ -316,6 +316,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: HUD
       objectReference: {fileID: 0}
+    - target: {fileID: 7707219837402001178, guid: 6abbd2e38158ca4428034656e8212c7a, type: 3}
+      propertyPath: pixHalfARoom
+      value: 10
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6abbd2e38158ca4428034656e8212c7a, type: 3}
 --- !u!1 &78523550 stripped

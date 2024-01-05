@@ -9,11 +9,22 @@ using static RoomPath;
 
 public static class RoomPath
 {
+    // Room size consts
+    public const int roomTileWidthCount = 15;
+    public const int roomTileHeightCount = 9;
+    public const float tileSize = 1.2f;
+
     // Size of actor box collider divided by tile size
     public const float actorSize = 0.8f;
 
     // Maximum actor offset relative to room grid with which it still can fit through narrow paths
-    public const float maxAllowedActorGridOffset = Room.tileSize * (1.0f - actorSize) / 2.0f;
+    public const float maxAllowedActorGridOffset = tileSize * (1.0f - actorSize) / 2.0f;
+
+    // Deafult travel cost for normal tile
+    public const byte defaultTravelCost = 1;
+
+    // Room type
+    public enum RoomType { None, SmallRoom, BigRoom }
 
     // Stores coordinates in room grid
     public class RoomPoint
@@ -63,7 +74,30 @@ public static class RoomPath
         }
     }
 
-    // Class for storing room grid
+    // Return local coordinates of point on room grid
+    public static Vector3 RoomPointToLocal(RoomPath.RoomPoint point)
+    {
+        return tileSize * new Vector3((point.j - roomTileWidthCount / 2), (roomTileHeightCount / 2 - point.i), 0.0f);
+    }
+
+    public static Vector3 RoomPointToLocal(int row, int col)
+    {
+        return tileSize * new Vector3((col - roomTileWidthCount / 2), (roomTileHeightCount / 2 - row), 0.0f);
+    }
+
+    // Returns room grid point from room local coordinates
+    public static RoomPath.RoomPoint LocalToRoomPoint(Vector3 pos)
+    {
+        return new RoomPath.RoomPoint(roomTileHeightCount / 2 - Mathf.RoundToInt(pos.y / tileSize), roomTileWidthCount / 2 + Mathf.RoundToInt(pos.x / tileSize));
+    }
+
+    // Returns fractional room grid point from room local coordinates. x is row, y is col
+    public static Vector2 LocalToFractionalRoomPoint(Vector3 pos)
+    {
+        return new Vector2(roomTileHeightCount / 2 - pos.y / tileSize, roomTileWidthCount / 2 + pos.x / tileSize);
+    }
+
+    // Class for storing room grid. 0 if tile is not travable, otherwise value is traveling cost for tile
     public class RoomGrid
     {
         private byte[,] grid;
@@ -80,25 +114,19 @@ public static class RoomPath
             set => grid[point.i, point.j] = value;
         }
 
-        public int rows
-        {
-            get => grid.GetLength(0);
-        }
+        public int rows { get => grid.GetLength(0); }
 
-        public int cols
-        {
-            get => grid.GetLength(1);
-        }
+        public int cols { get => grid.GetLength(1); }
 
-        public RoomGrid(Room.RoomType roomType)
+        public RoomGrid(RoomType roomType)
         {
-            if (roomType == Room.RoomType.SmallRoom)
+            if (roomType == RoomType.SmallRoom)
             {
-                grid = new byte[Room.roomTileHeightCount, Room.roomTileWidthCount];
+                grid = new byte[roomTileHeightCount, roomTileWidthCount];
             }
-            else if (roomType == Room.RoomType.BigRoom)
+            else if (roomType == RoomType.BigRoom)
             {
-                grid = new byte[Room.roomTileHeightCount * 2, Room.roomTileWidthCount * 2];
+                grid = new byte[roomTileHeightCount * 2, roomTileWidthCount * 2];
             }
             else
             {
@@ -109,7 +137,7 @@ public static class RoomPath
             {
                 for (int j = 0; j < this.cols; ++j)
                 {
-                    grid[i, j] = Room.defaultTravelCost;
+                    grid[i, j] = defaultTravelCost;
                 }
             }
         }
@@ -245,7 +273,7 @@ public static class RoomPath
     // Build path using local coordinates of start and end points
     public static Path BuildPath(Vector3 start, Vector3 end, RoomGrid roomGrid)
     {
-        return BuildPath(Room.LocalToRoomPoint(start), Room.LocalToRoomPoint(end), roomGrid);
+        return BuildPath(LocalToRoomPoint(start), LocalToRoomPoint(end), roomGrid);
     }
 
     // Returns true if there's no obstacles between start and end
@@ -369,13 +397,13 @@ public static class RoomPath
     {
         float distance = Vector3.Distance(start, end);
 
-        if (distance <= Room.tileSize)
+        if (distance <= tileSize)
         {
             return true;
         }
 
-        RoomPoint startPoint = Room.LocalToRoomPoint(start);
-        RoomPoint endPoint = Room.LocalToRoomPoint(end);
+        RoomPoint startPoint = LocalToRoomPoint(start);
+        RoomPoint endPoint = LocalToRoomPoint(end);
 
         if (!roomGrid.hasPoint(startPoint) || !roomGrid.hasPoint(endPoint))
         {
@@ -384,10 +412,10 @@ public static class RoomPath
 
         int maxTravelCost = considerTravelCost ? Mathf.Max(roomGrid[startPoint], roomGrid[endPoint]) : 0;
 
-        int checksCount = Mathf.Max(3, Mathf.CeilToInt(distance * 2.0f / Room.tileSize));
+        int checksCount = Mathf.Max(3, Mathf.CeilToInt(distance * 2.0f / tileSize));
 
-        Vector2 startVec = Room.LocalToFractionalRoomPoint(start);
-        Vector2 endVec = Room.LocalToFractionalRoomPoint(end);
+        Vector2 startVec = LocalToFractionalRoomPoint(start);
+        Vector2 endVec = LocalToFractionalRoomPoint(end);
 
         HashSet<RoomPoint> pointsToCheck = new HashSet<RoomPoint>();
 
@@ -514,7 +542,7 @@ public static class RoomPath
     // Returns local coordinates random point that can be travelled to from start point and which satisfies condition minRadius <= Distance(start, end) <= maxRadius
     public static Vector3 GetRandomTravablePointInRadius(Vector3 start, RoomGrid roomGrid, float minRadius, float maxRadius)
     {
-        return Room.RoomPointToLocal(GetRandomTravablePointInRadius(Room.LocalToRoomPoint(start), roomGrid, minRadius, maxRadius));
+        return RoomPointToLocal(GetRandomTravablePointInRadius(LocalToRoomPoint(start), roomGrid, minRadius, maxRadius));
     }
 
     // Returns local coordinates of point that can be travelled to from start point and which satisfies condition Distance(start, end) <= maxRadius
@@ -589,7 +617,7 @@ public static class RoomPath
 
     public static Path BuildPathToPointWithSightOn(Vector3 start, Vector3 sightPoint, RoomGrid roomGrid, float maxDistance)
     {
-        return BuildPathToPointWithSightOn(Room.LocalToRoomPoint(start), Room.LocalToRoomPoint(sightPoint), roomGrid, maxDistance);
+        return BuildPathToPointWithSightOn(LocalToRoomPoint(start), LocalToRoomPoint(sightPoint), roomGrid, maxDistance);
     }
 
     // Class used in A* algorithm
@@ -850,9 +878,9 @@ public static class RoomPath
 
     private static bool IsFacingSameDirection(RoomPoint start, RoomPoint end1, RoomPoint end2)
     {
-        Vector2 startVec = Room.RoomPointToLocal(start);
-        Vector2 endVec1 = Room.RoomPointToLocal(end1);
-        Vector2 endVec2 = Room.RoomPointToLocal(end2);
+        Vector2 startVec = RoomPointToLocal(start);
+        Vector2 endVec1 = RoomPointToLocal(end1);
+        Vector2 endVec2 = RoomPointToLocal(end2);
 
         return Vector2.Dot(endVec1 - startVec, endVec2 - startVec) >= 0;
     }

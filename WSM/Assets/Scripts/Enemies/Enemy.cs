@@ -168,7 +168,7 @@ public abstract class Enemy : MonoBehaviour
         }
         for (int i = 0; i < path.Count - 1; ++i)
         {
-            Debug.DrawLine(Room.RoomPointToLocal(path[i]) + transform.parent.position, Room.RoomPointToLocal(path[i + 1]) + transform.parent.position, Color.green, refreshPathsTime);
+            Debug.DrawLine(RoomPath.RoomPointToLocal(path[i]) + transform.parent.position, RoomPath.RoomPointToLocal(path[i + 1]) + transform.parent.position, Color.green, refreshPathsTime);
         }
     }
 
@@ -208,7 +208,7 @@ public abstract class Enemy : MonoBehaviour
             return Vector3.zero;
         }
 
-        if (Vector3.Distance(getUnscaledLocalPosition(), Room.RoomPointToLocal(path[1])) < waypointReachDistance)
+        if (Vector3.Distance(getUnscaledLocalPosition(), RoomPath.RoomPointToLocal(path[1])) < waypointReachDistance)
         {
             path.RemoveAt(0);
             if (path.Count < 2)
@@ -229,10 +229,10 @@ public abstract class Enemy : MonoBehaviour
     // Returns destination in which enemy have to go according to path
     private Vector3 getPathDestination()
     {
-        Vector3 waypoint = Room.RoomPointToLocal(path[1]);
+        Vector3 waypoint = RoomPath.RoomPointToLocal(path[1]);
         Vector3 norm = getNormalToPath();
         Vector3 result = waypoint - getUnscaledLocalPosition();
-        if (!RoomPath.Raycast(getUnscaledLocalPosition(), getUnscaledLocalPosition() + result.normalized * Room.tileSize, room.roomGrid, true))
+        if (!RoomPath.Raycast(getUnscaledLocalPosition(), getUnscaledLocalPosition() + result.normalized * RoomPath.tileSize, room.roomGrid, true))
         {
             result += norm * result.magnitude * 10.0f;
         }
@@ -242,8 +242,8 @@ public abstract class Enemy : MonoBehaviour
     // Get vector towards the line of path
     private Vector3 getNormalToPath()
     {
-        Vector3 startVec = Room.RoomPointToLocal(path[0]);
-        Vector3 endVec = Room.RoomPointToLocal(path[1]);
+        Vector3 startVec = RoomPath.RoomPointToLocal(path[0]);
+        Vector3 endVec = RoomPath.RoomPointToLocal(path[1]);
         Vector3 localPosition = getUnscaledLocalPosition();
 
         // Vector of line of path

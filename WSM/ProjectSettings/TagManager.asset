@@ -23,6 +23,7 @@ TagManager:
   - EnemyWeapon
   - WeaponDropped
   - Weapon_dropped
+  - Floor
   layers:
   - Default
   - TransparentFX

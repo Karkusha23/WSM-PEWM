@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class Floor : MonoBehaviour
 {
+
     // Struct for storing points on floor matrix
     public struct FloorPoint
     {
@@ -75,6 +76,8 @@ public class Floor : MonoBehaviour
     // 8 - pre-boss room
     // 9 - item room
 
+    public byte[,] FloorMatrix { get => floorMatrix; }
+
     // Lists of coordinates of possible rooms
     private PointList freeSmallRoom;
     private PointList freeBigRoom;
@@ -84,7 +87,6 @@ public class Floor : MonoBehaviour
     private bool[] bigDoors;
     private Vector3[] doorPoss;
     private Vector3[] bigRoomDoorOffsets;
-    private Minimap minimap;
 
     private void Awake()
     {
@@ -117,11 +119,6 @@ public class Floor : MonoBehaviour
                 }
             }
         }
-        minimap = GameObject.FindGameObjectWithTag("Minimap").GetComponent<Minimap>();
-        minimap.floorMatrix = floorMatrix;
-        minimap.floorHeight = floorHeight;
-        minimap.floorWidth = floorWidth;
-        minimap.init();
     }
 
     private void initVectors()
@@ -494,7 +491,7 @@ public class Floor : MonoBehaviour
         {
             room.GetComponent<Room>().loadout = smallLoadouts[Random.Range(0, smallLoadouts.Length)];
             room.GetComponent<Room>().roomDrops = pickups;
-            room.GetComponent<Room>().roomType = Room.RoomType.SmallRoom;
+            room.GetComponent<Room>().roomType = RoomPath.RoomType.SmallRoom;
             room.GetComponent<Room>().spawnProps();
         }
     }
@@ -523,7 +520,7 @@ public class Floor : MonoBehaviour
             room.GetComponent<Room>().loadout = bigLoadouts[Random.Range(0, bigLoadouts.Length)];
             room.GetComponent<Room>().roomDrops = pickups;
         }
-        room.GetComponent<Room>().roomType = Room.RoomType.BigRoom;
+        room.GetComponent<Room>().roomType = RoomPath.RoomType.BigRoom;
         room.GetComponent<Room>().spawnProps();
     }
 

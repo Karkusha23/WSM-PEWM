@@ -4,24 +4,14 @@ using UnityEngine;
 
 public class Room : MonoBehaviour
 {
-    public enum RoomType { None, SmallRoom, BigRoom }
-
     public RoomLoadout loadout;
     public List<GameObject> roomDrops;
     public List<GameObject> doors;
     public float invincibleTime;
-    public RoomType roomType;
+    public RoomPath.RoomType roomType;
 
-    // Tiling consts
-    public const int roomTileWidthCount = 15;
-    public const int roomTileHeightCount = 9;
-    public const float tileSize = 1.2f;
-
-    // Tile grid for enemy navigation. 0 if can not go through tile, otherwise value is traveling cost for tile
+    // Navigation grid for room
     public RoomPath.RoomGrid roomGrid;
-
-    // Deafult travel cost for normal tile
-    public const int defaultTravelCost = 1;
 
     // Time between enemy spawning when entering room
     public const float timeBetweenEnemySpawn = 0.2f;
@@ -38,15 +28,15 @@ public class Room : MonoBehaviour
         bigRoomOffset = new Vector3(Floor.roomWidth / 2.0f, -Floor.roomHeight, 0f);
         if (CompareTag("SmallRoom"))
         {
-            roomType = RoomType.SmallRoom;
+            roomType = RoomPath.RoomType.SmallRoom;
         }
         else if (CompareTag("BigRoom"))
         {
-            roomType = RoomType.BigRoom;
+            roomType = RoomPath.RoomType.BigRoom;
         }
         else
         {
-            roomType = RoomType.None;
+            roomType = RoomPath.RoomType.None;
         }
         isActivated = false;
         camcon = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraController>();
@@ -59,10 +49,10 @@ public class Room : MonoBehaviour
         {
             switch (roomType)
             {
-                case RoomType.SmallRoom:
+                case RoomPath.RoomType.SmallRoom:
                     camcon.goToPos(transform.position);
                     break;
-                case RoomType.BigRoom:
+                case RoomPath.RoomType.BigRoom:
                     if (other.GetComponent<Player>().hasWeapon)
                     {
                         camcon.followMousePos();
@@ -72,7 +62,7 @@ public class Room : MonoBehaviour
                         camcon.follow(other.gameObject);
                     }
                     break;
-                case RoomType.None:
+                case RoomPath.RoomType.None:
                     break;
             }
             if (loadout != null && !isActivated)
@@ -82,29 +72,6 @@ public class Room : MonoBehaviour
         }
     }
 
-    // Return local coordinates of point on room grid
-    public static Vector3 RoomPointToLocal(RoomPath.RoomPoint point)
-    {
-        return tileSize * new Vector3((point.j - roomTileWidthCount / 2), (roomTileHeightCount / 2 - point.i), 0.0f);
-    }
-
-    public static Vector3 RoomPointToLocal(int row, int col)
-    {
-        return tileSize * new Vector3((col - roomTileWidthCount / 2), (roomTileHeightCount / 2 - row), 0.0f);
-    }
-
-    // Returns room grid point from room local coordinates
-    public static RoomPath.RoomPoint LocalToRoomPoint(Vector3 pos)
-    {
-        return new RoomPath.RoomPoint(roomTileHeightCount / 2 - Mathf.RoundToInt(pos.y / tileSize), roomTileWidthCount / 2 + Mathf.RoundToInt(pos.x / tileSize));
-    }
-
-    // Returns fractional room grid point from room local coordinates. x is row, y is col
-    public static Vector2 LocalToFractionalRoomPoint(Vector3 pos)
-    {
-        return new Vector2(roomTileHeightCount / 2 - pos.y / tileSize, roomTileWidthCount / 2 + pos.x / tileSize);
-    }
-
     // Get traveling cost for tile from prefab
     public static byte getTravelingCost(GameObject prefab)
     {
@@ -112,7 +79,7 @@ public class Room : MonoBehaviour
         {
             return 0;
         }
-        return defaultTravelCost;
+        return RoomPath.defaultTravelCost;
     }
 
     public void spawnProps()
@@ -131,7 +98,7 @@ public class Room : MonoBehaviour
             }
             else
             {
-                Instantiate(loadoutUnit.prefab, transform.position + RoomPointToLocal(loadoutUnit.row, loadoutUnit.col), Quaternion.identity, transform);
+                Instantiate(loadoutUnit.prefab, transform.position + RoomPath.RoomPointToLocal(loadoutUnit.row, loadoutUnit.col), Quaternion.identity, transform);
                 roomGrid[loadoutUnit.row, loadoutUnit.col] = getTravelingCost(loadoutUnit.prefab);
             }
         }
@@ -157,41 +124,15 @@ public class Room : MonoBehaviour
         if (enemyCount <= 0)
         {
             openDoors();
-            Instantiate(roomDrops[Random.Range(0, roomDrops.Count)], roomType == RoomType.BigRoom ? transform.position + bigRoomOffset : transform.position, Quaternion.identity);
+            Instantiate(roomDrops[Random.Range(0, roomDrops.Count)], roomType == RoomPath.RoomType.BigRoom ? transform.position + bigRoomOffset : transform.position, Quaternion.identity);
         }
-    }
-
-    public string pathToString(RoomPath.Path path)
-    {
-        var tmpGrid = new byte[roomTileHeightCount, roomTileWidthCount];
-        for (int i = 0; i < roomTileHeightCount; ++i)
-        {
-            for (int j = 0; j < roomTileWidthCount; ++j)
-            {
-                tmpGrid[i, j] = roomGrid[i, j];
-            }
-        }
-        foreach (var point in path)
-        {
-            tmpGrid[point.i, point.j] = 2;
-        }
-        string result = "";
-        for (int i = 0; i < roomTileHeightCount; ++i)
-        {
-            for (int j = 0; j < roomTileWidthCount; ++j)
-            {
-                result += tmpGrid[i, j];
-            }
-            result += '\n';
-        }
-        return result;
     }
 
     private IEnumerator spawnEnemies()
     {
         foreach (var enemyLoadoutUnit in enemyLoadout)
         {
-            Instantiate(enemyLoadoutUnit.prefab, transform.position + RoomPointToLocal(enemyLoadoutUnit.row, enemyLoadoutUnit.col), Quaternion.identity, transform);
+            Instantiate(enemyLoadoutUnit.prefab, transform.position + RoomPath.RoomPointToLocal(enemyLoadoutUnit.row, enemyLoadoutUnit.col), Quaternion.identity, transform);
             yield return new WaitForSeconds(timeBetweenEnemySpawn);
         }
     }

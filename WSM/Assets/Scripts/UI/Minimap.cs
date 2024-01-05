@@ -2,14 +2,15 @@ using UnityEngine;
 
 public class Minimap : MonoBehaviour
 {
-    public int pixHalfARoom;
-    public int minimapHeight;
-    public int minimapWidth;
-    public GameObject smallRoomNotExplored;
-    public GameObject smallRoomExplored;
-    public GameObject bigRoomNotExplored;
-    public GameObject bigRoomExplored;
-    public GameObject bossIcon;
+    public int pixHalfARoom = 10;
+    public int minimapHeight = 10;
+    public int minimapWidth = 10;
+
+    public GameObject smallRoomNotExploredPrefab;
+    public GameObject smallRoomExploredPrefab;
+    public GameObject bigRoomNotExploredPrefab;
+    public GameObject bigRoomExploredPrefab;
+    public GameObject bossIconPrefab;
 
     [HideInInspector]
     public byte[,] floorMatrix;
@@ -18,7 +19,7 @@ public class Minimap : MonoBehaviour
     [HideInInspector]
     public int floorWidth;
 
-    private int[,] floorExplored;
+    private byte[,] floorExplored;
     // 0 - not explored
     // 1 - explored small room, not visited
     // 2 - explored big room core, not visited
@@ -34,13 +35,19 @@ public class Minimap : MonoBehaviour
     private int pixARoom;
     private Vector3 camOffset;
 
-    public void init()
+    private void Start()
     {
+        var floor = GameObject.FindGameObjectWithTag("Floor").GetComponent<Floor>();
+
+        floorMatrix = floor.FloorMatrix;
+        floorHeight = floor.floorHeight;
+        floorWidth = floor.floorWidth;
+
         camOffset = Camera.main.ScreenToWorldPoint(Vector3.zero);
         curRow = floorHeight / 2;
         curCol = floorWidth / 2;
         pixARoom = pixHalfARoom * 2;
-        floorExplored = new int[floorHeight, floorWidth];
+        floorExplored = new byte[floorHeight, floorWidth];
         minimapBase = transform.Find("MinimapBase");
         notExploredRooms = new GameObject[floorHeight, floorWidth];
         exploredRooms = new GameObject[floorHeight, floorWidth];
@@ -50,22 +57,32 @@ public class Minimap : MonoBehaviour
             {
                 if (floorMatrix[i, j] == 4 || floorMatrix[i, j] == 8 || floorMatrix[i, j] == 9)
                 {
-                    Vector3 tmpSmallRoomPos = transform.position + Camera.main.ScreenToWorldPoint(new Vector3((j - floorWidth / 2) * pixARoom, (floorHeight / 2 - i) * pixARoom, 0f)) - camOffset;
-                    notExploredRooms[i, j] = Instantiate(smallRoomNotExplored, tmpSmallRoomPos, Quaternion.identity, minimapBase);
+                    Vector2 newSmallRoomOffset = new Vector2((j - floorWidth / 2) * pixARoom, (floorHeight / 2 - i) * pixARoom);
+
+                    notExploredRooms[i, j] = Instantiate(smallRoomNotExploredPrefab, minimapBase);
                     notExploredRooms[i, j].SetActive(false);
-                    exploredRooms[i, j] = Instantiate(smallRoomExplored, tmpSmallRoomPos, Quaternion.identity, minimapBase);
+                    notExploredRooms[i, j].GetComponent<RectTransform>().anchoredPosition += newSmallRoomOffset;
+
+                    exploredRooms[i, j] = Instantiate(smallRoomExploredPrefab, minimapBase);
                     exploredRooms[i, j].SetActive(false);
+                    exploredRooms[i, j].GetComponent<RectTransform>().anchoredPosition += newSmallRoomOffset;
                 }
                 else if (floorMatrix[i, j] == 5 || floorMatrix[i, j] == 7)
                 {
-                    Vector3 tmpBigRoomPos = transform.position + Camera.main.ScreenToWorldPoint(new Vector3((j - floorWidth / 2) * pixARoom + pixHalfARoom, (floorHeight / 2 - i) * pixARoom - pixHalfARoom, 0f)) - camOffset;
-                    notExploredRooms[i, j] = notExploredRooms[i, j + 1] = notExploredRooms[i + 1, j] = notExploredRooms[i + 1, j + 1] = Instantiate(bigRoomNotExplored, tmpBigRoomPos, Quaternion.identity, minimapBase);
-                    exploredRooms[i, j] = exploredRooms[i, j + 1] = exploredRooms[i + 1, j] = exploredRooms[i + 1, j + 1] = Instantiate(bigRoomExplored, tmpBigRoomPos, Quaternion.identity, minimapBase);
+                    Vector2 newBigRoomOffset = new Vector2((j - floorWidth / 2) * pixARoom + pixHalfARoom, (floorHeight / 2 - i) * pixARoom - pixHalfARoom);
+
+                    notExploredRooms[i, j] = notExploredRooms[i, j + 1] = notExploredRooms[i + 1, j] = notExploredRooms[i + 1, j + 1] = Instantiate(bigRoomNotExploredPrefab, minimapBase);
+                    exploredRooms[i, j] = exploredRooms[i, j + 1] = exploredRooms[i + 1, j] = exploredRooms[i + 1, j + 1] = Instantiate(bigRoomExploredPrefab, minimapBase);
+
                     if (floorMatrix[i, j] == 7)
                     {
-                        Instantiate(bossIcon, notExploredRooms[i, j].transform.position, Quaternion.identity, notExploredRooms[i, j].transform);
-                        Instantiate(bossIcon, exploredRooms[i, j].transform.position, Quaternion.identity, exploredRooms[i, j].transform);
+                        Instantiate(bossIconPrefab, notExploredRooms[i, j].transform.position, Quaternion.identity, notExploredRooms[i, j].transform);
+                        Instantiate(bossIconPrefab, exploredRooms[i, j].transform.position, Quaternion.identity, exploredRooms[i, j].transform);
                     }
+
+                    notExploredRooms[i, j].GetComponent<RectTransform>().anchoredPosition += newBigRoomOffset;
+                    exploredRooms[i, j].GetComponent<RectTransform>().anchoredPosition += newBigRoomOffset;
+
                     notExploredRooms[i, j].SetActive(false);
                     exploredRooms[i, j].SetActive(false);
                 }
@@ -76,8 +93,8 @@ public class Minimap : MonoBehaviour
 
     public void checkRoom(Vector3 roomPos)
     {
-        int row = floorHeight / 2 - Mathf.RoundToInt(roomPos.y / 11f);
-        int col = floorWidth / 2 + Mathf.RoundToInt(roomPos.x / 17.6f);
+        int row = floorHeight / 2 - Mathf.RoundToInt(roomPos.y / Floor.roomHeight);
+        int col = floorWidth / 2 + Mathf.RoundToInt(roomPos.x / Floor.roomWidth);
         if (floorExplored[row, col] < 4)
         {
             if (floorMatrix[row, col] == 4 || floorMatrix[row, col] == 8 || floorMatrix[row, col] == 9)

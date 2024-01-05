@@ -40,7 +40,7 @@ public class EnemyShoot : Enemy
         {
             return getUnscaledLocalPosition();
         }
-        return Room.RoomPointToLocal(path.Last());
+        return RoomPath.RoomPointToLocal(path.Last());
     }
 
     private IEnumerator shootingSequence()
