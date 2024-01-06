@@ -75,7 +75,7 @@ public static class RoomPath
     }
 
     // Return local coordinates of point on room grid
-    public static Vector3 RoomPointToLocal(RoomPath.RoomPoint point)
+    public static Vector3 RoomPointToLocal(RoomPoint point)
     {
         return tileSize * new Vector3((point.j - roomTileWidthCount / 2), (roomTileHeightCount / 2 - point.i), 0.0f);
     }
@@ -86,9 +86,9 @@ public static class RoomPath
     }
 
     // Returns room grid point from room local coordinates
-    public static RoomPath.RoomPoint LocalToRoomPoint(Vector3 pos)
+    public static RoomPoint LocalToRoomPoint(Vector3 pos)
     {
-        return new RoomPath.RoomPoint(roomTileHeightCount / 2 - Mathf.RoundToInt(pos.y / tileSize), roomTileWidthCount / 2 + Mathf.RoundToInt(pos.x / tileSize));
+        return new RoomPoint(roomTileHeightCount / 2 - Mathf.RoundToInt(pos.y / tileSize), roomTileWidthCount / 2 + Mathf.RoundToInt(pos.x / tileSize));
     }
 
     // Returns fractional room grid point from room local coordinates. x is row, y is col

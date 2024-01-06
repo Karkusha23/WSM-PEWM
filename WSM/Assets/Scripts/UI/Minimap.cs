@@ -13,7 +13,7 @@ public class Minimap : MonoBehaviour
     public GameObject bossIconPrefab;
 
     [HideInInspector]
-    public byte[,] floorMatrix;
+    public FloorGenerator.FloorGrid floorGrid;
     [HideInInspector]
     public int floorHeight;
     [HideInInspector]
@@ -33,17 +33,15 @@ public class Minimap : MonoBehaviour
     private GameObject[,] notExploredRooms;
     private GameObject[,] exploredRooms;
     private int pixARoom;
-    private Vector3 camOffset;
 
     private void Start()
     {
         var floor = GameObject.FindGameObjectWithTag("Floor").GetComponent<Floor>();
 
-        floorMatrix = floor.FloorMatrix;
-        floorHeight = floor.floorHeight;
-        floorWidth = floor.floorWidth;
+        floorGrid = floor.FloorGrid;
+        floorHeight = floorGrid.rows;
+        floorWidth = floorGrid.cols;
 
-        camOffset = Camera.main.ScreenToWorldPoint(Vector3.zero);
         curRow = floorHeight / 2;
         curCol = floorWidth / 2;
         pixARoom = pixHalfARoom * 2;
@@ -55,7 +53,7 @@ public class Minimap : MonoBehaviour
         {
             for (int j = 0; j < floorWidth; ++j)
             {
-                if (floorMatrix[i, j] == 4 || floorMatrix[i, j] == 8 || floorMatrix[i, j] == 9)
+                if (floorGrid.isRoomSmall(i, j))
                 {
                     Vector2 newSmallRoomOffset = new Vector2((j - floorWidth / 2) * pixARoom, (floorHeight / 2 - i) * pixARoom);
 
@@ -67,14 +65,14 @@ public class Minimap : MonoBehaviour
                     exploredRooms[i, j].SetActive(false);
                     exploredRooms[i, j].GetComponent<RectTransform>().anchoredPosition += newSmallRoomOffset;
                 }
-                else if (floorMatrix[i, j] == 5 || floorMatrix[i, j] == 7)
+                else if (floorGrid.isRoomBig(i, j))
                 {
                     Vector2 newBigRoomOffset = new Vector2((j - floorWidth / 2) * pixARoom + pixHalfARoom, (floorHeight / 2 - i) * pixARoom - pixHalfARoom);
 
                     notExploredRooms[i, j] = notExploredRooms[i, j + 1] = notExploredRooms[i + 1, j] = notExploredRooms[i + 1, j + 1] = Instantiate(bigRoomNotExploredPrefab, minimapBase);
                     exploredRooms[i, j] = exploredRooms[i, j + 1] = exploredRooms[i + 1, j] = exploredRooms[i + 1, j + 1] = Instantiate(bigRoomExploredPrefab, minimapBase);
 
-                    if (floorMatrix[i, j] == 7)
+                    if (floorGrid[i, j] == FloorGenerator.RoomType.Boss)
                     {
                         Instantiate(bossIconPrefab, notExploredRooms[i, j].transform.position, Quaternion.identity, notExploredRooms[i, j].transform);
                         Instantiate(bossIconPrefab, exploredRooms[i, j].transform.position, Quaternion.identity, exploredRooms[i, j].transform);
@@ -97,29 +95,28 @@ public class Minimap : MonoBehaviour
         int col = floorWidth / 2 + Mathf.RoundToInt(roomPos.x / Floor.roomWidth);
         if (floorExplored[row, col] < 4)
         {
-            if (floorMatrix[row, col] == 4 || floorMatrix[row, col] == 8 || floorMatrix[row, col] == 9)
+            if (floorGrid.isRoomSmall(row, col))
             {
                 floorExplored[row, col] = 4;
+
+                checkSmallAround(row, col);
             }
-            else if (floorMatrix[row, col] == 5 || floorMatrix[row, col] == 7)
+            else if (floorGrid.isRoomBig(row, col))
             {
                 floorExplored[row, col] = 5;
                 floorExplored[row, col + 1] = floorExplored[row + 1, col] = floorExplored[row + 1, col + 1] = 6;
-            }
-            exploredRooms[row, col].SetActive(true);
-            notExploredRooms[row, col].SetActive(false);
-            if (floorMatrix[row, col] == 4 || floorMatrix[row, col] == 8 || floorMatrix[row, col] == 9)
-            {
-                checkSmallAround(row, col);
-            }
-            else if (floorMatrix[row, col] == 5)
-            {
+
                 checkBigAround(row, col);
             }
+
+            exploredRooms[row, col].SetActive(true);
+            notExploredRooms[row, col].SetActive(false);
         }
+
         minimapBase.GetComponent<RectTransform>().anchoredPosition += new Vector2((curCol - col) * pixARoom, (row - curRow) * pixARoom);
         curRow = row;
         curCol = col;
+
         checkToActivate();
     }
 
@@ -145,26 +142,26 @@ public class Minimap : MonoBehaviour
 
     private void checkCell(int row, int col)
     {
-        if (floorExplored[row, col] == 0 && floorMatrix[row, col] >= 4)
+        if (floorExplored[row, col] == 0 && floorGrid.isRoomOccupied(row, col))
         {
             notExploredRooms[row, col].SetActive(true);
-            if (floorMatrix[row, col] == 4 || floorMatrix[row, col] == 8)
+            if (floorGrid.isRoomSmall(row, col))
             {
                 floorExplored[row, col] = 1;
             }
-            else if (floorMatrix[row, col] == 5 || floorMatrix[row, col] == 7)
+            else if (floorGrid.isRoomSmall(row, col))
             {
                 floorExplored[row, col] = 2;
                 floorExplored[row, col + 1] = floorExplored[row + 1, col] = floorExplored[row + 1, col + 1] = 3;
             }
-            else if (floorMatrix[row, col] == 6)
+            else if (floorGrid[row, col] == FloorGenerator.RoomType.BigSubunit)
             {
-                if (floorMatrix[row, col - 1] == 5 || floorMatrix[row, col - 1] == 7)
+                if (floorGrid.isRoomBig(row, col - 1))
                 {
                     floorExplored[row, col - 1] = 2;
                     floorExplored[row, col] = floorExplored[row + 1, col - 1] = floorExplored[row + 1, col] = 3;
                 }
-                else if (floorMatrix[row - 1, col] == 5 || floorMatrix[row - 1, col] == 7)
+                else if (floorGrid.isRoomBig(row - 1, col))
                 {
                     floorExplored[row - 1, col] = 2;
                     floorExplored[row - 1, col + 1] = floorExplored[row, col] = floorExplored[row, col + 1] = 3;

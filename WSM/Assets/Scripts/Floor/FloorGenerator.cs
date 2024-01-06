@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -16,8 +15,8 @@ public static class FloorGenerator
         Small, // Small room built
         BigCore, // Big room core cell (top left)
         BigSubunit, // Other big room cells
-        Boss, // Boss Room
         PreBoss, // Pre-boss room
+        Boss, // Boss Room
         Item // Item room
     }
 
@@ -32,7 +31,12 @@ public static class FloorGenerator
             i = row;
             j = col;
         }
-    };
+
+        public override int GetHashCode()
+        {
+            return (i << 8) | j;
+        }
+    }
 
     // Class for floor grid
     public class FloorGrid
@@ -51,6 +55,12 @@ public static class FloorGenerator
             set => grid[point.i, point.j] = value;
         }
 
+        public RoomType center
+        {
+            get => grid[rows / 2, cols / 2];
+            set => grid[rows / 2, cols / 2] = value;
+        }
+
         public int rows { get => grid.GetLength(0); }
 
         public int cols { get => grid.GetLength(1); }
@@ -67,6 +77,64 @@ public static class FloorGenerator
                 }
             }
         }
+
+        public override string ToString()
+        {
+            string result = "";
+            for (int i = 0; i < rows; ++i)
+            {
+                for (int j = 0; j < cols; ++j)
+                {
+                    result += (byte)grid[i, j];
+                }
+                result += '\n';
+            }
+            return result;
+        }
+
+        // Extends floor matrix by cellCount cells in all 4 directions
+        public void extend(int cellCount)
+        {
+            RoomType[,] tmp = new RoomType[rows + cellCount * 2, cols + cellCount * 2];
+
+            for (int i = 0; i < rows + cellCount * 2; ++i)
+            {
+                for (int j = 0; j < cols + cellCount * 2; ++j)
+                {
+                    tmp[i, j] = RoomType.None;
+                }
+            }
+
+            for (int i = 0; i < rows; ++i)
+            {
+                for (int j = 0; j < cols; ++j)
+                {
+                    tmp[i + cellCount, j + cellCount] = grid[i, j];
+                }
+            }
+
+            grid = tmp;
+        }
+
+        public bool hasPoint(int row, int col)
+        {
+            return row >= 0 && row < rows && col >= 0 && col < cols;
+        }
+
+        public bool isRoomOccupied(int row, int col)
+        {
+            return hasPoint(row, col) && IsRoomOccupied(grid[row, col]);
+        }
+
+        public bool isRoomSmall(int row, int col)
+        {
+            return hasPoint(row, col) && IsRoomSmall(grid[row, col]);
+        }
+
+        public bool isRoomBig(int row, int col)
+        {
+            return hasPoint(row, col) && IsRoomBig(grid[row, col]);
+        }
     }
 
     // Generate floor with given parameters
@@ -75,7 +143,29 @@ public static class FloorGenerator
         floorGrid = new FloorGrid(floorHeight, floorWidth);
         freeSmallRoom = new PointList();
         freeBigRoom = new PointList();
-        return floorGrid;
+
+        floorGrid.center = RoomType.Small;
+        CheckSmallFreeRoom(floorGrid.rows / 2, floorGrid.cols / 2);
+
+        for (int i = 1; i < roomCount; ++i)
+        {
+            if (!BuildRandomRoom(bigRoomProbability))
+            {
+                break;
+            }
+        }
+
+        buildItemRooms(itemRoomCount);
+
+        buildBossRoom();
+
+        FloorGrid result = floorGrid;
+
+        floorGrid = null;
+        freeSmallRoom = null;
+        freeBigRoom = null;
+
+        return result;
     }
 
     // If given room is already occupied
@@ -93,6 +183,36 @@ public static class FloorGenerator
         }
 
         return true;
+    }
+
+    // If room is small room
+    public static bool IsRoomSmall(RoomType roomType)
+    {
+        switch (roomType)
+        {
+            case RoomType.Small:
+            case RoomType.PreBoss:
+            case RoomType.Item:
+                return true;
+            default:
+                break;
+        }
+
+        return false;
+    }
+
+    public static bool IsRoomBig(RoomType roomType)
+    {
+        switch (roomType)
+        {
+            case RoomType.BigCore:
+            case RoomType.Boss:
+                return true;
+            default:
+                break;
+        }
+
+        return false;
     }
 
     private class PointList : List<FloorPoint>
@@ -126,7 +246,7 @@ public static class FloorGenerator
             int col = freeBigRoom[index].j;
 
             CheckBigFreeRoom(row, col);
-            removeFreeBigAround(row, col);
+            RemoveFreeBigAround(row, col);
 
             floorGrid[row, col] = RoomType.BigCore;
             floorGrid[row + 1, col] = floorGrid[row, col + 1] = floorGrid[row + 1, col + 1] = RoomType.BigSubunit;
@@ -347,12 +467,12 @@ public static class FloorGenerator
         }
     }
 
-    private static void removeFreeBigAround(int row, int col)
+    private static void RemoveFreeBigAround(int row, int col)
     {
-        if (floorGrid[row, col] == 3)
+        if (floorGrid[row, col] == RoomType.FreeSmallBig)
         {
             freeSmallRoom.RemoveByPoint(row, col);
-            floorGrid[row, col] = 2;
+            floorGrid[row, col] = RoomType.FreeBig;
         }
         for (int i = 1; i < 4; ++i)
         {
@@ -360,13 +480,13 @@ public static class FloorGenerator
             int curCol = col + i % 2;
             switch (floorGrid[curRow, curCol])
             {
-                case 1:
+                case RoomType.FreeSmall:
                     freeSmallRoom.RemoveByPoint(curRow, curCol);
                     break;
-                case 2:
+                case RoomType.FreeBig:
                     freeBigRoom.RemoveByPoint(curRow, curCol);
                     break;
-                case 3:
+                case RoomType.FreeSmallBig:
                     freeSmallRoom.RemoveByPoint(curRow, curCol);
                     freeBigRoom.RemoveByPoint(curRow, curCol);
                     break;
@@ -378,13 +498,13 @@ public static class FloorGenerator
             {
                 switch (floorGrid[curRow, col - 1])
                 {
-                    case 2:
+                    case RoomType.FreeBig:
                         freeBigRoom.RemoveByPoint(curRow, col - 1);
-                        floorGrid[curRow, col - 1] = 0;
+                        floorGrid[curRow, col - 1] = RoomType.None;
                         break;
-                    case 3:
+                    case RoomType.FreeSmallBig:
                         freeBigRoom.RemoveByPoint(curRow, col - 1);
-                        floorGrid[curRow, col - 1] = 1;
+                        floorGrid[curRow, col - 1] = RoomType.FreeSmall;
                         break;
                 }
             }
@@ -392,13 +512,13 @@ public static class FloorGenerator
             {
                 switch (floorGrid[row - 1, col - 1])
                 {
-                    case 2:
+                    case RoomType.FreeBig:
                         freeBigRoom.RemoveByPoint(row - 1, col - 1);
-                        floorGrid[row - 1, col - 1] = 0;
+                        floorGrid[row - 1, col - 1] = RoomType.None;
                         break;
-                    case 3:
+                    case RoomType.FreeSmallBig:
                         freeBigRoom.RemoveByPoint(row - 1, col - 1);
-                        floorGrid[row - 1, col - 1] = 1;
+                        floorGrid[row - 1, col - 1] = RoomType.FreeSmall;
                         break;
                 }
             }
@@ -409,30 +529,31 @@ public static class FloorGenerator
             {
                 switch (floorGrid[row - 1, curCol])
                 {
-                    case 2:
+                    case RoomType.FreeBig:
                         freeBigRoom.RemoveByPoint(row - 1, curCol);
-                        floorGrid[row - 1, curCol] = 0;
+                        floorGrid[row - 1, curCol] = RoomType.None;
                         break;
-                    case 3:
+                    case RoomType.FreeSmallBig:
                         freeBigRoom.RemoveByPoint(row - 1, curCol);
-                        floorGrid[row - 1, curCol] = 1;
+                        floorGrid[row - 1, curCol] = RoomType.FreeSmall;
                         break;
                 }
             }
         }
     }
 
-    private static void buildItemRooms()
+    private static void buildItemRooms(int itemRoomCount)
     {
         PointList freeItemRoom = new PointList();
+
         foreach (FloorPoint point in freeSmallRoom)
         {
-            if (!(isInMiddle(point.i, point.j) || getDoorCount(point.i, point.j) != 1))
+            if (!(IsInCenter(point) || GetDoorCount(point) != 1))
             {
                 freeItemRoom.Add(point);
             }
         }
-        int itemRoomCount = Random.Range(minItemRoomCount, maxItemRoomCount + 1);
+
         for (int i = 0; i < itemRoomCount; ++i)
         {
             if (freeItemRoom.Count == 0)
@@ -449,23 +570,13 @@ public static class FloorGenerator
                     freeItemRoom.RemoveByPoint(curRow, curCol);
                 }
             }
-            floorGrid[row, col] = 9;
+            floorGrid[row, col] = RoomType.Item;
         }
     }
 
     private static void buildBossRoom()
     {
-        byte[,] tmpMatrix = new byte[floorGrid.rows + 6, floorGrid.cols + 6];
-        for (int i = 0; i < floorGrid.rows; ++i)
-        {
-            for (int j = 0; j < floorGrid.cols; ++j)
-            {
-                tmpMatrix[i + 3, j + 3] = floorGrid[i, j];
-            }
-        }
-        floorGrid = tmpMatrix;
-        floorGrid.rows += 6;
-        floorGrid.cols += 6;
+        floorGrid.extend(3);
         int tmpType = Random.Range(0, 4);
         int[] freeRoom = new int[Mathf.Max(floorGrid.rows, floorGrid.cols)];
         int freeRoomCount = 0;
@@ -477,7 +588,7 @@ public static class FloorGenerator
             {
                 for (; col < floorGrid.cols; ++col)
                 {
-                    if (floorGrid[row, col] >= 4)
+                    if (IsRoomOccupied(floorGrid[row, col]))
                     {
                         indicator = true;
                         break;
@@ -491,15 +602,15 @@ public static class FloorGenerator
             }
             for (; col < floorGrid.cols; ++col)
             {
-                if (floorGrid[row, col] >= 4)
+                if (IsRoomOccupied(floorGrid[row, col]))
                 {
                     freeRoom[freeRoomCount++] = col;
                 }
             }
             int tmpPos = freeRoom[Random.Range(0, freeRoomCount)];
-            floorGrid[row - 1, tmpPos] = 8;
-            floorGrid[row - 3, tmpPos] = 7;
-            floorGrid[row - 3, tmpPos + 1] = floorGrid[row - 2, tmpPos] = floorGrid[row - 2, tmpPos + 1] = 6;
+            floorGrid[row - 1, tmpPos] = RoomType.PreBoss;
+            floorGrid[row - 3, tmpPos] = RoomType.Boss;
+            floorGrid[row - 3, tmpPos + 1] = floorGrid[row - 2, tmpPos] = floorGrid[row - 2, tmpPos + 1] = RoomType.BigSubunit;
         }
         else if (tmpType == 1)
         {
@@ -509,7 +620,7 @@ public static class FloorGenerator
             {
                 for (; row < floorGrid.rows; ++row)
                 {
-                    if (floorGrid[row, col] >= 4)
+                    if (IsRoomOccupied(floorGrid[row, col]))
                     {
                         indicator = true;
                         break;
@@ -523,15 +634,15 @@ public static class FloorGenerator
             }
             for (; row < floorGrid.rows; ++row)
             {
-                if (floorGrid[row, col] >= 4)
+                if (IsRoomOccupied(floorGrid[row, col]))
                 {
                     freeRoom[freeRoomCount++] = row;
                 }
             }
             int tmpPos = freeRoom[Random.Range(0, freeRoomCount)];
-            floorGrid[tmpPos, col - 1] = 8;
-            floorGrid[tmpPos, col - 3] = 7;
-            floorGrid[tmpPos, col - 2] = floorGrid[tmpPos + 1, col - 3] = floorGrid[tmpPos + 1, col - 2] = 6;
+            floorGrid[tmpPos, col - 1] = RoomType.PreBoss;
+            floorGrid[tmpPos, col - 3] = RoomType.Boss;
+            floorGrid[tmpPos, col - 2] = floorGrid[tmpPos + 1, col - 3] = floorGrid[tmpPos + 1, col - 2] = RoomType.BigSubunit;
         }
         else if (tmpType == 2)
         {
@@ -541,7 +652,7 @@ public static class FloorGenerator
             {
                 for (; row < floorGrid.rows; ++row)
                 {
-                    if (floorGrid[row, col] >= 4)
+                    if (IsRoomOccupied(floorGrid[row, col]))
                     {
                         indicator = true;
                         break;
@@ -555,15 +666,15 @@ public static class FloorGenerator
             }
             for (; row < floorGrid.rows; ++row)
             {
-                if (floorGrid[row, col] >= 4)
+                if (IsRoomOccupied(floorGrid[row, col]))
                 {
                     freeRoom[freeRoomCount++] = row;
                 }
             }
             int tmpPos = freeRoom[Random.Range(0, freeRoomCount)];
-            floorGrid[tmpPos, col + 1] = 8;
-            floorGrid[tmpPos, col + 2] = 7;
-            floorGrid[tmpPos, col + 3] = floorGrid[tmpPos + 1, col + 2] = floorGrid[tmpPos + 1, col + 3] = 6;
+            floorGrid[tmpPos, col + 1] = RoomType.PreBoss;
+            floorGrid[tmpPos, col + 2] = RoomType.Boss;
+            floorGrid[tmpPos, col + 3] = floorGrid[tmpPos + 1, col + 2] = floorGrid[tmpPos + 1, col + 3] = RoomType.BigSubunit;
         }
         else
         {
@@ -573,7 +684,7 @@ public static class FloorGenerator
             {
                 for (; col < floorGrid.cols; ++col)
                 {
-                    if (floorGrid[row, col] >= 4)
+                    if (IsRoomOccupied(floorGrid[row, col]))
                     {
                         indicator = true;
                         break;
@@ -587,15 +698,42 @@ public static class FloorGenerator
             }
             for (; col < floorGrid.cols; ++col)
             {
-                if (floorGrid[row, col] >= 4)
+                if (IsRoomOccupied(floorGrid[row, col]))
                 {
                     freeRoom[freeRoomCount++] = col;
                 }
             }
             int tmpPos = freeRoom[Random.Range(0, freeRoomCount)];
-            floorGrid[row + 1, tmpPos] = 8;
-            floorGrid[row + 2, tmpPos] = 7;
-            floorGrid[row + 2, tmpPos + 1] = floorGrid[row + 3, tmpPos] = floorGrid[row + 3, tmpPos + 1] = 6;
+            floorGrid[row + 1, tmpPos] = RoomType.PreBoss;
+            floorGrid[row + 2, tmpPos] = RoomType.Boss;
+            floorGrid[row + 2, tmpPos + 1] = floorGrid[row + 3, tmpPos] = floorGrid[row + 3, tmpPos + 1] = RoomType.BigSubunit;
         }
+    }
+
+    private static bool IsInCenter(FloorPoint point)
+    {
+        return point.i >= floorGrid.rows / 2 - 1 && point.i <= floorGrid.rows / 2 + 1 && point.j >= floorGrid.cols / 2 - 1 && point.j <= floorGrid.cols / 2 + 1;
+    }
+
+    private static int GetDoorCount(FloorPoint point)
+    {
+        int result = 0;
+        if (point.i < floorGrid.rows - 1 && IsRoomOccupied(floorGrid[point.i + 1, point.j]))
+        {
+            ++result;
+        }
+        if (point.j < floorGrid.cols - 1 && IsRoomOccupied(floorGrid[point.i, point.j + 1]))
+        {
+            ++result;
+        }
+        if (point.i > 0 && IsRoomOccupied(floorGrid[point.i - 1, point.j]))
+        {
+            ++result;
+        }
+        if (point.j > 0 && IsRoomOccupied(floorGrid[point.i, point.j - 1]))
+        {
+            ++result;
+        }
+        return result;
     }
 }
