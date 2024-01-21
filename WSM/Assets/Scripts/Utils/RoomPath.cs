@@ -27,51 +27,9 @@ public static class RoomPath
     public enum RoomType { None, SmallRoom, BigRoom }
 
     // Stores coordinates in room grid
-    public class RoomPoint
+    public class RoomPoint : Point
     {
-        public int i { get; set; }
-        public int j { get; set; }
-
-        public RoomPoint(int row, int col)
-        {
-            i = row;
-            j = col;
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (obj == null || !GetType().Equals(obj.GetType()))
-            {
-                return false;
-            }
-            RoomPoint other = (RoomPoint)obj;
-            return this.i == other.i && this.j == other.j;
-        }
-
-        public override int GetHashCode()
-        {
-            return (i << 8) | j;
-        }
-
-        public override string ToString()
-        {
-            return string.Format("RoomPoint({0}, {1})", i, j);
-        }
-
-        public static bool operator ==(RoomPoint point1, RoomPoint point2)
-        {
-            return point1.i == point2.i && point1.j == point2.j;
-        }
-
-        public static bool operator !=(RoomPoint point1, RoomPoint point2)
-        {
-            return !(point1 == point2);
-        }
-
-        public static float Distance(RoomPoint point1, RoomPoint point2)
-        {
-            return Mathf.Sqrt((point1.i - point2.i) * (point1.i - point2.i) + (point1.j - point2.j) * (point1.j - point2.j));
-        }
+        public RoomPoint(int row, int col) : base(row, col) { }
     }
 
     // Return local coordinates of point on room grid
@@ -98,26 +56,8 @@ public static class RoomPath
     }
 
     // Class for storing room grid. 0 if tile is not travable, otherwise value is traveling cost for tile
-    public class RoomGrid
+    public class RoomGrid : Grid<byte>
     {
-        private byte[,] grid;
-
-        public byte this[int i, int j]
-        {
-            get => grid[i, j];
-            set => grid[i, j] = value;
-        }
-
-        public byte this[RoomPoint point]
-        {
-            get => grid[point.i, point.j];
-            set => grid[point.i, point.j] = value;
-        }
-
-        public int rows { get => grid.GetLength(0); }
-
-        public int cols { get => grid.GetLength(1); }
-
         public RoomGrid(RoomType roomType)
         {
             if (roomType == RoomType.SmallRoom)
@@ -140,17 +80,6 @@ public static class RoomPath
                     grid[i, j] = defaultTravelCost;
                 }
             }
-        }
-
-        // If point is inside of grid bounds
-        public bool hasPoint(RoomPoint point)
-        {
-            return point.i >= 0 && point.i < this.rows && point.j >= 0 && point.j < this.cols;
-        }
-
-        public bool hasPoint(int i, int j)
-        {
-            return i >= 0 && i < this.rows && j >= 0 && j < this.cols;
         }
     }
 

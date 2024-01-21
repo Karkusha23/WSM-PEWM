@@ -21,49 +21,19 @@ public static class FloorGenerator
     }
 
     // Struct for storing points on floor grid
-    public struct FloorPoint
+    public class FloorPoint : Point 
     {
-        public int i { get; set; }
-        public int j { get; set; }
-
-        public FloorPoint(int row, int col)
-        {
-            i = row;
-            j = col;
-        }
-
-        public override int GetHashCode()
-        {
-            return (i << 8) | j;
-        }
-    }
+        public FloorPoint(int row, int col) : base(row, col) { }
+    };
 
     // Class for floor grid
-    public class FloorGrid
+    public class FloorGrid : Grid<RoomType>
     {
-        private RoomType[,] grid;
-
-        public RoomType this[int i, int j]
-        {
-            get => grid[i, j];
-            set => grid[i, j] = value;
-        }
-
-        public RoomType this[FloorPoint point]
-        {
-            get => grid[point.i, point.j];
-            set => grid[point.i, point.j] = value;
-        }
-
         public RoomType center
         {
             get => grid[rows / 2, cols / 2];
             set => grid[rows / 2, cols / 2] = value;
         }
-
-        public int rows { get => grid.GetLength(0); }
-
-        public int cols { get => grid.GetLength(1); }
 
         public FloorGrid(int floorHeight, int floorWidth)
         {
@@ -114,11 +84,6 @@ public static class FloorGenerator
             }
 
             grid = tmp;
-        }
-
-        public bool hasPoint(int row, int col)
-        {
-            return row >= 0 && row < rows && col >= 0 && col < cols;
         }
 
         public bool isRoomOccupied(int row, int col)

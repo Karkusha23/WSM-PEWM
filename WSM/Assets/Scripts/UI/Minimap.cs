@@ -1,7 +1,149 @@
+using System.Dynamic;
 using UnityEngine;
 
 public class Minimap : MonoBehaviour
 {
+    public enum MinimapCell : byte
+    {
+        NotExplored, // Room is not explored and not shown in minimap
+        SmallExplored, // Small room explored, but not visited. Shown in minimap as dark cell
+        BigExplored, // Big room core explored, but not visited
+        BigSubunitExplored, // Big room subunit explored, but not visited
+        SmallVisited, // Small room visited. Shown in minimap as bright cell
+        BigVisited, // Big room core visited
+        BigSubunitVisited // Big room subunit visited
+    }
+
+    public static bool isRoomExplored(MinimapCell minimapCell)
+    {
+        switch (minimapCell)
+        {
+            case MinimapCell.SmallExplored:
+            case MinimapCell.BigExplored:
+            case MinimapCell.BigSubunitExplored:
+                return true;
+            default:
+                break;
+        }
+
+        return false;
+    }
+
+    public static bool isRoomVisited(MinimapCell minimapCell)
+    {
+        switch (minimapCell)
+        {
+            case MinimapCell.SmallVisited:
+            case MinimapCell.BigVisited:
+            case MinimapCell.BigSubunitVisited:
+                return true;
+            default:
+                break;
+        }
+
+        return false;
+    }
+
+    // Struct used in minimap grid
+    public struct MinimapTuple
+    {
+        // Type of minimap cell
+        public MinimapCell cell { get; set; }
+
+        // Instance of not explored room icon
+        public GameObject notExplored { get; set; }
+
+        // Instance of explored room icon
+        public GameObject explored { get; set; }
+    }
+
+    public class MinimapGrid : Grid<MinimapTuple>
+    {
+        public MinimapGrid(int floorHeight, int floorWidth)
+        {
+            grid = new MinimapTuple[floorHeight, floorWidth];
+
+            for (int i = 0; i < rows; ++i)
+            {
+                for (int j = 0; j < cols; ++j)
+                {
+                    grid[i, j].cell = MinimapCell.NotExplored;
+                    grid[i, j].notExplored = grid[i, j].explored = null;
+                }
+            }
+        }
+
+        public bool isRoomExplored(int row, int col)
+        {
+            return hasPoint(row, col) && Minimap.isRoomExplored(grid[row, col].cell);
+        }
+
+        public bool isRoomVisited(int row, int col)
+        {
+            return hasPoint(row, col) && Minimap.isRoomVisited(grid[row, col].cell);
+        }
+
+        public void setSmallRoomExplored(int row, int col)
+        {
+            grid[row, col].cell = MinimapCell.SmallExplored;
+        }
+
+        public void setBigRoomExplored(int row, int col)
+        {
+            grid[row, col].cell = MinimapCell.BigExplored;
+            grid[row, col + 1].cell = grid[row + 1, col].cell = grid[row + 1, col + 1].cell = MinimapCell.BigSubunitExplored;
+        }
+
+        public void setSmallRoomVisited(int row, int col)
+        {
+            if (!hasPoint(row, col))
+            {
+                return;
+            }
+
+            grid[row, col].cell = MinimapCell.SmallVisited;
+
+            grid[row, col].explored.SetActive(true);
+            grid[row, col].notExplored.SetActive(false);
+        }
+
+        public void setBigRoomVisited(int row, int col)
+        {
+            if (!(row >= 0 && row < rows - 1 && col >= 0 && col < cols - 1))
+            {
+                return;
+            }
+
+            grid[row, col].cell = MinimapCell.BigVisited;
+            grid[row, col + 1].cell = grid[row + 1, col].cell = grid[row + 1, col + 1].cell = MinimapCell.BigSubunitVisited;
+
+            grid[row, col].explored.SetActive(true);
+            grid[row, col].notExplored.SetActive(false);
+        }
+
+        public void createSmallRoom(int row, int col, GameObject notExploredPrefab, GameObject exploredPrefab, Transform parent, Vector2 offset)
+        {
+            grid[row, col].notExplored = Instantiate(notExploredPrefab, parent);
+            grid[row, col].notExplored.SetActive(false);
+            grid[row, col].notExplored.GetComponent<RectTransform>().anchoredPosition += offset;
+
+            grid[row, col].explored = Instantiate(exploredPrefab, parent);
+            grid[row, col].explored.SetActive(false);
+            grid[row, col].explored.GetComponent<RectTransform>().anchoredPosition += offset;
+        }
+
+        public void createBigRoom(int row, int col, GameObject notExploredPrefab, GameObject exploredPrefab, Transform parent, Vector2 offset)
+        {
+            grid[row, col].notExplored = grid[row, col + 1].notExplored = grid[row + 1, col].notExplored = grid[row + 1, col + 1].notExplored = Instantiate(notExploredPrefab, parent);
+            grid[row, col].notExplored.GetComponent<RectTransform>().anchoredPosition += offset;
+            grid[row, col].notExplored.SetActive(false);
+
+            grid[row, col].explored = grid[row, col + 1].explored = grid[row + 1, col].explored = grid[row + 1, col + 1].explored = Instantiate(exploredPrefab, parent);
+            grid[row, col].explored.GetComponent<RectTransform>().anchoredPosition += offset;
+            grid[row, col].explored.SetActive(false);
+        }
+    }
+
     public int pixHalfARoom = 10;
     public int minimapHeight = 10;
     public int minimapWidth = 10;
@@ -19,19 +161,10 @@ public class Minimap : MonoBehaviour
     [HideInInspector]
     public int floorWidth;
 
-    private byte[,] floorExplored;
-    // 0 - not explored
-    // 1 - explored small room, not visited
-    // 2 - explored big room core, not visited
-    // 3 - explored big room units, not visited
-    // 4 - small room visited
-    // 5 - big room core visited
-    // 6 - big room subuints visited
+    private MinimapGrid minimapGrid;
     private int curRow;
     private int curCol;
     private Transform minimapBase;
-    private GameObject[,] notExploredRooms;
-    private GameObject[,] exploredRooms;
     private int pixARoom;
 
     private void Start()
@@ -45,10 +178,8 @@ public class Minimap : MonoBehaviour
         curRow = floorHeight / 2;
         curCol = floorWidth / 2;
         pixARoom = pixHalfARoom * 2;
-        floorExplored = new byte[floorHeight, floorWidth];
+        minimapGrid = new MinimapGrid(floorHeight, floorWidth);
         minimapBase = transform.Find("MinimapBase");
-        notExploredRooms = new GameObject[floorHeight, floorWidth];
-        exploredRooms = new GameObject[floorHeight, floorWidth];
         for (int i = 0; i < floorHeight; ++i)
         {
             for (int j = 0; j < floorWidth; ++j)
@@ -57,32 +188,19 @@ public class Minimap : MonoBehaviour
                 {
                     Vector2 newSmallRoomOffset = new Vector2((j - floorWidth / 2) * pixARoom, (floorHeight / 2 - i) * pixARoom);
 
-                    notExploredRooms[i, j] = Instantiate(smallRoomNotExploredPrefab, minimapBase);
-                    notExploredRooms[i, j].SetActive(false);
-                    notExploredRooms[i, j].GetComponent<RectTransform>().anchoredPosition += newSmallRoomOffset;
-
-                    exploredRooms[i, j] = Instantiate(smallRoomExploredPrefab, minimapBase);
-                    exploredRooms[i, j].SetActive(false);
-                    exploredRooms[i, j].GetComponent<RectTransform>().anchoredPosition += newSmallRoomOffset;
+                    minimapGrid.createSmallRoom(i, j, smallRoomNotExploredPrefab, smallRoomExploredPrefab, minimapBase, newSmallRoomOffset);
                 }
                 else if (floorGrid.isRoomBig(i, j))
                 {
                     Vector2 newBigRoomOffset = new Vector2((j - floorWidth / 2) * pixARoom + pixHalfARoom, (floorHeight / 2 - i) * pixARoom - pixHalfARoom);
 
-                    notExploredRooms[i, j] = notExploredRooms[i, j + 1] = notExploredRooms[i + 1, j] = notExploredRooms[i + 1, j + 1] = Instantiate(bigRoomNotExploredPrefab, minimapBase);
-                    exploredRooms[i, j] = exploredRooms[i, j + 1] = exploredRooms[i + 1, j] = exploredRooms[i + 1, j + 1] = Instantiate(bigRoomExploredPrefab, minimapBase);
+                    minimapGrid.createBigRoom(i, j, bigRoomNotExploredPrefab, bigRoomExploredPrefab, minimapBase, newBigRoomOffset);
 
                     if (floorGrid[i, j] == FloorGenerator.RoomType.Boss)
                     {
-                        Instantiate(bossIconPrefab, notExploredRooms[i, j].transform.position, Quaternion.identity, notExploredRooms[i, j].transform);
-                        Instantiate(bossIconPrefab, exploredRooms[i, j].transform.position, Quaternion.identity, exploredRooms[i, j].transform);
+                        Instantiate(bossIconPrefab, minimapGrid[i, j].notExplored.transform.position, Quaternion.identity, minimapGrid[i, j].notExplored.transform);
+                        Instantiate(bossIconPrefab, minimapGrid[i, j].explored.transform.position, Quaternion.identity, minimapGrid[i, j].explored.transform);
                     }
-
-                    notExploredRooms[i, j].GetComponent<RectTransform>().anchoredPosition += newBigRoomOffset;
-                    exploredRooms[i, j].GetComponent<RectTransform>().anchoredPosition += newBigRoomOffset;
-
-                    notExploredRooms[i, j].SetActive(false);
-                    exploredRooms[i, j].SetActive(false);
                 }
 
             }
@@ -93,24 +211,20 @@ public class Minimap : MonoBehaviour
     {
         int row = floorHeight / 2 - Mathf.RoundToInt(roomPos.y / Floor.roomHeight);
         int col = floorWidth / 2 + Mathf.RoundToInt(roomPos.x / Floor.roomWidth);
-        if (floorExplored[row, col] < 4)
+        if (!minimapGrid.isRoomVisited(row, col))
         {
             if (floorGrid.isRoomSmall(row, col))
             {
-                floorExplored[row, col] = 4;
+                minimapGrid.setSmallRoomVisited(row, col);
 
                 checkSmallAround(row, col);
             }
             else if (floorGrid.isRoomBig(row, col))
             {
-                floorExplored[row, col] = 5;
-                floorExplored[row, col + 1] = floorExplored[row + 1, col] = floorExplored[row + 1, col + 1] = 6;
+                minimapGrid.setBigRoomVisited(row, col);
 
                 checkBigAround(row, col);
             }
-
-            exploredRooms[row, col].SetActive(true);
-            notExploredRooms[row, col].SetActive(false);
         }
 
         minimapBase.GetComponent<RectTransform>().anchoredPosition += new Vector2((curCol - col) * pixARoom, (row - curRow) * pixARoom);
@@ -142,34 +256,30 @@ public class Minimap : MonoBehaviour
 
     private void checkCell(int row, int col)
     {
-        if (floorExplored[row, col] == 0 && floorGrid.isRoomOccupied(row, col))
+        if (minimapGrid[row, col].cell == MinimapCell.NotExplored && floorGrid.isRoomOccupied(row, col))
         {
-            notExploredRooms[row, col].SetActive(true);
+            minimapGrid[row, col].notExplored.SetActive(true);
             if (floorGrid.isRoomSmall(row, col))
             {
-                floorExplored[row, col] = 1;
+                minimapGrid.setSmallRoomExplored(row, col);
             }
             else if (floorGrid.isRoomSmall(row, col))
             {
-                floorExplored[row, col] = 2;
-                floorExplored[row, col + 1] = floorExplored[row + 1, col] = floorExplored[row + 1, col + 1] = 3;
+                minimapGrid.setBigRoomExplored(row, col);
             }
             else if (floorGrid[row, col] == FloorGenerator.RoomType.BigSubunit)
             {
                 if (floorGrid.isRoomBig(row, col - 1))
                 {
-                    floorExplored[row, col - 1] = 2;
-                    floorExplored[row, col] = floorExplored[row + 1, col - 1] = floorExplored[row + 1, col] = 3;
+                    minimapGrid.setBigRoomExplored(row, col - 1);
                 }
                 else if (floorGrid.isRoomBig(row - 1, col))
                 {
-                    floorExplored[row - 1, col] = 2;
-                    floorExplored[row - 1, col + 1] = floorExplored[row, col] = floorExplored[row, col + 1] = 3;
+                    minimapGrid.setBigRoomExplored(row - 1, col);
                 }
                 else
                 {
-                    floorExplored[row - 1, col - 1] = 2;
-                    floorExplored[row - 1, col] = floorExplored[row, col - 1] = floorExplored[row, col] = 3;
+                    minimapGrid.setBigRoomExplored(row - 1, col - 1);
                 }
             }
         }
@@ -181,23 +291,23 @@ public class Minimap : MonoBehaviour
         {
             for (int j = 0; j < floorWidth; ++j)
             {
-                if (floorExplored[i, j] > 0)
+                if (minimapGrid[i, j].cell != MinimapCell.NotExplored)
                 {
                     if (Mathf.Abs(i - curRow) <= minimapHeight / 2 - 1 && Mathf.Abs(j - curCol) <= minimapWidth / 2 - 1)
                     {
-                        if (floorExplored[i, j] >= 1 && floorExplored[i, j] <= 3)
+                        if (minimapGrid.isRoomExplored(i, j))
                         {
-                            notExploredRooms[i, j].SetActive(true);
+                            minimapGrid[i, j].notExplored.SetActive(true);
                         }
-                        else if (floorExplored[i, j] >= 4 && floorExplored[i, j] <= 6)
+                        else if (minimapGrid.isRoomVisited(i, j))
                         {
-                            exploredRooms[i, j].SetActive(true);
+                            minimapGrid[i, j].explored.SetActive(true);
                         }
                     }
                     else
                     {
-                        notExploredRooms[i, j].SetActive(false);
-                        exploredRooms[i, j].SetActive(false);
+                        minimapGrid[i, j].notExplored.SetActive(false);
+                        minimapGrid[i, j].explored.SetActive(false);
                     }
                 }
             }
