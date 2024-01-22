@@ -103,7 +103,7 @@ MonoBehaviour:
   direction: {x: 1, y: -1}
   angleOffset: 90
   bulletPrefab: {fileID: 3239862130681951045, guid: 53666d4f76fd6d34b875a01f19bf4501, type: 3}
-  bulletSpeed: 15
+  bulletSpeed: 20
   reloadTimeMult: 1
   damageMult: 1
   canPlayerControlWeapon: 1

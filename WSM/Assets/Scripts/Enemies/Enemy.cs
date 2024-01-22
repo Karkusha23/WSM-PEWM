@@ -44,10 +44,7 @@ public abstract class Enemy : MonoBehaviour
     public bool HasReachedPathEnd { get => hasReachedPathEnd; }
 
     // Called activationTime seconds after spawning
-    protected virtual void onActivation()
-    {
-        canAct = true;
-    }
+    protected virtual void onActivation() { }
 
     // Defines to which point enemy is going to build paths
     // Default is player position
@@ -180,6 +177,7 @@ public abstract class Enemy : MonoBehaviour
         {
             StartCoroutine("findingPathSequence");
         }
+        canAct = true;
         onActivation();
     }
 

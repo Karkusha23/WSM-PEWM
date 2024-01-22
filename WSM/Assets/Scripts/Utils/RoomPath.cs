@@ -1,9 +1,6 @@
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Playables;
-using static RoomPath;
 
 // Static class that implements pathfinding algorithms and structs that are being used in them
 
@@ -66,7 +63,7 @@ public static class RoomPath
             }
             else if (roomType == RoomType.BigRoom)
             {
-                grid = new byte[roomTileHeightCount * 2, roomTileWidthCount * 2];
+                grid = new byte[roomTileHeightCount * 2 + 1, roomTileWidthCount * 2 + 1];
             }
             else
             {
@@ -518,6 +515,7 @@ public static class RoomPath
             }
         }
 
+        // if we already stay in potentinal end point
         if (travablePoints.Contains(start))
         {
             if (RoomPoint.Distance(start, sightPoint) >= maxDistance - 1.0f)
@@ -525,6 +523,7 @@ public static class RoomPath
                 return BuildPath(start, start, roomGrid);
             }
 
+            // Remove points that are on the other side of our goal
             travablePoints.RemoveWhere(x => IsFacingSameDirection(start, sightPoint, x));
         }
 
@@ -705,7 +704,7 @@ public static class RoomPath
         return neighbors;
     }
 
-    // Returns list of nearest nodes that are avaliable for travel
+    // Returns list of nearest points that are avaliable for travel
     private static List<RoomPoint> findNeighbors(RoomPoint point, RoomGrid roomGrid)
     {
         var neighbors = new List<RoomPoint>();
@@ -756,6 +755,7 @@ public static class RoomPath
         return neighbors;
     }
 
+    // If nearby space is travable. Using fractional room position and actor size 
     private static bool IsNeighborhoodTravable(float row, float col, RoomGrid roomGrid, int maxTravelCost)
     {
         var rows = new List<int>();
@@ -805,6 +805,7 @@ public static class RoomPath
         return roomGrid.hasPoint(row, col) && roomGrid[row, col] > 0 && (maxTravelCost == 0 || !(roomGrid[row, col] > maxTravelCost));
     }
 
+    // If end1 and end2 points are in same direction looking from start point
     private static bool IsFacingSameDirection(RoomPoint start, RoomPoint end1, RoomPoint end2)
     {
         Vector2 startVec = RoomPointToLocal(start);

@@ -1,4 +1,3 @@
-using System.Dynamic;
 using UnityEngine;
 
 public class Minimap : MonoBehaviour
@@ -150,18 +149,18 @@ public class Minimap : MonoBehaviour
 
     public GameObject smallRoomNotExploredPrefab;
     public GameObject smallRoomExploredPrefab;
+    public GameObject itemRoomNotExploredPrefab;
+    public GameObject itemRoomExploredPrefab;
     public GameObject bigRoomNotExploredPrefab;
     public GameObject bigRoomExploredPrefab;
     public GameObject bossIconPrefab;
 
-    [HideInInspector]
-    public FloorGenerator.FloorGrid floorGrid;
-    [HideInInspector]
-    public int floorHeight;
-    [HideInInspector]
-    public int floorWidth;
-
     private MinimapGrid minimapGrid;
+    private FloorGenerator.FloorGrid floorGrid;
+
+    private int floorHeight;
+    private int floorWidth;
+
     private int curRow;
     private int curCol;
     private Transform minimapBase;
@@ -188,7 +187,14 @@ public class Minimap : MonoBehaviour
                 {
                     Vector2 newSmallRoomOffset = new Vector2((j - floorWidth / 2) * pixARoom, (floorHeight / 2 - i) * pixARoom);
 
-                    minimapGrid.createSmallRoom(i, j, smallRoomNotExploredPrefab, smallRoomExploredPrefab, minimapBase, newSmallRoomOffset);
+                    if (floorGrid[i, j] == FloorGenerator.RoomType.Item)
+                    {
+                        minimapGrid.createSmallRoom(i, j, itemRoomNotExploredPrefab, itemRoomExploredPrefab, minimapBase, newSmallRoomOffset);
+                    }
+                    else
+                    {
+                        minimapGrid.createSmallRoom(i, j, smallRoomNotExploredPrefab, smallRoomExploredPrefab, minimapBase, newSmallRoomOffset);
+                    }
                 }
                 else if (floorGrid.isRoomBig(i, j))
                 {
