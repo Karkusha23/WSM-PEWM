@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1820597460}
   - component: {fileID: 1820597461}
-  - component: {fileID: 579386896}
   m_Layer: 0
   m_Name: Boss1Weapon
   m_TagString: Untagged
@@ -58,8 +57,8 @@ MonoBehaviour:
   - 3
   - 3
   attackTimeBetweenShots:
+  - 0.1
   - 0.05
-  - 0.025
   attackBulletSpeed:
   - 5
   - 7
@@ -67,26 +66,6 @@ MonoBehaviour:
   maxBulSpeedScale: 1.2
   maxBulDirectionDeviation: 1.5
   EnemyBullet: {fileID: 3239862130681951045, guid: 968b415287c1da04e99413c21c2792c3, type: 3}
---- !u!95 &579386896
-Animator:
-  serializedVersion: 4
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1820597459}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 3274ca78bedbb0f45adc2014f57a677b, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!1 &908353080552381990
 GameObject:
   m_ObjectHideFlags: 0
@@ -314,6 +293,10 @@ PrefabInstance:
     - target: {fileID: 211350373683881711, guid: feb7a32c35080fe479aceee777c98f03, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6596493635877446945, guid: feb7a32c35080fe479aceee777c98f03, type: 3}
+      propertyPath: m_RootOrder
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: -4457360368958818946, guid: feb7a32c35080fe479aceee777c98f03, type: 3}
@@ -650,6 +633,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6596493635877446945, guid: feb7a32c35080fe479aceee777c98f03, type: 3}
+      propertyPath: m_RootOrder
+      value: 2
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: -4457360368958818946, guid: feb7a32c35080fe479aceee777c98f03, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: feb7a32c35080fe479aceee777c98f03, type: 3}
@@ -732,6 +719,10 @@ PrefabInstance:
     - target: {fileID: 211350373683881711, guid: feb7a32c35080fe479aceee777c98f03, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6596493635877446945, guid: feb7a32c35080fe479aceee777c98f03, type: 3}
+      propertyPath: m_RootOrder
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: -4457360368958818946, guid: feb7a32c35080fe479aceee777c98f03, type: 3}
@@ -872,6 +863,10 @@ PrefabInstance:
     - target: {fileID: 211350373683881711, guid: feb7a32c35080fe479aceee777c98f03, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6596493635877446945, guid: feb7a32c35080fe479aceee777c98f03, type: 3}
+      propertyPath: m_RootOrder
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: -4457360368958818946, guid: feb7a32c35080fe479aceee777c98f03, type: 3}

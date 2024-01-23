@@ -4,10 +4,10 @@ using System.Collections;
 public class Boss1 : MonoBehaviour
 {
     public GameObject enemyWeapon;
-    public float enemyHealth;
-    public float enemySpeed;
-    public float refreshPlayerPosTime;
-    public float betweenAttacksTime;
+    public float enemyHealth = 30.0f;
+    public float enemySpeed = 0.5f;
+    public float refreshPlayerPosTime = 0.5f;
+    public float betweenAttacksTime = 1.0f;
     public GameObject bossHealthBar;
 
     private Rigidbody2D rb;

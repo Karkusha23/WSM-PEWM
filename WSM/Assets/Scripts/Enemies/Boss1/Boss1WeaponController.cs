@@ -3,17 +3,17 @@ using System.Collections;
 
 public class Boss1WeaponController : MonoBehaviour
 {
-    public float spearsOffset;
-    public float rotationSpeed;
-    public float spearsDumping;
-    public float changeDistance;
-    public float spearsRotationDumping;
-    public float[] attackDuration;
-    public float[] attackTimeBetweenShots;
-    public float[] attackBulletSpeed;
-    public float minBulSpeedScale;
-    public float maxBulSpeedScale;
-    public float maxBulDirectionDeviation;
+    public float spearsOffset = 90.0f;
+    public float rotationSpeed = 400.0f;
+    public float spearsDumping = 5.0f;
+    public float changeDistance = 0.005f;
+    public float spearsRotationDumping = 10.0f;
+    public float[] attackDuration = { 3.0f, 3.0f };
+    public float[] attackTimeBetweenShots = { 0.1f, 0.05f };
+    public float[] attackBulletSpeed = { 5.0f, 7.0f };
+    public float minBulSpeedScale = 1.0f;
+    public float maxBulSpeedScale = 1.2f;
+    public float maxBulDirectionDeviation = 1.5f;
     public GameObject EnemyBullet;
 
     private GameObject[] spears;

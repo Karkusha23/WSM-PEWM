@@ -107,6 +107,11 @@ public class Player : MonoBehaviour
         {
             dropWeaponTimer = 0f;
         }
+
+        if (Input.GetKeyDown(KeyCode.Tab))
+        {
+            minimap.toggleFullMap();
+        }
     }
 
     private void FixedUpdate()

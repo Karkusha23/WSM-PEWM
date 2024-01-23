@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 public class Minimap : MonoBehaviour
 {
@@ -143,9 +144,13 @@ public class Minimap : MonoBehaviour
         }
     }
 
-    public int pixHalfARoom = 10;
-    public int minimapHeight = 10;
-    public int minimapWidth = 10;
+    public const int pixHalfARoom = 10;
+    public const int pixARoom = pixHalfARoom * 2;
+
+    public const int minimapHeight = 10;
+    public const int minimapWidth = 10;
+
+    public const float fullMapToggleReloadTime = 0.1f;
 
     public GameObject smallRoomNotExploredPrefab;
     public GameObject smallRoomExploredPrefab;
@@ -155,6 +160,10 @@ public class Minimap : MonoBehaviour
     public GameObject bigRoomExploredPrefab;
     public GameObject bossIconPrefab;
 
+    public bool IsFullMapOn { get => isFullMapOn; }
+
+    private bool isFullMapOn;
+
     private MinimapGrid minimapGrid;
     private FloorGenerator.FloorGrid floorGrid;
 
@@ -163,8 +172,13 @@ public class Minimap : MonoBehaviour
 
     private int curRow;
     private int curCol;
-    private Transform minimapBase;
-    private int pixARoom;
+    private RectTransform playerIcon;
+    private RectTransform minimapBase;
+    private GameObject frame;
+
+    private Vector2 minimapBasePosition;
+
+    private bool canToggleMinimap;
 
     private void Start()
     {
@@ -176,9 +190,18 @@ public class Minimap : MonoBehaviour
 
         curRow = floorHeight / 2;
         curCol = floorWidth / 2;
-        pixARoom = pixHalfARoom * 2;
+
+        isFullMapOn = false;
+        canToggleMinimap = true;
+
         minimapGrid = new MinimapGrid(floorHeight, floorWidth);
-        minimapBase = transform.Find("MinimapBase");
+
+        minimapBase = transform.Find("MinimapBase").GetComponent<RectTransform>();
+        playerIcon = minimapBase.Find("Player").GetComponent<RectTransform>();
+        frame = transform.Find("Frame").gameObject;
+
+        minimapBasePosition = minimapBase.anchoredPosition;
+
         for (int i = 0; i < floorHeight; ++i)
         {
             for (int j = 0; j < floorWidth; ++j)
@@ -233,11 +256,53 @@ public class Minimap : MonoBehaviour
             }
         }
 
-        minimapBase.GetComponent<RectTransform>().anchoredPosition += new Vector2((curCol - col) * pixARoom, (row - curRow) * pixARoom);
+        Vector2 minimapMove = new Vector2((curCol - col) * pixARoom, (row - curRow) * pixARoom);
+
+        if (!isFullMapOn)
+        {
+            minimapBase.anchoredPosition += minimapMove;
+        }
+        else
+        {
+            minimapBasePosition += minimapMove;
+        }
+
+        playerIcon.anchoredPosition -= minimapMove;
+
+        Debug.Log(minimapMove);
+
         curRow = row;
         curCol = col;
 
-        checkToActivate();
+        checkToActivate(false);
+    }
+
+    public void toggleFullMap()
+    {
+        if (!canToggleMinimap)
+        {
+            return;
+        }
+
+        canToggleMinimap = false;
+
+        isFullMapOn = !isFullMapOn;
+
+        if (isFullMapOn)
+        {
+            minimapBasePosition = minimapBase.anchoredPosition;
+            minimapBase.transform.position = transform.parent.position;
+        }
+        else
+        {
+            minimapBase.anchoredPosition = minimapBasePosition;
+        }
+
+        frame.SetActive(!isFullMapOn);
+
+        checkToActivate(isFullMapOn);
+
+        StartCoroutine("fullMapToggleReload");
     }
 
     private void checkSmallAround(int row, int col)
@@ -262,6 +327,11 @@ public class Minimap : MonoBehaviour
 
     private void checkCell(int row, int col)
     {
+        if (!minimapGrid.hasPoint(row, col))
+        {
+            return;
+        }
+
         if (minimapGrid[row, col].cell == MinimapCell.NotExplored && floorGrid.isRoomOccupied(row, col))
         {
             minimapGrid[row, col].notExplored.SetActive(true);
@@ -291,7 +361,7 @@ public class Minimap : MonoBehaviour
         }
     }
 
-    private void checkToActivate()
+    private void checkToActivate(bool showAllMap)
     {
         for (int i = 0; i < floorHeight; ++i)
         {
@@ -299,7 +369,7 @@ public class Minimap : MonoBehaviour
             {
                 if (minimapGrid[i, j].cell != MinimapCell.NotExplored)
                 {
-                    if (Mathf.Abs(i - curRow) <= minimapHeight / 2 - 1 && Mathf.Abs(j - curCol) <= minimapWidth / 2 - 1)
+                    if (showAllMap || Mathf.Abs(i - curRow) <= minimapHeight / 2 - 1 && Mathf.Abs(j - curCol) <= minimapWidth / 2 - 1)
                     {
                         if (minimapGrid.isRoomExplored(i, j))
                         {
@@ -318,5 +388,11 @@ public class Minimap : MonoBehaviour
                 }
             }
         }
+    }
+
+    private IEnumerator fullMapToggleReload()
+    {
+        yield return new WaitForSeconds(fullMapToggleReloadTime);
+        canToggleMinimap = true;
     }
 }
