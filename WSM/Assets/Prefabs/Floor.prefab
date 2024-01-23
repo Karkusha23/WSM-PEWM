@@ -58,6 +58,8 @@ MonoBehaviour:
   smallLoadouts:
   - {fileID: 11400000, guid: 6397f6ef160481a47a2228b7ec7b81a7, type: 2}
   - {fileID: 11400000, guid: cf146f8e9c3463d4d946ea78c917ae78, type: 2}
+  - {fileID: 11400000, guid: c1e44e1656e0ceb439c5db41e11f574a, type: 2}
+  - {fileID: 11400000, guid: a0c1d6ee40800574786fa0b45f38d5c4, type: 2}
   bigLoadouts:
   - {fileID: 11400000, guid: b91115882f6839141892d4d65db132e4, type: 2}
   bossLoadouts:

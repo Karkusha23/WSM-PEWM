@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d65055952ec93bd4090c801c56f65980, type: 3}
+  m_Name: Room5
+  m_EditorClassIdentifier: 
+  loadout:
+  - prefab: {fileID: 3399728581602776512, guid: 9cb7e639c8c8d2d4eb28c51badb6c0ed, type: 3}
+    row: 2
+    col: 0
+  - prefab: {fileID: 3399728581602776512, guid: 9cb7e639c8c8d2d4eb28c51badb6c0ed, type: 3}
+    row: 2
+    col: 1
+  - prefab: {fileID: 3399728581602776512, guid: 9cb7e639c8c8d2d4eb28c51badb6c0ed, type: 3}
+    row: 2
+    col: 2
+  - prefab: {fileID: 3399728581602776512, guid: 9cb7e639c8c8d2d4eb28c51badb6c0ed, type: 3}
+    row: 2
+    col: 3
+  - prefab: {fileID: 3399728581602776512, guid: 9cb7e639c8c8d2d4eb28c51badb6c0ed, type: 3}
+    row: 2
+    col: 4
+  - prefab: {fileID: 3399728581602776512, guid: 9cb7e639c8c8d2d4eb28c51badb6c0ed, type: 3}
+    row: 2
+    col: 5
+  - prefab: {fileID: 3399728581602776512, guid: 9cb7e639c8c8d2d4eb28c51badb6c0ed, type: 3}
+    row: 1
+    col: 5
+  - prefab: {fileID: 3399728581602776512, guid: 9cb7e639c8c8d2d4eb28c51badb6c0ed, type: 3}
+    row: 0
+    col: 5
+  - prefab: {fileID: 3399728581602776512, guid: 9cb7e639c8c8d2d4eb28c51badb6c0ed, type: 3}
+    row: 0
+    col: 9
+  - prefab: {fileID: 3399728581602776512, guid: 9cb7e639c8c8d2d4eb28c51badb6c0ed, type: 3}
+    row: 1
+    col: 9
+  - prefab: {fileID: 3399728581602776512, guid: 9cb7e639c8c8d2d4eb28c51badb6c0ed, type: 3}
+    row: 2
+    col: 9
+  - prefab: {fileID: 3399728581602776512, guid: 9cb7e639c8c8d2d4eb28c51badb6c0ed, type: 3}
+    row: 2
+    col: 10
+  - prefab: {fileID: 3399728581602776512, guid: 9cb7e639c8c8d2d4eb28c51badb6c0ed, type: 3}
+    row: 2
+    col: 11
+  - prefab: {fileID: 3399728581602776512, guid: 9cb7e639c8c8d2d4eb28c51badb6c0ed, type: 3}
+    row: 2
+    col: 12
+  - prefab: {fileID: 3399728581602776512, guid: 9cb7e639c8c8d2d4eb28c51badb6c0ed, type: 3}
+    row: 2
+    col: 13
+  - prefab: {fileID: 3399728581602776512, guid: 9cb7e639c8c8d2d4eb28c51badb6c0ed, type: 3}
+    row: 2
+    col: 14

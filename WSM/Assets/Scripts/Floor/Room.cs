@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Security.Principal;
 using UnityEngine;
 
 public class Room : MonoBehaviour
@@ -15,6 +16,10 @@ public class Room : MonoBehaviour
 
     // Time between enemy spawning when entering room
     public const float timeBetweenEnemySpawn = 0.2f;
+
+    public int tileHeight { get => roomType == RoomPath.RoomType.BigRoom ? RoomPath.bigRoomTileHeightCount : RoomPath.roomTileHeightCount; }
+
+    public int tileWidth { get => roomType == RoomPath.RoomType.BigRoom ? RoomPath.bigRoomTileWidthCount : RoomPath.roomTileWidthCount; }
 
     private int enemyCount;
     private bool isActivated;
@@ -124,8 +129,13 @@ public class Room : MonoBehaviour
         if (enemyCount <= 0)
         {
             openDoors();
-            Instantiate(roomDrops[Random.Range(0, roomDrops.Count)], roomType == RoomPath.RoomType.BigRoom ? transform.position + bigRoomOffset : transform.position, Quaternion.identity);
+            spawnRoomReward();
         }
+    }
+
+    public void spawnRoomReward()
+    {
+        Instantiate(roomDrops[Random.Range(0, roomDrops.Count)], RoomPath.RoomPointToLocal(RoomPath.GetFreeCenterPoint(roomGrid)) + transform.position, Quaternion.identity);
     }
 
     private IEnumerator spawnEnemies()

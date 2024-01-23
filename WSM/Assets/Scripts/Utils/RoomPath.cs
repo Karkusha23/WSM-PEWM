@@ -9,6 +9,10 @@ public static class RoomPath
     // Room size consts
     public const int roomTileWidthCount = 15;
     public const int roomTileHeightCount = 9;
+
+    public const int bigRoomTileWidthCount = roomTileWidthCount * 2 + 1;
+    public const int bigRoomTileHeightCount = roomTileHeightCount * 2 + 1;
+
     public const float tileSize = 1.2f;
 
     // Size of actor box collider divided by tile size
@@ -63,7 +67,7 @@ public static class RoomPath
             }
             else if (roomType == RoomType.BigRoom)
             {
-                grid = new byte[roomTileHeightCount * 2 + 1, roomTileWidthCount * 2 + 1];
+                grid = new byte[bigRoomTileHeightCount, bigRoomTileWidthCount];
             }
             else
             {
@@ -546,6 +550,54 @@ public static class RoomPath
     public static Path BuildPathToPointWithSightOn(Vector3 start, Vector3 sightPoint, RoomGrid roomGrid, float maxDistance)
     {
         return BuildPathToPointWithSightOn(LocalToRoomPoint(start), LocalToRoomPoint(sightPoint), roomGrid, maxDistance);
+    }
+
+    // Returns point that is not wall and is nearest to the center
+    public static RoomPoint GetFreeCenterPoint(RoomGrid roomGrid)
+    {
+        var openList = new HashSet<RoomPoint>();
+        openList.Add(new RoomPoint(roomGrid.rows / 2, roomGrid.cols / 2));
+
+        var closedList = new HashSet<RoomPoint>();
+
+        while (openList.Count > 0)
+        {
+            RoomPoint point = openList.First();
+            openList.Remove(point);
+
+            if (roomGrid[point] > 0)
+            {
+                return point;
+            }
+
+            closedList.Add(point);
+
+            point = new RoomPoint(point.i + 1, point.j);
+            if (!openList.Contains(point) && !closedList.Contains(point) && roomGrid.hasPoint(point))
+            {
+                openList.Add(point);
+            }
+
+            point = new RoomPoint(point.i - 1, point.j);
+            if (!openList.Contains(point) && !closedList.Contains(point) && roomGrid.hasPoint(point))
+            {
+                openList.Add(point);
+            }
+
+            point = new RoomPoint(point.i, point.j + 1);
+            if (!openList.Contains(point) && !closedList.Contains(point) && roomGrid.hasPoint(point))
+            {
+                openList.Add(point);
+            }
+
+            point = new RoomPoint(point.i, point.j - 1);
+            if (!openList.Contains(point) && !closedList.Contains(point) && roomGrid.hasPoint(point))
+            {
+                openList.Add(point);
+            }
+        }
+
+        return new RoomPoint(roomGrid.rows / 2, roomGrid.cols / 2);
     }
 
     // Class used in A* algorithm
