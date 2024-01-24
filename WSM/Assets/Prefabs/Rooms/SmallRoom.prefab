@@ -470,8 +470,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7288156958747843772}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -18.409704, y: 26.984303, z: 0}
-  m_LocalScale: {x: 1.2, y: 1.2, z: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7288156959392809849}
@@ -490,12 +490,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1f20179ea5611045a373a982423f175, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  debugPrefab: {fileID: 3239862130681951045, guid: 53666d4f76fd6d34b875a01f19bf4501, type: 3}
-  loadout: {fileID: 0}
+  layout: {fileID: 0}
   roomDrops:
   - {fileID: 0}
   doors: []
   invincibleTime: 1
+  roomType: 0
 --- !u!61 &3700888113171833834
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -520,7 +520,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 14, y: 8}
+  m_Size: {x: 16.8, y: 9.6}
   m_EdgeRadius: 0
 --- !u!1 &7288156959392809848
 GameObject:
@@ -548,7 +548,7 @@ Transform:
   m_GameObject: {fileID: 7288156959392809848}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 16, y: 10, z: 1}
+  m_LocalScale: {x: 19.2, y: 12, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7288156959518214383}
