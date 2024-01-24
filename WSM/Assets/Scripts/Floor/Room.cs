@@ -1,11 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Security.Principal;
 using UnityEngine;
 
 public class Room : MonoBehaviour
 {
-    public RoomLoadout loadout;
+    public RoomLayout layout;
     public List<GameObject> roomDrops;
     public List<GameObject> doors;
     public float invincibleTime;
@@ -22,15 +21,17 @@ public class Room : MonoBehaviour
     public int tileWidth { get => roomType == RoomPath.RoomType.BigRoom ? RoomPath.bigRoomTileWidthCount : RoomPath.roomTileWidthCount; }
 
     private int enemyCount;
+    private bool isPropsSpawned;
     private bool isActivated;
     private CameraController camcon;
     private Vector3 bigRoomOffset;
 
-    private List<RoomLoadout.LoadoutUnit> enemyLoadout;
+    private List<RoomLayout.ObjectPoint> enemyLayout;
 
     private void Start()
     {
         bigRoomOffset = new Vector3(Floor.roomWidth / 2.0f, -Floor.roomHeight, 0f);
+        isPropsSpawned = false;
         if (CompareTag("SmallRoom"))
         {
             roomType = RoomPath.RoomType.SmallRoom;
@@ -70,7 +71,7 @@ public class Room : MonoBehaviour
                 case RoomPath.RoomType.None:
                     break;
             }
-            if (loadout != null && !isActivated)
+            if (layout != null && !isActivated)
             {
                 activateEnemyRoom(other.gameObject);
             }
@@ -89,36 +90,30 @@ public class Room : MonoBehaviour
 
     public void spawnProps()
     {
-        if (loadout == null || enemyLoadout != null)
+        if (layout == null)
         {
             return;
         }
-        enemyLoadout = new List<RoomLoadout.LoadoutUnit>();
         roomGrid = new RoomPath.RoomGrid(roomType);
-        foreach (var loadoutUnit in loadout.loadout)
+        foreach (var layoutUnit in layout.getProps())
         {
-            if (loadoutUnit.prefab.CompareTag("Enemy"))
-            {
-                enemyLoadout.Add(loadoutUnit);
-            }
-            else
-            {
-                Instantiate(loadoutUnit.prefab, transform.position + RoomPath.RoomPointToLocal(loadoutUnit.row, loadoutUnit.col), Quaternion.identity, transform);
-                roomGrid[loadoutUnit.row, loadoutUnit.col] = getTravelingCost(loadoutUnit.prefab);
-            }
+            Instantiate(layoutUnit.obj, transform.position + RoomPath.RoomPointToLocal(layoutUnit.point.row, layoutUnit.point.col), Quaternion.identity, transform);
+            roomGrid[layoutUnit.point.row, layoutUnit.point.col] = getTravelingCost(layoutUnit.obj);
         }
+        isPropsSpawned = true;
     }
 
     public void activateEnemyRoom(GameObject player)
     {
-        if (enemyLoadout == null)
+        if (!isPropsSpawned)
         {
             spawnProps();
         }
         player.GetComponent<Player>().setInvincible(invincibleTime);
         lockDoors();
         isActivated = true;
-        enemyCount = enemyLoadout.Count;
+        enemyLayout = layout.getEnemies();
+        enemyCount = enemyLayout.Count;
         StartCoroutine("spawnEnemies");
     }
 
@@ -140,9 +135,9 @@ public class Room : MonoBehaviour
 
     private IEnumerator spawnEnemies()
     {
-        foreach (var enemyLoadoutUnit in enemyLoadout)
+        foreach (var layoutUnit in enemyLayout)
         {
-            Instantiate(enemyLoadoutUnit.prefab, transform.position + RoomPath.RoomPointToLocal(enemyLoadoutUnit.row, enemyLoadoutUnit.col), Quaternion.identity, transform);
+            Instantiate(layoutUnit.obj, transform.position + RoomPath.RoomPointToLocal(layoutUnit.point.row, layoutUnit.point.col), Quaternion.identity, transform);
             yield return new WaitForSeconds(timeBetweenEnemySpawn);
         }
     }

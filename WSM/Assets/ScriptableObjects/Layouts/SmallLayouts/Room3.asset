@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 686d02383c2878349b61b7d32eb663b7, type: 3}
-  m_Name: Room2
+  m_Name: Room3
   m_EditorClassIdentifier: 
   layout:
   - obj: {fileID: 3399728581602776512, guid: 9cb7e639c8c8d2d4eb28c51badb6c0ed, type: 3}
@@ -18,7 +18,11 @@ MonoBehaviour:
     points:
     - row: 2
       col: 3
-  - obj: {fileID: 8768637141398408717, guid: 9c06c5e99c41df34e8ffe4fb4abab4f4, type: 3}
+    - row: 2
+      col: 4
+    - row: 3
+      col: 3
+  - obj: {fileID: 4081609876960264284, guid: ad04bcd936384894b9b232f7afd088fd, type: 3}
     symmetryType: 0
     points:
     - row: 4

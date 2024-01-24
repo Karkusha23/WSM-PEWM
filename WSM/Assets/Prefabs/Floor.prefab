@@ -55,15 +55,16 @@ MonoBehaviour:
   bigRoomPrefab: {fileID: 2322337418231900787, guid: e7b006119d6f79a44a0a0b59b7946fbd, type: 3}
   doorPrefab: {fileID: 2980541394161524617, guid: 9f5b4032567f5f84687c48d05a1d50c4, type: 3}
   wallPlugPrefab: {fileID: 6542898871119334974, guid: d5e7e321bf02efa418c3c731acf458b3, type: 3}
-  smallLoadouts:
-  - {fileID: 11400000, guid: 6397f6ef160481a47a2228b7ec7b81a7, type: 2}
-  - {fileID: 11400000, guid: cf146f8e9c3463d4d946ea78c917ae78, type: 2}
-  - {fileID: 11400000, guid: c1e44e1656e0ceb439c5db41e11f574a, type: 2}
-  - {fileID: 11400000, guid: a0c1d6ee40800574786fa0b45f38d5c4, type: 2}
-  bigLoadouts:
-  - {fileID: 11400000, guid: b91115882f6839141892d4d65db132e4, type: 2}
-  bossLoadouts:
-  - {fileID: 11400000, guid: 896bc78445cf9d64aa8ff697c7af9aee, type: 2}
+  smallLayouts:
+  - {fileID: 11400000, guid: 2af592f2b3126514cba655f44f41d498, type: 2}
+  - {fileID: 11400000, guid: 977194fdf3c05a04590d6e0ae9ac8717, type: 2}
+  - {fileID: 11400000, guid: de4ac2338b2050943aa3158f824feb6f, type: 2}
+  - {fileID: 11400000, guid: a7ef0e925e0dc2a4cb7014e869be3b45, type: 2}
+  - {fileID: 11400000, guid: 1ce47147fc766264db8066ef6389b23d, type: 2}
+  bigLayouts:
+  - {fileID: 11400000, guid: c3d145317fcd40b469b647b9954dc42c, type: 2}
+  bossLayouts:
+  - {fileID: 11400000, guid: daa5751361ebd1843a73600ca7d55988, type: 2}
   pickups:
   - {fileID: 4370064962261114294, guid: 212499558dea19446856b3d5396767d1, type: 3}
   bossDrops:

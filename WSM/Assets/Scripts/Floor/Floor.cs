@@ -28,9 +28,9 @@ public class Floor : MonoBehaviour
     public const float roomHeight = 12.0f;
     public const float roomWidth = 19.2f;
 
-    public RoomLoadout[] smallLoadouts;
-    public RoomLoadout[] bigLoadouts;
-    public RoomLoadout[] bossLoadouts;
+    public List<RoomLayout> smallLayouts;
+    public List<RoomLayout> bigLayouts;
+    public List<RoomLayout> bossLayouts;
     public List<GameObject> pickups;
     public List<GameObject> bossDrops;
     public ItemList itemList;
@@ -108,7 +108,7 @@ public class Floor : MonoBehaviour
         }
         if (withEnemies)
         {
-            room.GetComponent<Room>().loadout = smallLoadouts[Random.Range(0, smallLoadouts.Length)];
+            room.GetComponent<Room>().layout = smallLayouts[Random.Range(0, smallLayouts.Count)];
             room.GetComponent<Room>().roomDrops = pickups;
             room.GetComponent<Room>().roomType = RoomPath.RoomType.SmallRoom;
             room.GetComponent<Room>().spawnProps();
@@ -131,12 +131,12 @@ public class Floor : MonoBehaviour
         createBigDoors();
         if (isBoss)
         {
-            room.GetComponent<Room>().loadout = bossLoadouts[Random.Range(0, bossLoadouts.Length)];
+            room.GetComponent<Room>().layout = bossLayouts[Random.Range(0, bossLayouts.Count)];
             room.GetComponent<Room>().roomDrops = bossDrops;
         }
         else
         {
-            room.GetComponent<Room>().loadout = bigLoadouts[Random.Range(0, bigLoadouts.Length)];
+            room.GetComponent<Room>().layout = bigLayouts[Random.Range(0, bigLayouts.Count)];
             room.GetComponent<Room>().roomDrops = pickups;
         }
         room.GetComponent<Room>().roomType = RoomPath.RoomType.BigRoom;
