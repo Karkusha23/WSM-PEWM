@@ -3,11 +3,13 @@ Top-down roguelite shooter prototype with procedure generation of floors based o
 # Description
 ## Controls
 * WASD - move
+* Mouse - aim
 * LMB - shoot
 * RMB - dodgeroll
 * E - take item/weapon
+* F (hold) - drop weapon
 * ESC - pause
-* TAB - map
+* TAB - open full map
 ## Player Target
 To explore the stage, find items that boost stats (optionally), then find boss room and fight the boss to go to the next level  
 ## HUD
@@ -35,12 +37,12 @@ Room layout (obstacles and enemies locations) is chosen randomly from room layou
 
 ![image](https://github.com/Karkusha23/WSM-PEWM/assets/16138259/e4dab1f9-a2af-453c-ae8b-b073e67f8f92)
 ## Enemies
-Enemies can build paths with A* algorithm  
+Enemies can build paths using A* algorithm  
 
 Enemy types
 * Chaser - approaches player and deals contact damage
 * Shooter - keeps player in his line of sight as well as trying to keep distance. Will retreat if player gets to close
-* DVD - wanders diagonally and bouncing off the walls like DVD logo. Sometime stops and shoots several bullets in 4 directions
+* DVD - wanders diagonally and bouncing off the walls like DVD logo. Periodically stops and shoots several bullets in 4 directions
 * Wanderer - just walks randomly
 ### Boss
 Has healthbar at the bottom of the screen. Player has to defeat it to go to the next level  
@@ -52,3 +54,28 @@ Has 2 attacks
 * Machinegun
 
 ![image](https://github.com/Karkusha23/WSM-PEWM/assets/16138259/77694c81-58b0-41a2-8df0-941202ec7600)
+
+# Released features
+Player
+* Moving
+* Aiming and shooting
+* Dodgeroll - small dash in direction of moving with invincibility frames. Player's cube will change color to purple while invincible
+* Stat boosting by picking items
+* Animation upon taking damage (blinking)
+
+UI
+* Health points
+* Minimap
+* Full map
+* Item count
+* Pause menu
+
+Enemy
+* 4 types of regular enemies
+* Boss
+* Navigation system based on room grid and A* algorithm
+
+Stages
+* Procedural stage generation
+* Generation of item rooms and boss room
+* Different room layouts assigned to every room
