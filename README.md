@@ -79,3 +79,5 @@ Stages
 * Procedural stage generation
 * Generation of item rooms and boss room
 * Different room layouts assigned to every room
+* Healing pickup upon room completion
+* Transition on new stage upon defeating boss
