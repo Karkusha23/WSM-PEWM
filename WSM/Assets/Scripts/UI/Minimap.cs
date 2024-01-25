@@ -178,8 +178,6 @@ public class Minimap : MonoBehaviour
 
     private Vector2 minimapBasePosition;
 
-    private bool canToggleMinimap;
-
     private void Start()
     {
         var floor = GameObject.FindGameObjectWithTag("Floor").GetComponent<Floor>();
@@ -192,7 +190,6 @@ public class Minimap : MonoBehaviour
         curCol = floorWidth / 2;
 
         isFullMapOn = false;
-        canToggleMinimap = true;
 
         minimapGrid = new MinimapGrid(floorHeight, floorWidth);
 
@@ -258,13 +255,11 @@ public class Minimap : MonoBehaviour
 
         Vector2 minimapMove = new Vector2((curCol - col) * pixARoom, (row - curRow) * pixARoom);
 
+        minimapBasePosition += minimapMove;
+
         if (!isFullMapOn)
         {
-            minimapBase.anchoredPosition += minimapMove;
-        }
-        else
-        {
-            minimapBasePosition += minimapMove;
+            minimapBase.anchoredPosition = minimapBasePosition;
         }
 
         playerIcon.anchoredPosition -= minimapMove;
@@ -279,18 +274,10 @@ public class Minimap : MonoBehaviour
 
     public void toggleFullMap()
     {
-        if (!canToggleMinimap)
-        {
-            return;
-        }
-
-        canToggleMinimap = false;
-
         isFullMapOn = !isFullMapOn;
 
         if (isFullMapOn)
         {
-            minimapBasePosition = minimapBase.anchoredPosition;
             minimapBase.transform.position = transform.parent.position;
         }
         else
@@ -301,8 +288,6 @@ public class Minimap : MonoBehaviour
         frame.SetActive(!isFullMapOn);
 
         checkToActivate(isFullMapOn);
-
-        StartCoroutine("fullMapToggleReload");
     }
 
     private void checkSmallAround(int row, int col)
@@ -388,11 +373,5 @@ public class Minimap : MonoBehaviour
                 }
             }
         }
-    }
-
-    private IEnumerator fullMapToggleReload()
-    {
-        yield return new WaitForSeconds(fullMapToggleReloadTime);
-        canToggleMinimap = true;
     }
 }

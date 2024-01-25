@@ -23,6 +23,7 @@ public class Player : MonoBehaviour
 
     private Rigidbody2D rb;
     private Vector2 movement;
+    private float curMoveSpeed;
     private bool invincible;
     private float invincibleTimer;
     private HUDHP hpMain;
@@ -59,6 +60,7 @@ public class Player : MonoBehaviour
     private void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        curMoveSpeed = moveSpeed;
         invincible = false;
         invincibleTimer = 0f;
         loseScreen.SetActive(false);
@@ -116,7 +118,7 @@ public class Player : MonoBehaviour
 
     private void FixedUpdate()
     {
-        rb.MovePosition(rb.position + movement.normalized * moveSpeed * Time.fixedDeltaTime);
+        rb.MovePosition(rb.position + movement.normalized * curMoveSpeed * Time.fixedDeltaTime);
     }
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -237,8 +239,8 @@ public class Player : MonoBehaviour
             dodgeroolTimer = dodgerollActivePhaseTime;
             invincible_dodgeroll = 1;
             anim.SetBool("IsRolling", true);
-            moveSpeed *= dodgerollSpeedBoost;
-            movement = Camera.main.ScreenToWorldPoint(Input.mousePosition) - transform.position;
+            curMoveSpeed = moveSpeed * dodgerollSpeedBoost;
+            movement = Vector2.Distance(movement, Vector2.zero) < 0.001f ? Camera.main.ScreenToWorldPoint(Input.mousePosition) - transform.position : movement;
         }
 
         if (invincible_dodgeroll == 1)
@@ -249,7 +251,7 @@ public class Player : MonoBehaviour
                 invincible_dodgeroll = 2;
                 dodgeroolTimer = dodgerollPassivePhaseTime;
                 anim.SetBool("IsRolling", false);
-                moveSpeed /= dodgerollSpeedBoost;
+                curMoveSpeed = moveSpeed;
             }
         }
 
