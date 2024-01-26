@@ -41,9 +41,9 @@ Enemies can build paths using A* algorithm
 
 Enemy types
 * Chaser - approaches player and deals contact damage
-* Shooter - keeps player in his line of sight as well as trying to keep distance. Will retreat if player gets to close
-* DVD - wanders diagonally and bouncing off the walls like DVD logo. Periodically stops and shoots several bullets in 4 directions
-* Wanderer - just walks randomly
+* Shooter - keeps player in his line of sight as well as trying to keep distance. Will retreat if player gets too close
+* DVD - moves diagonally and bounces off the walls like DVD logo. Periodically stops and shoots several bullets in 4 directions
+* Wanderer - just wanders randomly
 ### Boss
 Has healthbar at the bottom of the screen. Player has to defeat it to go to the next level  
 
